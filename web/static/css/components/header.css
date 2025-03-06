@@ -9,7 +9,7 @@
     margin-bottom: 20px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     width: 100%;
-    position: relative;
+    position: relative; /* Important for absolute positioning of the toggle button */
 }
 
 .header-logo-title {
@@ -40,4 +40,4 @@
     .header-logo {
         font-size: 1.6rem;
     }
-} 
+}
