@@ -1,139 +1,141 @@
-# Updated header.py with Google Font import
 import streamlit as st
-import os
 
-def render_header(title, icon):
-    """Render the application header with logo and theme toggle."""
-    # Apply theme toggle
-    if 'theme' not in st.session_state:
-        st.session_state.theme = 'light'
+def render_header():
+    """Render the application header with logo and title."""
     
-    # Add Google Fonts import
-    google_fonts_css = """
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    """
-    st.markdown(google_fonts_css, unsafe_allow_html=True)
+    # Initialize dark mode in session state
+    if 'dark_mode' not in st.session_state:
+        st.session_state.dark_mode = False
     
-    # Theme-specific CSS with updated font family
-    theme_css = """
+    # Define a callback function to toggle dark mode
+    def toggle_dark_mode():
+        st.session_state.dark_mode = not st.session_state.dark_mode
+        st.rerun()
+    
+    # Place a hidden button in the container that will be clicked by our JavaScript
+    with st.container():
+        st.button("Toggle Dark Mode", key="toggle_dark_mode_button", on_click=toggle_dark_mode, help="Toggle dark mode")
+    
+    # Header styling with streamlit native components
+    st.markdown("""
     <style>
-    :root {
-        --bg-primary: %s;
-        --bg-secondary: %s;
-        --text-primary: %s;
-        --text-primary-rgb: %s;
-        --text-secondary: %s;
-        --accent-primary: %s;
-        --accent-secondary: %s;
-        --border-color: %s;
-        --shadow: %s;
-        --font-family: 'Poppins', sans-serif;
+    /* Header styles */
+    .header-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: linear-gradient(to right, #2c3e50, #4ca1af);
+        padding: 1rem;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        position: relative;
     }
-
-    /* Apply font family to all elements */
-    body, button, input, select, textarea, .stMarkdown, .stText, h1, h2, h3, h4, h5, h6 {
-        font-family: var(--font-family) !important;
+    .header-logo-title {
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
-
-    /* Force dark mode to apply immediately */
-    body {
-        background-color: var(--bg-primary) !important;
-        color: var(--text-primary) !important;
-        transition: background-color 0.3s ease, color 0.3s ease;
+    .header-logo {
+        font-size: 2rem;
+        margin-right: 10px;
+        animation: pulse 2s infinite ease-in-out;
     }
-
-    .stApp {
-        background-color: var(--bg-primary) !important;
-    }
-
-    /* Override Streamlit elements with theme variables */
-    .stTextInput > div > div {
-        background-color: var(--bg-secondary) !important;
-        color: var(--text-primary) !important;
+    .header-title {
+        color: white;
+        font-size: 1.8rem;
+        font-weight: 600;
+        margin: 0;
     }
     
-    .stButton > button {
-        background-color: var(--accent-primary) !important;
-        color: white !important;
-        font-family: var(--font-family) !important;
+    /* Dark mode toggle positioned within header */
+    .dark-mode-toggle {
+        position: absolute;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        font-size: 1.2rem;
+    }
+    .dark-mode-toggle:hover {
+        transform: translateY(-50%) scale(1.1);
+        background: rgba(0, 0, 0, 0.3);
     }
     
-    .css-1cpxqw2 {
-        background-color: var(--bg-primary) !important;
-        color: var(--text-primary) !important;
+    /* Completely hide toggle button */
+    button[kind="secondary"] {
+        display: none !important;
     }
-
-    /* Enforce dark mode for Streamlit components */
-    %s
+    
+    /* Hide button container div */
+    div[data-testid="element-container"] button[kind="secondary"] {
+        display: none !important;
+    }
+    
+    div[data-testid="element-container"]:has(button[kind="secondary"]) {
+        height: 0 !important;
+        min-height: 0 !important;
+        visibility: hidden !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        position: absolute !important;
+        pointer-events: none !important;
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
     </style>
-    """ % (
-        "#f8f9fa" if st.session_state.theme == "light" else "#121212",
-        "#ffffff" if st.session_state.theme == "light" else "#1e1e1e",
-        "#212529" if st.session_state.theme == "light" else "#e0e0e0",
-        "33, 37, 41" if st.session_state.theme == "light" else "224, 224, 224",
-        "#495057" if st.session_state.theme == "light" else "#ababab",
-        "#4361ee" if st.session_state.theme == "light" else "#4cc9f0",
-        "#3a0ca3" if st.session_state.theme == "light" else "#7209b7",
-        "#dee2e6" if st.session_state.theme == "light" else "#333333",
-        "0 4px 20px rgba(0,0,0,0.08)" if st.session_state.theme == "light" else "0 4px 20px rgba(0,0,0,0.4)",
-        # Additional dark mode overrides for Streamlit components
-        """
-        .dark-mode .stTextInput input, .dark-mode .stSelectbox select {
-            background-color: #1e1e1e !important;
-            color: #e0e0e0 !important;
-        }
-        
-        .dark-mode .stTabs [role="tab"][aria-selected="true"] {
-            background-color: #333333 !important;
-            color: #e0e0e0 !important;
-        }
-        
-        .dark-mode .stTabs [role="tab"] {
-            color: #ababab !important;
-        }
-        """ if st.session_state.theme == "dark" else ""
-    )
+    """, unsafe_allow_html=True)
     
-    st.markdown(theme_css, unsafe_allow_html=True)
+    # Header content with integrated dark mode toggle
+    st.markdown(f"""
+    <div class="header-container">
+        <div class="header-logo-title">
+            <div class="header-logo">✏️</div>
+            <h1 class="header-title">MNIST Digit Classifier</h1>
+        </div>
+        <div class="dark-mode-toggle" onclick="document.getElementById('toggle_dark_mode_button').click()">
+            {" 🌙" if st.session_state.dark_mode else " ☀️"}
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
     
-    # Load base CSS
-    css_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static", "styles.css")
-    try:
-        with open(css_path, "r") as f:
-            st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
-    except Exception as e:
-        st.error(f"Error loading CSS: {str(e)}")
-        try:
-            # Fallback: Use relative path
-            with open("static/styles.css", "r") as f:
-                st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
-        except Exception as e2:
-            st.error(f"Error with fallback CSS: {str(e2)}")
-    
-    # Simple theme toggle with direct Streamlit functionality
-    cols = st.columns([6, 1])
-    with cols[0]:
-        st.markdown(f"<h1 class='header-title'>{icon} {title}</h1>", unsafe_allow_html=True)
-    with cols[1]:
-        current_theme = st.session_state.theme
-        if st.button("🌙" if current_theme == "light" else "☀️", key="theme_toggle"):
-            # Toggle theme
-            st.session_state.theme = "dark" if current_theme == "light" else "light"
-            # Force rerun to apply theme
-            st.experimental_rerun()
-    
-    # Apply dark mode class to body
-    if st.session_state.theme == "dark":
+    # Apply dark mode styles
+    if st.session_state.dark_mode:
         st.markdown("""
-        <script>
-            document.body.classList.add('dark-mode');
-        </script>
-        """, unsafe_allow_html=True)
-    else:
-        st.markdown("""
-        <script>
-            document.body.classList.remove('dark-mode');
-        </script>
+        <style>
+        .stApp {
+            background-color: #121212;
+            color: #f0f0f0;
+        }
+        .header-container {
+            background: linear-gradient(to right, #1a1a2e, #16213e);
+        }
+        .footer-container {
+            background: linear-gradient(to right, #1a1a2e, #16213e);
+        }
+        .dark-mode-toggle {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .stButton > button {
+            background-color: #2c3e50;
+            color: white;
+        }
+        .stTextInput > div > div {
+            background-color: #333;
+            color: white;
+        }
+        </style>
         """, unsafe_allow_html=True)
