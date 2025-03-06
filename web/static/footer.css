@@ -1,0 +1,79 @@
+/* Footer Styles */
+.app-footer {
+    padding: 1.5rem 2rem;
+    background: linear-gradient(to right, #2c3e50, #4ca1af);
+    color: white;
+    margin-top: 2rem;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.footer-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.project-name {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.developer-info {
+    font-size: 0.85rem;
+    opacity: 0.9;
+}
+
+.developer-info a {
+    color: #a1ffce;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.developer-info a:hover {
+    color: white;
+    text-decoration: underline;
+}
+
+.copyright-info {
+    font-size: 0.85rem;
+    opacity: 0.7;
+}
+
+/* Animated underscore effect */
+.project-name::after {
+    content: '';
+    display: block;
+    width: 0;
+    height: 2px;
+    background: #a1ffce;
+    transition: width 0.3s ease;
+}
+
+.app-footer:hover .project-name::after {
+    width: 100%;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+    .footer-content {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .footer-info {
+        margin-bottom: 1rem;
+    }
+    
+    .project-name::after {
+        margin: 0.5rem auto 0;
+    }
+}
