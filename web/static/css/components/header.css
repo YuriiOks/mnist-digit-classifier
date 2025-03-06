@@ -1,0 +1,42 @@
+/* Header Styles */
+.header-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(to right, #2c3e50, #4ca1af);
+    padding: 1rem;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.header-logo-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.header-logo {
+    font-size: 2rem;
+    margin-right: 10px;
+    animation: pulse 2s infinite ease-in-out;
+}
+
+.header-title {
+    color: white;
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+    .header-title {
+        font-size: 1.4rem;
+    }
+    
+    .header-logo {
+        font-size: 1.6rem;
+    }
+} 
