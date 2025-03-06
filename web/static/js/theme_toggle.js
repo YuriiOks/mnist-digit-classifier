@@ -1,7 +1,11 @@
 // Theme toggle functionality
 function toggleDarkMode() {
-    const toggleButton = document.getElementById('toggle_dark_mode_button');
-    if (toggleButton) {
-        toggleButton.click();
+    // Find the Streamlit button and click it programmatically
+    const buttons = document.querySelectorAll('button');
+    for (let button of buttons) {
+        if (button.innerText === '🔄') {
+            button.click();
+            break;
+        }
     }
 } 
