@@ -1,0 +1,53 @@
+/* Dark Mode Styles */
+body.dark-mode {
+    background-color: #121212;
+    color: #f0f0f0;
+}
+
+/* Dark mode header styles */
+body.dark-mode .app-header {
+    background: linear-gradient(to right, #1a1a2e, #16213e);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Dark mode footer styles */
+body.dark-mode .app-footer {
+    background: linear-gradient(to right, #1a1a2e, #16213e);
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5);
+}
+
+body.dark-mode .developer-info a {
+    color: #7dd3fc;
+}
+
+body.dark-mode .developer-info a:hover {
+    color: #bae6fd;
+}
+
+body.dark-mode .project-name::after {
+    background: #7dd3fc;
+}
+
+/* Dark mode toggle adjustments */
+body.dark-mode .theme-toggle-label {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Additional dark mode adjustments for Streamlit elements */
+body.dark-mode .stApp {
+    background-color: #121212;
+}
+
+body.dark-mode .stTextInput > div > div {
+    background-color: #333;
+    color: white;
+}
+
+body.dark-mode .stButton > button {
+    background-color: #2c3e50;
+    color: white;
+}
+
+body.dark-mode .stButton > button:hover {
+    background-color: #3d5a74;
+}
