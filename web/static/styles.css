@@ -1,0 +1,344 @@
+/* Base Variables */
+:root {
+    --bg-primary: #f8f9fa;
+    --bg-secondary: #ffffff;
+    --text-primary: #212529;
+    --text-secondary: #495057;
+    --accent-primary: #4361ee;
+    --accent-secondary: #3a0ca3;
+    --border-color: #dee2e6;
+    --shadow: 0 4px 20px rgba(0,0,0,0.08);
+    --transition: all 0.3s ease;
+}
+
+/* Clean up Streamlit defaults */
+.stApp {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+    font-family: 'Inter', 'Segoe UI', Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Hide Streamlit branding */
+#MainMenu, footer, header {
+    visibility: hidden;
+}
+
+/* Buttons */
+.stButton > button {
+    width: 100%;
+    background-color: var(--accent-primary) !important;
+    color: white !important;
+    border: none !important;
+    padding: 0.75rem 1rem !important;
+    font-weight: 600 !important;
+    border-radius: 8px !important;
+    transition: var(--transition) !important;
+}
+
+.stButton > button:hover {
+    background-color: var(--accent-secondary) !important;
+    transform: translateY(-2px);
+}
+
+/* Canvas styling */
+.stDrawingCanvas {
+    border: 2px solid var(--accent-primary) !important;
+    border-radius: 8px !important;
+    overflow: hidden !important;
+    margin: 0 auto !important;
+    display: block !important;
+}
+
+/* Prediction panel styling */
+.empty-prediction {
+    border: 2px dashed #4361ee;
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 280px;
+}
+
+.empty-icon {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: #4361ee;
+}
+
+.empty-text {
+    color: #495057;
+    max-width: 250px;
+    line-height: 1.5;
+}
+
+/* History section styling */
+.empty-history {
+    border: 2px dashed #4361ee;
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Clean tabs design */
+h2 {
+    color: var(--accent-primary);
+    border-bottom: 2px solid var(--accent-primary);
+    padding-bottom: 10px;
+    margin-bottom: 25px;
+    text-align: center;
+    max-width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Prediction result styling */
+.prediction-result {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    margin: 1rem 0;
+    background-color: #f8f9fa;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.predicted-digit {
+    font-size: 5rem;
+    font-weight: 800;
+    color: #4361ee;
+    margin-bottom: 0.5rem;
+}
+
+.confidence {
+    margin-top: 0.5rem;
+    color: #495057;
+    font-size: 1rem;
+    background-color: rgba(0,0,0,0.05);
+    padding: 0.3rem 1rem;
+    border-radius: 20px;
+}
+
+/* Header */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    background-color: var(--bg-secondary);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    margin-bottom: 2rem;
+    border-bottom: 3px solid var(--accent-primary);
+}
+
+.header-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.header-title svg {
+    width: 30px;
+    height: 30px;
+}
+
+/* Main container */
+.main-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    padding: 0 1rem;
+}
+
+/* Cards */
+.card-container {
+    background-color: var(--bg-secondary);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.card-container:hover {
+    box-shadow: var(--shadow-hover);
+}
+
+.card-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent-primary);
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 3px solid var(--accent-primary);
+    text-align: center;
+}
+
+/* Canvas tools */
+.canvas-tools {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.tool-button {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.tool-button:hover {
+    background-color: var(--accent-primary);
+    color: white;
+}
+
+/* Loading animation */
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(67, 97, 238, 0.2);
+    border-radius: 50%;
+    border-top-color: var(--accent-primary);
+    animation: spin 1s ease-in-out infinite;
+    margin: 2rem auto;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Toast notifications */
+.toast {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    padding: 1rem;
+    border-radius: 8px;
+    background-color: var(--bg-secondary);
+    box-shadow: var(--shadow);
+    z-index: 1000;
+    animation: slideIn 0.3s ease-out;
+}
+
+.toast-success {
+    border-left: 4px solid var(--success);
+}
+
+.toast-error {
+    border-left: 4px solid var(--danger);
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .main-container {
+        padding: 0;
+    }
+    
+    .card-container, .history-section {
+        margin-bottom: 1rem;
+        border-radius: 0;
+    }
+    
+    .predicted-digit {
+        font-size: 4rem;
+    }
+    
+    .header-title {
+        font-size: 1.25rem;
+    }
+}
+
+/* Add these styles to better highlight the elements */
+
+/* Canvas instructions */
+.canvas-instructions {
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    background-color: rgba(var(--accent-primary-rgb), 0.1);
+    border-radius: 8px;
+    text-align: center;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+/* Button container */
+.button-container {
+    margin-top: 1.5rem;
+}
+
+/* Override Streamlit button styles to make them more visible */
+.stButton > button {
+    background-color: var(--accent-primary) !important;
+    color: white !important;
+    border: none !important;
+    padding: 0.75rem 1.5rem !important;
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    border-radius: 8px !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2) !important;
+    transition: all 0.2s ease !important;
+}
+
+.stButton > button:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* More visible empty states */
+.empty-icon {
+    font-size: 3rem !important;
+    margin-bottom: 1rem !important;
+    color: var(--accent-primary) !important;
+}
+
+.empty-text {
+    font-size: 1.1rem !important;
+    color: var(--text-primary) !important;
+    max-width: 300px !important;
+    line-height: 1.6 !important;
+}
+
+/* Add these styles to create a vertical divider and better column spacing */
+
+/* Column styling with margins - more subtle */
+.column-container {
+    padding: 15px 10px;
+    margin: 0 auto;
+    max-width: 95%;
+}
+
+/* Remove left and right column specific styling with borders */
+.left-column, .right-column {
+    /* Remove the border and extra padding */
+} 
