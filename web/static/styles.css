@@ -477,3 +477,48 @@ body.dark-mode .history-cell {
     color: #e0e0e0;
     border-color: #333333;
 }
+
+/* Center-align canvas and instructions inside tab */
+.canvas-instructions-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin: 10px auto 15px auto;
+    text-align: center;
+}
+
+.canvas-instructions {
+    display: inline-block;
+    background-color: #f8f0ff;
+    padding: 12px 20px;
+    border-radius: 8px;
+    color: #495057;
+    font-size: 16px;
+    max-width: 80%;
+    margin: 0 auto;
+}
+
+/* Center the canvas element */
+.canvas-center-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin: 0 auto 20px auto;
+}
+
+/* Ensure canvas is centered */
+.canvas-center-container > .stDrawingCanvas > div {
+    margin: 0 auto !important;
+}
+
+/* Further styles to properly center the canvas element */
+.element-container:has(.stDrawingCanvas) {
+    display: flex;
+    justify-content: center;
+}
+
+/* Fix for button alignment */
+.row-widget.stButton {
+    text-align: center;
+}
