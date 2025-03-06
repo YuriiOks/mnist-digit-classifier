@@ -342,3 +342,138 @@ h2 {
 .left-column, .right-column {
     /* Remove the border and extra padding */
 } 
+
+/* Improved canvas alignment */
+.canvas-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.canvas-instructions {
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    background-color: rgba(67, 97, 238, 0.1);
+    padding: 0.75rem 1.2rem;
+    border-radius: 8px;
+    display: inline-block;
+}
+
+.canvas-wrapper {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin: 0 auto 20px auto;
+}
+
+/* Center the Streamlit canvas */
+.canvas-wrapper .stDrawingCanvas {
+    margin: 0 auto !important;
+}
+
+/* Center buttons */
+.button-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin: 15px auto;
+}
+
+/* Make column containers centered */
+.column-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 15px 10px;
+    margin: 0 auto;
+    max-width: 95%;
+}
+
+/* Center h2 headings */
+h2 {
+    text-align: center;
+    margin: 0 auto 25px auto;
+    max-width: 80%;
+}
+
+/* Dark Theme Improvements */
+body.dark-mode {
+    background-color: #121212 !important;
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode .stApp {
+    background-color: #121212 !important;
+}
+
+body.dark-mode .stButton > button {
+    background-color: #4cc9f0 !important;
+}
+
+body.dark-mode .stTextInput > div > div {
+    background-color: #1e1e1e !important;
+    color: #e0e0e0 !important;
+    border-color: #333333 !important;
+}
+
+body.dark-mode .stSelectbox > div > div {
+    background-color: #1e1e1e !important;
+    color: #e0e0e0 !important;
+    border-color: #333333 !important;
+}
+
+body.dark-mode .stTabs [role="tab"] {
+    background-color: #1e1e1e !important;
+    color: #ababab !important;
+}
+
+body.dark-mode .stTabs [role="tab"][aria-selected="true"] {
+    background-color: #333333 !important;
+    color: #e0e0e0 !important;
+}
+
+/* Canvas adjustments for dark mode */
+body.dark-mode .stDrawingCanvas {
+    border-color: #4cc9f0 !important;
+}
+
+/* Prediction result in dark mode */
+body.dark-mode .prediction-result {
+    background-color: #1e1e1e;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+body.dark-mode .predicted-digit {
+    color: #4cc9f0;
+}
+
+body.dark-mode .confidence {
+    color: #ababab;
+    background-color: rgba(255,255,255,0.05);
+}
+
+/* History table in dark mode */
+body.dark-mode .history-table-header {
+    background-color: #1e1e1e;
+    border-color: #333333;
+}
+
+body.dark-mode .history-table-row {
+    background-color: #121212;
+    border-color: #333333;
+}
+
+body.dark-mode .history-table-row:nth-child(even) {
+    background-color: #1a1a1a;
+}
+
+body.dark-mode .history-cell {
+    color: #e0e0e0;
+    border-color: #333333;
+}
