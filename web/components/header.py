@@ -1,3 +1,4 @@
+# Updated header.py with Google Font import
 import streamlit as st
 import os
 
@@ -7,7 +8,15 @@ def render_header(title, icon):
     if 'theme' not in st.session_state:
         st.session_state.theme = 'light'
     
-    # Theme-specific CSS with text-primary-rgb variable added for opacity calculations
+    # Add Google Fonts import
+    google_fonts_css = """
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    """
+    st.markdown(google_fonts_css, unsafe_allow_html=True)
+    
+    # Theme-specific CSS with updated font family
     theme_css = """
     <style>
     :root {
@@ -20,6 +29,12 @@ def render_header(title, icon):
         --accent-secondary: %s;
         --border-color: %s;
         --shadow: %s;
+        --font-family: 'Poppins', sans-serif;
+    }
+
+    /* Apply font family to all elements */
+    body, button, input, select, textarea, .stMarkdown, .stText, h1, h2, h3, h4, h5, h6 {
+        font-family: var(--font-family) !important;
     }
 
     /* Force dark mode to apply immediately */
@@ -42,12 +57,16 @@ def render_header(title, icon):
     .stButton > button {
         background-color: var(--accent-primary) !important;
         color: white !important;
+        font-family: var(--font-family) !important;
     }
     
     .css-1cpxqw2 {
         background-color: var(--bg-primary) !important;
         color: var(--text-primary) !important;
     }
+
+    /* Enforce dark mode for Streamlit components */
+    %s
     </style>
     """ % (
         "#f8f9fa" if st.session_state.theme == "light" else "#121212",
@@ -58,7 +77,23 @@ def render_header(title, icon):
         "#4361ee" if st.session_state.theme == "light" else "#4cc9f0",
         "#3a0ca3" if st.session_state.theme == "light" else "#7209b7",
         "#dee2e6" if st.session_state.theme == "light" else "#333333",
-        "0 4px 20px rgba(0,0,0,0.08)" if st.session_state.theme == "light" else "0 4px 20px rgba(0,0,0,0.4)"
+        "0 4px 20px rgba(0,0,0,0.08)" if st.session_state.theme == "light" else "0 4px 20px rgba(0,0,0,0.4)",
+        # Additional dark mode overrides for Streamlit components
+        """
+        .dark-mode .stTextInput input, .dark-mode .stSelectbox select {
+            background-color: #1e1e1e !important;
+            color: #e0e0e0 !important;
+        }
+        
+        .dark-mode .stTabs [role="tab"][aria-selected="true"] {
+            background-color: #333333 !important;
+            color: #e0e0e0 !important;
+        }
+        
+        .dark-mode .stTabs [role="tab"] {
+            color: #ababab !important;
+        }
+        """ if st.session_state.theme == "dark" else ""
     )
     
     st.markdown(theme_css, unsafe_allow_html=True)
@@ -87,4 +122,18 @@ def render_header(title, icon):
             # Toggle theme
             st.session_state.theme = "dark" if current_theme == "light" else "light"
             # Force rerun to apply theme
-            st.experimental_rerun() 
+            st.experimental_rerun()
+    
+    # Apply dark mode class to body
+    if st.session_state.theme == "dark":
+        st.markdown("""
+        <script>
+            document.body.classList.add('dark-mode');
+        </script>
+        """, unsafe_allow_html=True)
+    else:
+        st.markdown("""
+        <script>
+            document.body.classList.remove('dark-mode');
+        </script>
+        """, unsafe_allow_html=True)
