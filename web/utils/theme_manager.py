@@ -8,6 +8,7 @@ class ThemeManager:
     def initialize():
         """Initialize theme settings in session state."""
         if 'dark_mode' not in st.session_state:
+            # Default to light mode
             st.session_state.dark_mode = False
     
     @staticmethod
@@ -30,18 +31,34 @@ class ThemeManager:
         # Load theme-specific CSS
         if st.session_state.dark_mode:
             ResourceLoader.load_css(["css/themes/dark_mode.css"])
+        
+        # Load JavaScript for theme toggling
+        ResourceLoader.load_js(["theme_toggle.js"])
     
     @staticmethod
     def create_theme_toggle():
         """Create the hidden button that toggles the theme."""
+        # Place the toggle button in a container with minimal footprint
         with st.container():
+            # Create a hidden button with a specific key for the JavaScript to find
             st.button(
                 "🔄", 
                 key="dark_mode_toggle", 
-                on_click=ThemeManager.toggle_dark_mode
+                on_click=ThemeManager.toggle_dark_mode,
+                # Set to secondary to help with CSS targeting
+                type="secondary"
             )
     
     @staticmethod
     def get_theme_icon():
         """Get the appropriate theme icon based on current mode."""
-        return " 🌙" if st.session_state.dark_mode else " ☀️" 
+        return "🌙" if not st.session_state.dark_mode else "☀️"
+    
+    @staticmethod
+    def get_html_toggle():
+        """Get the HTML for the theme toggle button."""
+        theme_icon = ThemeManager.get_theme_icon()
+        return ResourceLoader.load_template(
+            "components/theme_toggle.html", 
+            THEME_ICON=theme_icon
+        )
