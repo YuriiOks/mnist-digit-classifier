@@ -1,20 +1,21 @@
 /* Header Styles */
 .header-container {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
     background: linear-gradient(to right, #2c3e50, #4ca1af);
     padding: 1rem;
     border-radius: 10px;
     margin-bottom: 20px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
     position: relative;
 }
 
 .header-logo-title {
     display: flex;
     align-items: center;
-    justify-content: center;
+    margin: 0 auto;
 }
 
 .header-logo {
