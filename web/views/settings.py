@@ -78,7 +78,7 @@ def render_theme_settings():
     
     # Create the toggle switch with the correct import
     toggle_result = sts.st_toggle_switch(
-        label="Toggle Theme", 
+        label=theme_settings["toggle_label"],
         key="theme_toggle_switch", 
         default_value=is_dark_mode,
         label_after=True,
