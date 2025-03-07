@@ -2,7 +2,7 @@ import streamlit as st
 from utils.theme_manager import ThemeManager
 from utils.resource_loader import ResourceLoader
 from utils.settings_manager import SettingsManager
-import streamlit_toggle as tog
+import streamlit_toggle as sts
 
 def render_settings():
     """Render the settings page with a 3-column grid layout."""
@@ -76,8 +76,8 @@ def render_theme_settings():
     # Get the current theme for default value
     is_dark_mode = st.session_state.dark_mode
     
-    # Create the toggle switch
-    toggle_result = tog.st_toggle_switch(
+    # Create the toggle switch with the correct import
+    toggle_result = sts.st_toggle_switch(
         label="Toggle Theme", 
         key="theme_toggle_switch", 
         default_value=is_dark_mode,
