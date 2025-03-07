@@ -1,21 +1,29 @@
-/* Dark theme footer styles */
+/* Dark theme footer styles with updated colors to match navbar */
 .footer-container {
-    background: linear-gradient(145deg, #2C3E50 0%, #1a1a1a 100%) !important;
-    box-shadow: 0 7px 14px rgba(0, 0, 0, 0.8) !important;
+    background: linear-gradient(135deg, #232742 0%, #151928 100%) !important;
+    box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.5) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.05) !important;
 }
 
 .project-name {
     color: white !important;
+    font-weight: 600 !important;
 }
 
 .developer-info {
-    color: #f0f0f0 !important;
+    color: #e0e0e0 !important;
 }
 
 .developer-info a {
-    color: #64c4d2 !important;
+    color: #90a8ff !important;
+    transition: all 0.2s ease !important;
+}
+
+.developer-info a:hover {
+    color: #a3b8ff !important;
+    text-decoration: underline !important;
 }
 
 .copyright-info {
-    color: #e0e0e0 !important;
+    color: #cccccc !important;
 } 
