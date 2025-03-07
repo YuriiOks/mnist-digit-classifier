@@ -92,10 +92,6 @@ def render_theme_settings():
         ThemeManager.toggle_dark_mode()
         st.rerun()
     
-    # Hidden button for theme toggle (fallback, may not be needed anymore)
-    if st.button("Toggle Theme", key="theme_toggle_settings", on_click=ThemeManager.toggle_dark_mode):
-        pass
-    
     # Close content and card divs
     st.markdown("""
     </div>
