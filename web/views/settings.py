@@ -26,11 +26,34 @@ def render_theme_settings():
         <h2>Theme Settings</h2>
     """, unsafe_allow_html=True)
     
-    theme_mode = st.toggle("Dark Mode", value=st.session_state.dark_mode, key="theme_toggle_settings")
+    # Display current theme
+    current_theme = "Dark Mode" if st.session_state.dark_mode else "Light Mode"
+    st.write(f"Current theme: **{current_theme}**")
     
-    # Check if theme toggle changed
-    if theme_mode != st.session_state.dark_mode:
-        ThemeManager.toggle_dark_mode()
+    # Add a direct URL toggle button
+    st.markdown(f"""
+    <a href="?toggle_theme=true" class="theme-settings-button">
+        Toggle Theme ({current_theme} ⟷ {"Light Mode" if st.session_state.dark_mode else "Dark Mode"})
+    </a>
+    <style>
+    .theme-settings-button {{
+        display: inline-block;
+        padding: 8px 16px;
+        background-color: var(--primary-color);
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        font-weight: 500;
+        margin-top: 10px;
+        transition: all 0.2s ease;
+    }}
+    .theme-settings-button:hover {{
+        background-color: var(--secondary-color);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px var(--card-shadow);
+    }}
+    </style>
+    """, unsafe_allow_html=True)
     
     st.markdown("</div>", unsafe_allow_html=True)
 
