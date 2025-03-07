@@ -80,38 +80,67 @@ class ThemeManager:
         ])
         
         # Load theme-specific CSS only for dark mode
-        # Light mode uses default styling
         if is_dark_mode:
-            # Add dark mode class to body
+            # Add comprehensive dark mode styling
             st.markdown("""
             <style>
+            /* Core Streamlit elements */
             .stApp {
-                font-family: var(--font-main);
-                color: var(--text-color);
-                background-color: var(--background-color);
-                transition: background-color var(--transition-speed) ease, 
-                            color var(--transition-speed) ease;
+                background-color: #121212 !important;
+                color: #f0f0f0 !important;
             }
             
-            body, .stApp {
-                background-color: #121212;
-                color: #f0f0f0;
+            /* Override Streamlit default elements for dark theme */
+            .stTextInput > div > div {
+                background-color: #262837 !important;
+                color: white !important;
+                border: 1px solid rgba(255, 255, 255, 0.1) !important;
             }
             
-            /* Add dark class to the body for CSS targeting */
-            body, .stApp, :root {
-                --dark-mode: true;
+            .stTextInput input {
+                color: white !important;
             }
             
-            body::before {
-                content: "";
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background-color: #121212;
-                z-index: -1;
+            .stSlider > div {
+                color: white !important;
+            }
+            
+            .stSlider > div > div > div {
+                background-color: #90a8ff !important;
+            }
+            
+            .stSlider > div > div > div > div {
+                background-color: white !important;
+            }
+            
+            .stCheckbox > div {
+                color: white !important;
+            }
+            
+            .stCheckbox > div > label > div[data-baseweb="checkbox"] {
+                background-color: #262837 !important;
+            }
+            
+            .stButton > button {
+                background-color: #8A85FF !important;
+                color: white !important;
+                border: none !important;
+            }
+            
+            .stButton > button:hover {
+                background-color: #a3b8ff !important;
+                color: white !important;
+            }
+            
+            /* Ensure body has dark background */
+            body {
+                background-color: #121212 !important;
+                color: #f0f0f0 !important;
+            }
+            
+            /* Fix dashboard mode */
+            .main .block-container {
+                background-color: #121212 !important;
             }
             </style>
             """, unsafe_allow_html=True)
@@ -120,7 +149,8 @@ class ThemeManager:
             ResourceLoader.load_css([
                 "css/themes/dark/home.css",
                 "css/themes/dark/header.css", 
-                "css/themes/dark/footer.css"
+                "css/themes/dark/footer.css",
+                "css/themes/dark/navbar.css"
             ])
         
         # Load JavaScript for theme toggling
