@@ -1,0 +1,21 @@
+/* Dark theme footer styles */
+.footer-container {
+    background: linear-gradient(145deg, #2C3E50 0%, #1a1a1a 100%) !important;
+    box-shadow: 0 7px 14px rgba(0, 0, 0, 0.8) !important;
+}
+
+.project-name {
+    color: white !important;
+}
+
+.developer-info {
+    color: #f0f0f0 !important;
+}
+
+.developer-info a {
+    color: #64c4d2 !important;
+}
+
+.copyright-info {
+    color: #e0e0e0 !important;
+} 
