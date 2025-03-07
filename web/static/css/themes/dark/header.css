@@ -1,0 +1,14 @@
+/* Dark theme header styles */
+.header-container {
+    background: linear-gradient(145deg, #2C3E50 0%, #1a1a1a 100%) !important;
+    box-shadow: 0 7px 14px rgba(0, 0, 0, 0.8) !important;
+}
+
+/* Ensure text remains visible */
+.header-title {
+    color: white !important;
+}
+
+.header-logo {
+    color: #64c4d2 !important;
+} 
