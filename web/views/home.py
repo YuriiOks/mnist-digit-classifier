@@ -1,57 +1,55 @@
 import streamlit as st
-from utils.resource_loader import ResourceLoader  # New import for CSS loading
+from utils.resource_loader import ResourceLoader
+from utils.theme_manager import ThemeManager
 
-def render_home():
-    """Render the home page."""
-    # Load custom CSS for home page styles, including dark mode support for content cards
-    ResourceLoader.load_css(["css/views/home.css"])
-    
-    # Home page with cards
-    st.markdown("""
-    <div class="content-card">
-        <h1>MNIST Digit Classifier</h1>
-        <p style="font-size: 1.2rem; margin-top: 1rem;">
-            Welcome to the MNIST Digit Classifier application! This app uses machine learning to recognize handwritten digits.
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # Features section
+def load_theme_specific_css():
+    """Load theme-specific CSS based on current theme."""
+    theme = "dark" if st.session_state.dark_mode else "light"
+    ResourceLoader.load_css([
+        "css/views/home/base.css",
+        f"css/themes/{theme}/home.css"
+    ])
+
+def render_welcome_section():
+    """Render the welcome section of the home page."""
+    welcome_html = ResourceLoader.load_template("views/home/welcome_card.html")
+    st.markdown(welcome_html, unsafe_allow_html=True)
+
+def render_feature_card(icon: str, title: str, description: str):
+    """Render a feature card with the given content."""
+    feature_html = ResourceLoader.load_template(
+        "views/home/feature_card.html",
+        ICON=icon,
+        TITLE=title,
+        DESCRIPTION=description
+    )
+    st.markdown(feature_html, unsafe_allow_html=True)
+
+def render_features_section():
+    """Render the features section with three columns."""
     col1, col2, col3 = st.columns(3)
     
-    with col1:
-        st.markdown("""
-        <div class="content-card">
-            <h3 style="color: #4CA1AF;">✏️ Draw a Digit</h3>
-            <p>Use the interactive canvas to draw any digit from 0-9 and see the prediction in real-time.</p>
-        </div>
-        """, unsafe_allow_html=True)
+    features = [
+        ("✏️", "Draw a Digit", "Use the interactive canvas to draw any digit from 0-9 and see the prediction in real-time."),
+        ("🔍", "High Accuracy", "Our model is trained on thousands of handwritten digit samples for high prediction accuracy."),
+        ("📊", "Track History", "Review your previous predictions and track the model's performance over time.")
+    ]
     
-    with col2:
-        st.markdown("""
-        <div class="content-card">
-            <h3 style="color: #4CA1AF;">🔍 High Accuracy</h3>
-            <p>Our model is trained on thousands of handwritten digit samples for high prediction accuracy.</p>
-        </div>
-        """, unsafe_allow_html=True)
+    for col, (icon, title, desc) in zip([col1, col2, col3], features):
+        with col:
+            render_feature_card(icon, title, desc)
+
+def render_how_to_use():
+    """Render the how-to-use section."""
+    how_to_html = ResourceLoader.load_template("views/home/how_to_use.html")
+    st.markdown(how_to_html, unsafe_allow_html=True)
+
+def render_home():
+    """Render the home page with all its sections."""
+    # Load theme-specific CSS
+    load_theme_specific_css()
     
-    with col3:
-        st.markdown("""
-        <div class="content-card">
-            <h3 style="color: #4CA1AF;">📊 Track History</h3>
-            <p>Review your previous predictions and track the model's performance over time.</p>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    # How to use section
-    st.markdown("""
-    <div class="content-card">
-        <h2>How to Use</h2>
-        <ol style="margin-left: 1.5rem; margin-top: 1rem;">
-            <li>Go to the <b>Drawing</b> section using the sidebar menu</li>
-            <li>Draw a digit on the canvas provided</li>
-            <li>Click the <b>Predict</b> button to see the result</li>
-            <li>Check your prediction history in the <b>History</b> section</li>
-        </ol>
-    </div>
-    """, unsafe_allow_html=True) 
+    # Render all sections
+    render_welcome_section()
+    render_features_section()
+    render_how_to_use() 
