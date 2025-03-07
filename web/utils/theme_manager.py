@@ -10,6 +10,13 @@ class ThemeManager:
         if 'dark_mode' not in st.session_state:
             # Default to light mode (sun icon showing)
             st.session_state.dark_mode = False
+        
+        # Check if theme toggle was triggered via query parameter
+        if 'toggle_theme' in st.query_params:
+            # Remove the parameter to prevent repeated toggling
+            st.query_params.clear()
+            # Toggle the theme
+            ThemeManager.toggle_dark_mode()
     
     @staticmethod
     def toggle_dark_mode():
@@ -25,7 +32,8 @@ class ThemeManager:
         ResourceLoader.load_css([
             "css/components/header.css", 
             "css/components/footer.css", 
-            "css/components/theme_toggle.css"
+            "css/components/theme_toggle.css",
+            "css/components/sidebar.css"
         ])
         
         # Load theme-specific CSS
@@ -34,37 +42,6 @@ class ThemeManager:
         
         # Load JavaScript for theme toggling
         ResourceLoader.load_js(["theme_toggle.js"])
-        
-        # Add CSS to better hide the toggle button
-        st.markdown("""
-        <style>
-        /* Better hide the original toggle button */
-        button[data-testid="baseButton-secondary"] {
-            position: absolute !important;
-            top: -9999px !important;
-            left: -9999px !important;
-            width: 1px !important;
-            height: 1px !important;
-            padding: 0 !important;
-            margin: 0 !important;
-            overflow: hidden !important;
-            clip: rect(0, 0, 0, 0) !important;
-            white-space: nowrap !important;
-            border: 0 !important;
-        }
-        </style>
-        """, unsafe_allow_html=True)
-    
-    @staticmethod
-    def create_theme_toggle():
-        """Create the hidden button that toggles the theme."""
-        # Create a hidden button with a specific key for the JavaScript to find
-        st.button(
-            "🔄", 
-            key="dark_mode_toggle", 
-            on_click=ThemeManager.toggle_dark_mode,
-            type="secondary"
-        )
     
     @staticmethod
     def get_theme_icon():
@@ -74,15 +51,3 @@ class ThemeManager:
         """
         # Just return the icon character, NOT a Streamlit button
         return "☀️" if not st.session_state.dark_mode else "🌙"
-    
-    @staticmethod
-    def get_html_toggle():
-        """Get the HTML for the theme toggle button."""
-        theme_icon = ThemeManager.get_theme_icon()
-        # Make sure the template loading properly replaces the THEME_ICON placeholder
-        toggle_html = ResourceLoader.load_template(
-            "components/theme_toggle.html"
-        )
-        # Manually replace the placeholder to ensure it works
-        toggle_html = toggle_html.replace("{{THEME_ICON}}", theme_icon)
-        return toggle_html
