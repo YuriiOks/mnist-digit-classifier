@@ -6,7 +6,7 @@ from utils.resource_loader import ResourceLoader
 def render_sidebar():
     """Render the sidebar with navigation and theme toggle."""
     with st.sidebar:
-        st.markdown('<div class="navigation-title">Navigation</div>', unsafe_allow_html=True)
+        # st.markdown('<div class="navigation-title">Navigation</div>', unsafe_allow_html=True)
         
         # Load sidebar CSS
         ResourceLoader.load_css(["css/components/sidebar.css"])
@@ -23,7 +23,7 @@ def render_sidebar():
         
         # Option menu for navigation
         selected = option_menu(
-            "Main Menu", 
+            "", 
             ["Home", "Drawing", "History", "Settings"], 
             icons=["house", "pencil", "clock-history", "gear"], 
             menu_icon="cast",
