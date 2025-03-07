@@ -1,0 +1,251 @@
+/* Settings page styling */
+
+/* Settings card - container for each settings section */
+.settings-card {
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    box-shadow: 0 6px 15px var(--card-shadow);
+    margin-bottom: 2rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    border: 1px solid var(--card-border);
+}
+
+.settings-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px var(--card-shadow);
+}
+
+/* Header for each settings section */
+.settings-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+    padding: 1.5rem;
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.settings-header h2 {
+    margin: 0;
+    font-weight: 600;
+    font-size: 1.4rem;
+}
+
+.settings-icon {
+    font-size: 2rem;
+    animation: float 3s ease-in-out infinite;
+}
+
+/* Content area for settings */
+.settings-content {
+    padding: 1.5rem;
+}
+
+/* Theme settings specific styles */
+.current-theme-info {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    background-color: rgba(0,0,0,0.03);
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+.theme-label {
+    font-weight: 500;
+    margin-right: 1rem;
+    color: var(--text-color);
+}
+
+.theme-value {
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 20px;
+}
+
+/* Theme toggle switch */
+.theme-toggle-container {
+    display: flex;
+    justify-content: center;
+    margin: 2rem 0 1rem;
+}
+
+.toggle-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.theme-switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.theme-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 5px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    z-index: 2;
+}
+
+.toggle-icon {
+    z-index: 1;
+    font-size: 0.9rem;
+}
+
+.toggle-icon.sun {
+    margin-left: auto;
+}
+
+input:checked + .slider {
+    background-color: var(--primary-color);
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px var(--primary-color);
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+.toggle-label {
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--text-color);
+    opacity: 0.8;
+}
+
+/* Canvas settings specific styles */
+.brush-preview-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 2rem 0;
+}
+
+.brush-preview-container h3 {
+    margin-bottom: 1rem;
+    font-weight: 500;
+}
+
+.brush-preview {
+    border-radius: 50%;
+    box-shadow: 0 4px 8px var(--card-shadow);
+    transition: all 0.3s ease;
+}
+
+.brush-preview:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 12px var(--card-shadow);
+}
+
+/* App info specific styles */
+.app-description, .app-tech {
+    margin-bottom: 1rem;
+    line-height: 1.5;
+}
+
+.version-info {
+    margin-top: 2rem;
+}
+
+.version-info h3 {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    font-weight: 500;
+}
+
+.version-info ul {
+    list-style-type: none;
+    padding-left: 0.5rem;
+}
+
+.version-info li {
+    padding: 0.5rem 0;
+    display: flex;
+    align-items: center;
+}
+
+.version-info li:before {
+    content: "•";
+    color: var(--primary-color);
+    font-weight: bold;
+    display: inline-block;
+    width: 1rem;
+    margin-left: -1rem;
+}
+
+.info-label {
+    font-weight: 500;
+    margin-right: 0.5rem;
+}
+
+/* Reset Button Styling */
+.reset-button {
+    background: linear-gradient(135deg, #f5515f 0%, #9f041b 100%);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    margin: 1rem auto;
+    width: fit-content;
+}
+
+.reset-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+}
+
+.reset-button:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+} 
