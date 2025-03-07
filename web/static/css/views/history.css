@@ -1,0 +1,207 @@
+/* History page styling */
+
+/* Table header */
+.history-table-header {
+    display: flex;
+    border-bottom: 2px solid var(--divider-color);
+    padding-bottom: 0.8rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+/* Table row */
+.history-table-row {
+    display: flex;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid var(--divider-color);
+    align-items: center;
+}
+
+.history-table-row:hover {
+    background-color: var(--hover-bg);
+}
+
+/* Table columns */
+.history-col {
+    padding: 0 0.5rem;
+}
+
+.time-col {
+    width: 15%;
+}
+
+.image-col {
+    width: 15%;
+    display: flex;
+    justify-content: center;
+}
+
+.prediction-col {
+    width: 20%;
+    font-size: 1.2rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.confidence-col {
+    width: 20%;
+}
+
+.actual-col {
+    width: 20%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.correct-col {
+    width: 10%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Method badge styling */
+.method-badge {
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-right: 0.5rem;
+}
+
+.method-badge.draw {
+    background-color: #e3f2fd;
+    color: #0d47a1;
+}
+
+.method-badge.upload {
+    background-color: #e8f5e9;
+    color: #1b5e20;
+}
+
+.method-badge.url {
+    background-color: #fff3e0;
+    color: #e65100;
+}
+
+/* Confidence bar */
+.confidence-bar-container {
+    background-color: var(--divider-color);
+    border-radius: 10px;
+    height: 10px;
+    width: 100%;
+    overflow: hidden;
+}
+
+.confidence-bar {
+    height: 100%;
+    border-radius: 10px;
+}
+
+.confidence-bar.high {
+    background-color: var(--success-color);
+}
+
+.confidence-bar.medium {
+    background-color: var(--warning-color);
+}
+
+.confidence-bar.low {
+    background-color: var(--danger-color);
+}
+
+.confidence-value {
+    text-align: center;
+    font-size: 0.8rem;
+    margin-top: 0.3rem;
+    color: var(--text-muted);
+}
+
+/* Empty state */
+.empty-history {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    text-align: center;
+}
+
+.empty-history-icon {
+    font-size: 3rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+}
+
+.empty-history-text {
+    color: var(--text-muted);
+    max-width: 400px;
+}
+
+/* Analytics section */
+.analytics-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 2rem 0;
+}
+
+.accuracy-label {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.accuracy-value {
+    font-size: 3rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.accuracy-value.high {
+    color: var(--success-color);
+}
+
+.accuracy-value.medium {
+    color: var(--warning-color);
+}
+
+.accuracy-value.low {
+    color: var(--danger-color);
+}
+
+.feedback-count {
+    margin-top: 0.5rem;
+    color: var(--text-muted);
+}
+
+.no-feedback {
+    text-align: center;
+    color: var(--text-muted);
+    margin: 2rem 0;
+    font-size: 1.2rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .history-table-header, 
+    .history-table-row {
+        flex-wrap: wrap;
+    }
+    
+    .time-col, 
+    .image-col,
+    .prediction-col,
+    .confidence-col,
+    .actual-col,
+    .correct-col {
+        width: 50%;
+        margin-bottom: 0.5rem;
+    }
+} 
