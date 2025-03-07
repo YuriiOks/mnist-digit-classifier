@@ -4,12 +4,12 @@
   "options": {
     "light": {
       "name": "Light Mode",
-      "icon": "☀️",
+      "icon": "🌙",
       "label": "Switch to Dark Mode"
     },
     "dark": {
       "name": "Dark Mode",
-      "icon": "🌙",
+      "icon": "☀️",
       "label": "Switch to Light Mode"
     }
   }
