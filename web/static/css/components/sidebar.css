@@ -21,6 +21,8 @@
     -webkit-backdrop-filter: blur(5px) !important;
     font-size: 1.4rem !important;
     cursor: pointer !important;
+    color: inherit !important;
+    text-decoration: none !important;
 }
 
 /* Dark mode version */
@@ -34,6 +36,8 @@
     transform: scale(1.1) !important;
     background: rgba(0, 0, 0, 0.3) !important;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4) !important;
+    color: inherit !important;
+    text-decoration: none !important;
 }
 
 /* Active state */
@@ -52,6 +56,7 @@
 .theme-toggle-sidebar .icon {
     animation: float 2s ease-in-out infinite !important;
     margin: 0 !important;
+    color: inherit !important;
 }
 
 /* Sidebar toggle button container */
