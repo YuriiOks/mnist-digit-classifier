@@ -1,12 +1,12 @@
 /* Dark theme styles for home page */
 .content-card {
-    background: linear-gradient(145deg, #222 0%, #1a1a1a 100%);
+    background: linear-gradient(to right, #1a1a2e, #16213e);
     border: 1px solid #444;
     box-shadow: 0 7px 14px rgba(0, 0, 0, 0.8);
 }
 
 .welcome-card {
-    background: linear-gradient(145deg, #2C3E50 0%, #1a1a1a 100%);
+    background: linear-gradient(to right, #1a1a2e, #16213e);
 }
 
 /* Target Streamlit's heading elements */
