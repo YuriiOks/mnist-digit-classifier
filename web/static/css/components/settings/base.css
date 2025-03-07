@@ -1,0 +1,92 @@
+/* Base settings card styles */
+.settings-card {
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    box-shadow: 0 6px 15px var(--card-shadow);
+    margin-bottom: 2rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    border: 1px solid var(--card-border);
+    height: 100%; /* Ensure cards fill their container height */
+    display: flex;
+    flex-direction: column;
+}
+
+.settings-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px var(--card-shadow);
+}
+
+/* Header for each settings section */
+.settings-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+    padding: 1.5rem;
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 100px; /* Fixed height for all headers */
+    min-height: 100px; /* Ensure minimum height */
+}
+
+.settings-header h2 {
+    margin: 0;
+    font-weight: 600;
+    font-size: 1.4rem;
+    font-family: var(--font-main); /* Match main font */
+    color: white; /* Consistent text color */
+}
+
+.settings-icon {
+    font-size: 2rem;
+    animation: float 3s ease-in-out infinite;
+}
+
+/* Content area for settings */
+.settings-content {
+    padding: 1.5rem;
+    flex: 1; /* Allow content to grow and fill available space */
+    display: flex;
+    flex-direction: column;
+}
+
+/* Settings header card */
+.settings-header-card {
+    margin-bottom: 2rem;
+}
+
+.settings-header-card h1 {
+    margin-bottom: 0.5rem;
+    color: var(--primary-color);
+    font-family: var(--font-main);
+    font-weight: 600;
+    font-size: 2rem;
+}
+
+.settings-header-card p {
+    color: var(--text-color);
+    font-family: var(--font-main);
+    font-size: 1.1rem;
+    line-height: 1.5;
+}
+
+/* Ensure consistent card height */
+.st-emotion-cache-79elbk > div > div {
+    height: 100%;
+}
+
+/* Consistent spacing between cards */
+div[data-testid="column"] {
+    padding: 0 0.75rem;
+}
+
+/* Consistent titles across all settings sections */
+.settings-content h3,
+.settings-content .section-title {
+    font-family: var(--font-main);
+    font-weight: 600;
+    font-size: 1.2rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+} 
