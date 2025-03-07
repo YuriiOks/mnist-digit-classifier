@@ -1,5 +1,17 @@
 <div class="toggle-container">
-    <a href="?toggle_theme=true" class="theme-toggle-sidebar" style="color: inherit; text-decoration: none;">
+    <!-- Changed to a div to avoid default button styling issues -->
+    <div class="theme-toggle-sidebar" id="sidebar-theme-toggle" title="Toggle dark/light mode" onclick="toggleTheme()">
         <span class="icon">${THEME_ICON}</span>
-    </a>
-</div> 
+    </div>
+</div>
+
+<script>
+    // Direct theme toggle function that works with our new approach
+    function toggleTheme() {
+        // Find and click the hidden Streamlit theme toggle button
+        const themeToggleButton = document.querySelector('button[key="theme_toggle_settings"]');
+        if (themeToggleButton) {
+            themeToggleButton.click();
+        }
+    }
+</script> 
