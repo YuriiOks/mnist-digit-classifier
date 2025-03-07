@@ -1,7 +1,11 @@
 import streamlit as st
+from utils.resource_loader import ResourceLoader  # New import for CSS loading
 
 def render_home():
     """Render the home page."""
+    # Load custom CSS for home page styles, including dark mode support for content cards
+    ResourceLoader.load_css(["css/views/home.css"])
+    
     # Home page with cards
     st.markdown("""
     <div class="content-card">
