@@ -17,18 +17,28 @@ class ResourceLoader:
         """Load CSS files and inject them into the Streamlit app.
         
         Args:
-            css_files: List of CSS files to load (relative to static/css)
+            css_files: List of CSS file paths relative to the static directory
         """
         try:
             all_css = ""
+            # Always include fonts.css first if it exists
+            base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            fonts_path = os.path.join(base_dir, "static", "css", "fonts.css")
+            
+            try:
+                with open(fonts_path, "r", encoding="utf-8") as f:
+                    all_css += f.read() + "\n"
+            except:
+                pass
+                
+            # Then load the requested CSS files
             for css_file in css_files:
-                base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
                 css_path = os.path.join(base_dir, "static", css_file)
                 
                 with open(css_path, "r", encoding="utf-8") as f:
                     all_css += f.read() + "\n"
             
-            # Inject all CSS at once to prevent multiple style elements
+            # Inject all CSS at once
             if all_css:
                 st.markdown(f"<style>{all_css}</style>", unsafe_allow_html=True)
         except Exception as e:
@@ -39,18 +49,19 @@ class ResourceLoader:
         """Load JavaScript files and inject them into the Streamlit app.
         
         Args:
-            js_files: List of JS files to load (relative to static/js)
+            js_files: List of JS file paths relative to the static directory
         """
         try:
             all_js = ""
+            base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            
             for js_file in js_files:
-                base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-                js_path = os.path.join(base_dir, "static", "js", js_file)
+                js_path = os.path.join(base_dir, "static", js_file)
                 
                 with open(js_path, "r", encoding="utf-8") as f:
                     all_js += f.read() + "\n"
             
-            # Inject all JavaScript at once to prevent multiple script elements
+            # Inject all JS at once
             if all_js:
                 st.markdown(f"<script>{all_js}</script>", unsafe_allow_html=True)
         except Exception as e:
@@ -58,29 +69,69 @@ class ResourceLoader:
     
     @staticmethod
     def load_template(template_path, **kwargs):
-        """Load an HTML template and replace any placeholders.
+        """Load an HTML template and replace variables with provided values.
         
         Args:
-            template_path: Path to the template relative to templates directory
-            **kwargs: Key-value pairs for placeholder replacement
+            template_path: Path to the template file relative to the templates directory
+            **kwargs: Key-value pairs to replace in the template
             
         Returns:
-            Processed HTML content with placeholders replaced
+            The processed template with variables replaced
         """
         try:
-            # Build the full path to the template
             base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-            full_path = os.path.join(base_dir, "templates", template_path)
+            template_full_path = os.path.join(base_dir, "templates", template_path)
             
-            # Read the template file
-            with open(full_path, "r", encoding="utf-8") as f:
+            with open(template_full_path, "r", encoding="utf-8") as f:
                 template = f.read()
             
-            # Replace placeholders using string.Template
-            if kwargs:
-                template = string.Template(template).substitute(kwargs)
+            # Replace variables in the template
+            for key, value in kwargs.items():
+                template = template.replace(f"${{{key}}}", str(value))
             
             return template
         except Exception as e:
             st.error(f"Error loading template {template_path}: {str(e)}")
-            return f"<div>Error loading template: {str(e)}</div>" 
+            return ""
+    
+    @staticmethod
+    def render_content_card(title=None, content="", card_class=""):
+        """Render a content card with the given title and content.
+        
+        Args:
+            title: Optional card title (string or HTML)
+            content: Card content (string or HTML)
+            card_class: Additional CSS classes for the card
+            
+        Returns:
+            HTML string for the content card
+        """
+        # Prepare the class string
+        class_str = ""
+        if card_class:
+            class_str = f" {card_class}"
+        
+        # Prepare the header
+        header_html = ""
+        if title:
+            header_html = f"<h2 class='card-title'>{title}</h2>"
+        
+        # Load the template
+        try:
+            template = ResourceLoader.load_template(
+                "components/content_card.html",
+                CARD_CLASS=class_str,
+                CARD_HEADER=header_html,
+                CARD_CONTENT=content
+            )
+            return template
+        except Exception as e:
+            # Fallback simple version
+            return f"""
+            <div class="content-card{class_str}">
+                {header_html}
+                <div class="card-content">
+                    {content}
+                </div>
+            </div>
+            """ 
