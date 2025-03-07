@@ -1,0 +1,51 @@
+/* Light theme specific sidebar styles */
+[data-testid="stSidebar"] .stApp {
+    background-color: var(--sidebar-bg) !important;
+}
+
+/* Fix navigation menu background for light theme */
+[data-testid="stSidebar"] li,
+[data-testid="stSidebar"] a,
+[data-testid="stSidebar"] *[class*="element-container"],
+[data-testid="stSidebar"] *[class*="item-container"] {
+    background-color: transparent !important;
+}
+
+/* Selected navigation item */
+[data-testid="stSidebar"] a.nav-link.active {
+    background-color: rgba(76, 161, 175, 0.15) !important;
+    color: var(--primary-color) !important;
+    font-weight: 600 !important;
+}
+
+/* Navigation menu icon */
+[data-testid="stSidebar"] a.nav-link i {
+    color: var(--primary-color) !important;
+}
+
+/* Color the menu title */
+.menu-title {
+    color: var(--primary-dark) !important;
+}
+
+/* Theme toggle in sidebar */
+.theme-toggle-sidebar {
+    background: rgba(0, 0, 0, 0.05) !important;
+    color: var(--text-color) !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+
+.theme-toggle-sidebar:hover {
+    background: rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Fix for default streamlit elements */
+[data-testid="stSidebar"] .st-emotion-cache-16idsys p,
+[data-testid="stSidebar"] .st-emotion-cache-16idsys span {
+    color: var(--text-color);
+}
+
+/* Ensure proper scrollbar styling */
+[data-testid="stSidebar"] [data-testid="stVerticalBlock"] {
+    background-color: var(--sidebar-bg);
+} 
