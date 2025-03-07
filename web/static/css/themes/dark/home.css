@@ -3,60 +3,143 @@
     background: linear-gradient(to right, #1a1a2e, #16213e);
     border: 1px solid #444;
     box-shadow: 0 7px 14px rgba(0, 0, 0, 0.8);
+    overflow: hidden;
 }
 
 .welcome-card {
     background: linear-gradient(to right, #1a1a2e, #16213e);
+    border-top: 3px solid #64c4d2;
 }
 
-/* Target Streamlit's heading elements */
-.content-card [data-testid="stHeadingWithActionElements"] h1,
-.content-card [data-testid="stHeadingWithActionElements"] h2,
+/* Enhanced card headers for dark theme */
+.content-card [data-testid="stHeadingWithActionElements"] {
+    margin-bottom: 1.2rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid rgba(100, 196, 210, 0.2);
+    position: relative;
+}
+
+/* Add subtle glow effect to headers */
+.content-card [data-testid="stHeadingWithActionElements"]::after {
+    content: "";
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100px;
+    height: 1px;
+    background: linear-gradient(to right, #64c4d2, transparent);
+}
+
+/* Main heading styling with gradient text */
+.content-card [data-testid="stHeadingWithActionElements"] h1 {
+    background: linear-gradient(90deg, #64c4d2, #acdbe4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent !important;
+    font-weight: 700;
+    letter-spacing: 0.7px;
+    font-size: 2.2rem;
+    text-shadow: none;
+}
+
+/* Secondary heading styling */
+.content-card [data-testid="stHeadingWithActionElements"] h2 {
+    color: #a8e0e8 !important;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    font-size: 1.6rem;
+}
+
+/* Tertiary heading styling */
 .content-card [data-testid="stHeadingWithActionElements"] h3 {
-    color: #ffffff !important;
+    color: #3d6f7d !important;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    font-size: 1.3rem;
 }
 
-/* Style the link icons in headers */
+/* Feature card specific header styling */
+.feature-card .feature-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #64c4d2 !important;
+    font-weight: 600;
+}
+
+/* Make icons in feature titles more prominent */
+.feature-title svg, 
+.feature-title span {
+    filter: drop-shadow(0 0 3px rgba(100, 196, 210, 0.3));
+}
+
+/* Style the link icons in headers to be more subtle */
 .content-card [data-testid="stHeaderActionElements"] svg {
-    stroke: #64c4d2 !important;
+    stroke: rgba(100, 196, 210, 0.5) !important;
+    transition: all 0.2s ease;
+    opacity: 0.6;
 }
 
 .content-card [data-testid="stHeaderActionElements"] a:hover svg {
-    stroke: #ffffff !important;
+    stroke: #64c4d2 !important;
+    filter: drop-shadow(0 0 3px rgba(100, 196, 210, 0.7));
+    opacity: 1;
 }
 
+/* Text styling with softer colors */
 .welcome-text {
-    color: #ffffff !important;
-}
-
-.feature-title {
-    color: #64c4d2 !important;
+    color: #e6e6e6 !important;
+    font-size: 1.1rem;
+    line-height: 1.6;
 }
 
 .feature-description {
-    color: #ffffff !important;
+    color: #e0e0e0 !important;
+    margin-top: 0.5rem;
+    line-height: 1.5;
 }
 
 .how-to-card h2 {
-    color: #ffffff !important;
+    color: #a8e0e8 !important;
 }
 
 .instructions-list {
-    color: #ffffff !important;
+    color: #d9d9d9 !important;
 }
 
 .instructions-list li {
-    color: #ffffff !important;
+    color: #d9d9d9 !important;
+    margin-bottom: 0.7rem;
+    line-height: 1.5;
 }
 
-/* Make bold text more visible in dark mode */
+/* Make bold text more visible in dark mode with a softer color */
 .instructions-list b {
-    color: #64c4d2 !important;
+    color: #7ccad8 !important;
+    font-weight: 600;
+}
+
+/* Make "How to Use" card stand out */
+.how-to-card {
+    border-left: 3px solid #64c4d2;
 }
 
 /* Override any Streamlit default text colors */
 .st-emotion-cache-te000z,
 .st-emotion-cache-1xvjzxl,
 .st-emotion-cache-gi0tri {
-    color: #ffffff !important;
+    color: #e0e0e0 !important;
+}
+
+/* Improve link appearance */
+a {
+    color: #64c4d2 !important;
+    text-decoration: none !important;
+    transition: all 0.2s ease;
+}
+
+a:hover {
+    color: #a8e0e8 !important;
+    text-decoration: underline !important;
 } 
