@@ -68,25 +68,60 @@ class ThemeManager:
     
     @staticmethod
     def load_theme_resources():
-        """Load the appropriate CSS based on current theme."""
-        # Check if we need to refresh after a theme change
-        if st.session_state.theme_config.get("refreshed") == False:
-            st.session_state.theme_config["refreshed"] = True
-            st.rerun()
+        """Load theme-specific resources."""
+        is_dark_mode = "dark_mode" in st.session_state and st.session_state.dark_mode
         
-        # Load base CSS that's common to all themes
-        ResourceLoader.load_css(["css/base.css"])
+        # Load base CSS for all themes
         ResourceLoader.load_css([
-            "css/components/header.css", 
-            "css/components/footer.css", 
-            "css/components/theme_toggle.css",
-            "css/components/sidebar.css",
-            "css/components/navigation.css"
+            "css/base.css",
+            "css/components/header.css",
+            "css/components/footer.css",
+            "css/components/theme_toggle.css"
         ])
         
-        # Load theme-specific CSS for additional customizations
-        if st.session_state.dark_mode:
-            ResourceLoader.load_css(["css/themes/dark_mode.css"])
+        # Load theme-specific CSS only for dark mode
+        # Light mode uses default styling
+        if is_dark_mode:
+            # Add dark mode class to body
+            st.markdown("""
+            <style>
+            .stApp {
+                font-family: var(--font-main);
+                color: var(--text-color);
+                background-color: var(--background-color);
+                transition: background-color var(--transition-speed) ease, 
+                            color var(--transition-speed) ease;
+            }
+            
+            body, .stApp {
+                background-color: #121212;
+                color: #f0f0f0;
+            }
+            
+            /* Add dark class to the body for CSS targeting */
+            body, .stApp, :root {
+                --dark-mode: true;
+            }
+            
+            body::before {
+                content: "";
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: #121212;
+                z-index: -1;
+            }
+            </style>
+            """, unsafe_allow_html=True)
+            
+            # Load dark theme specific CSS files
+            ResourceLoader.load_css([
+                "css/themes/dark/home.css",
+                "css/themes/dark/header.css", 
+                "css/themes/dark/footer.css"
+            ])
         
         # Load JavaScript for theme toggling
         ResourceLoader.load_js(["theme_toggle.js"])
