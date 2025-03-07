@@ -1,0 +1,29 @@
+{
+  "menu": {
+    "title": "",
+    "items": [
+      {
+        "name": "Home",
+        "icon": "house",
+        "url": "#home"
+      },
+      {
+        "name": "Drawing",
+        "icon": "pencil",
+        "url": "#drawing"
+      },
+      {
+        "name": "History",
+        "icon": "clock-history",
+        "url": "#history"
+      },
+      {
+        "name": "Settings",
+        "icon": "gear",
+        "url": "#settings"
+      }
+    ],
+    "icon": "cast",
+    "defaultIndex": 0
+  }
+} 
