@@ -1,0 +1,16 @@
+{
+  "title": "Theme Settings",
+  "icon": "🎨",
+  "options": {
+    "light": {
+      "name": "Light Mode",
+      "icon": "☀️",
+      "label": "Switch to Dark Mode"
+    },
+    "dark": {
+      "name": "Dark Mode",
+      "icon": "🌙",
+      "label": "Switch to Light Mode"
+    }
+  }
+} 
