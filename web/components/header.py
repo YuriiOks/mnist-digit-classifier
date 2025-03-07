@@ -21,6 +21,3 @@ def render_header():
     """
     
     st.markdown(theme_toggle_html, unsafe_allow_html=True)
-    
-    # Create the hidden button that will be clicked by JavaScript
-    ThemeManager.create_theme_toggle()
