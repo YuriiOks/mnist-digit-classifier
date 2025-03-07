@@ -5,8 +5,7 @@ from utils.settings_manager import SettingsManager
 
 def render_settings():
     """Render the settings page with a 3-column grid layout."""
-    # Load settings CSS, but use the improved ResourceLoader method
-    # to ensure CSS is loaded as styles only once, not as content
+    # Load settings CSS
     ResourceLoader.load_css([
         "css/components/settings/base.css",
         "css/components/settings/theme.css",
@@ -15,15 +14,12 @@ def render_settings():
         "css/components/settings/grid.css"
     ])
     
-    # Single spacing element with proper margin
-    st.markdown("<div style='margin-top: 40px;'></div>", unsafe_allow_html=True)
-    
-    # Main settings header
+    # Main settings header - no extra spacing before it
     header_html = ResourceLoader.load_template("views/settings/header.html")
     st.markdown(header_html, unsafe_allow_html=True)
     
-    # Add spacing between settings header and content
-    st.markdown("<div style='margin-top: 30px;'></div>", unsafe_allow_html=True)
+    # Add a smaller spacing between settings header and content
+    st.markdown("<div style='margin-top: 20px;'></div>", unsafe_allow_html=True)
     
     # Create a 3-column grid layout
     col1, col2, col3 = st.columns(3)
@@ -40,7 +36,7 @@ def render_settings():
     with col3:
         render_app_info()
     
-    # Load settings JavaScript - use the improved method
+    # Load settings JavaScript
     ResourceLoader.load_js(["settings/theme_toggle.js"])
 
 def render_theme_settings():
