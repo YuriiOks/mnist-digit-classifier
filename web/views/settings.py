@@ -2,6 +2,7 @@ import streamlit as st
 from utils.theme_manager import ThemeManager
 from utils.resource_loader import ResourceLoader
 from utils.settings_manager import SettingsManager
+import streamlit_toggle as tog
 
 def render_settings():
     """Render the settings page with a 3-column grid layout."""
@@ -69,15 +70,29 @@ def render_theme_settings():
     )
     st.markdown(current_theme_html, unsafe_allow_html=True)
     
-    # Render theme toggle
-    toggle_html = ResourceLoader.load_template(
-        "views/settings/controls/theme_toggle.html",
-        CHECKBOX_STATE=theme_settings["checkbox_state"],
-        TOGGLE_LABEL=theme_settings["toggle_label"]
-    )
-    st.markdown(toggle_html, unsafe_allow_html=True)
+    # Use streamlit-toggle-switch instead of custom HTML toggle
+    st.markdown("<div style='padding: 10px 0 20px 0;'></div>", unsafe_allow_html=True)
     
-    # Hidden button for theme toggle, activated by JavaScript
+    # Get the current theme for default value
+    is_dark_mode = st.session_state.dark_mode
+    
+    # Create the toggle switch
+    toggle_result = tog.st_toggle_switch(
+        label="Toggle Theme", 
+        key="theme_toggle_switch", 
+        default_value=is_dark_mode,
+        label_after=True,
+        inactive_color='#D3D3D3',  # Light gray for light mode
+        active_color="#2C3E50",    # Match our dark blue color
+        track_color="#4CA1AF"      # Match our primary color
+    )
+    
+    # If toggle changed, update the theme
+    if toggle_result != is_dark_mode:
+        ThemeManager.toggle_dark_mode()
+        st.rerun()
+    
+    # Hidden button for theme toggle (fallback, may not be needed anymore)
     if st.button("Toggle Theme", key="theme_toggle_settings", on_click=ThemeManager.toggle_dark_mode):
         pass
     
