@@ -12,102 +12,57 @@ st.set_page_config(
     page_title="MNIST Digit Classifier",
     page_icon="✏️",
     layout="wide",
-    initial_sidebar_state="collapsed"
+    initial_sidebar_state="expanded"
 )
 
 # Import our custom modules
 from utils.theme_manager import ThemeManager
 from components.header import render_header
 from components.footer import render_footer
+from components.sidebar import render_sidebar
+
+# Import views
+from views.home import render_home
+from views.drawing import render_drawing
+from views.history import render_history
+from views.settings import render_settings
 
 # Initialize theme
 ThemeManager.initialize()
 ThemeManager.load_theme_resources()
 
+# Initialize session state variables
+if 'canvas_result' not in st.session_state:
+    st.session_state.canvas_result = None
+if 'prediction' not in st.session_state:
+    st.session_state.prediction = None
+if 'confidence' not in st.session_state:
+    st.session_state.confidence = None
+if 'history' not in st.session_state:
+    st.session_state.history = []
+if 'brush_size' not in st.session_state:
+    st.session_state.brush_size = 20
+if 'brush_color' not in st.session_state:
+    st.session_state.brush_color = "#000000"
+
 # Render header (which also creates the theme toggle)
 render_header()
+
+# Render sidebar and get the selected menu item
+selected = render_sidebar()
 
 # Main content container with some spacing after header
 st.markdown("<div style='margin-top: 20px;'></div>", unsafe_allow_html=True)
 
-# Create a two-column layout for the main content
-left_col, right_col = st.columns(2)
-
-# Left column - Drawing panel
-with left_col:
-    st.markdown(
-        "<h2 style='text-align: center;'>Draw a digit</h2>", 
-        unsafe_allow_html=True
-    )
-    st.write("Use the canvas below to draw a digit from 0-9")
-    
-    # Placeholder for canvas component (we'll implement this later)
-    st.markdown("""
-    <div style="
-        border: 2px dashed #ccc; 
-        border-radius: 5px; 
-        height: 300px; 
-        display: flex; 
-        justify-content: center; 
-        align-items: center;
-        margin-bottom: 20px;
-    ">
-        Canvas component will go here
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # Buttons for interaction
-    col1, col2 = st.columns(2)
-    with col1:
-        st.button("Clear Canvas", key="clear_canvas")
-    with col2:
-        st.button("Predict", key="predict_button")
-
-# Right column - Prediction panel
-with right_col:
-    st.markdown(
-        "<h2 style='text-align: center;'>Prediction</h2>", 
-        unsafe_allow_html=True
-    )
-    st.write("Draw a digit on the canvas and click 'Predict'")
-    
-    # Placeholder for prediction result
-    st.markdown("""
-    <div style="
-        border: 2px dashed #ccc; 
-        border-radius: 5px; 
-        height: 300px; 
-        display: flex; 
-        justify-content: center; 
-        align-items: center;
-        flex-direction: column;
-        margin-bottom: 20px;
-    ">
-        <div style="font-size: 24px; margin-bottom: 10px;">
-            Prediction result will appear here
-        </div>
-        <div style="font-size: 16px; color: #666;">
-            Draw a digit and click "Predict"
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-# History section
-st.markdown("<hr/>", unsafe_allow_html=True)
-st.markdown("<h3>Prediction History</h3>", unsafe_allow_html=True)
-st.markdown("""
-<div style="
-    border: 2px dashed #ccc; 
-    border-radius: 5px; 
-    height: 200px; 
-    display: flex; 
-    justify-content: center; 
-    align-items: center;
-    margin-bottom: 20px;
-">
-    No prediction history yet
-</div>
-""", unsafe_allow_html=True)
+# Display different content based on selected menu item
+if selected == "Home":
+    render_home()
+elif selected == "Drawing":
+    render_drawing()
+elif selected == "History":
+    render_history()
+elif selected == "Settings":
+    render_settings()
 
 # Add spacer to push footer down
 st.markdown("<div style='min-height: 50px;'></div>", unsafe_allow_html=True)
