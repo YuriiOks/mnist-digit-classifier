@@ -33,7 +33,8 @@ class ThemeManager:
             "css/components/header.css", 
             "css/components/footer.css", 
             "css/components/theme_toggle.css",
-            "css/components/sidebar.css"
+            "css/components/sidebar.css",
+            "css/components/navigation.css"
         ])
         
         # Load theme-specific CSS
