@@ -10,16 +10,10 @@
         const sidebarToggle = document.getElementById('sidebar-theme-toggle');
         if (sidebarToggle) {
             sidebarToggle.addEventListener('click', function() {
-                // Look for the hidden toggle button and click it
-                const toggleButton = document.querySelector('button[key="theme_toggle_settings"]');
-                if (toggleButton) {
-                    toggleButton.click();
-                } else {
-                    // Fallback to URL parameter method
-                    const url = new URL(window.location);
-                    url.searchParams.set('toggle_theme', 'true');
-                    window.location.href = url.toString();
-                }
+                // Always use URL parameter method to trigger theme toggle
+                const url = new URL(window.location);
+                url.searchParams.set('toggle_theme', 'true');
+                window.location.href = url.toString();
             });
         }
     });
