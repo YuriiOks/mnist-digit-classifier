@@ -1,85 +1,128 @@
 import streamlit as st
 from utils.theme_manager import ThemeManager
 from utils.resource_loader import ResourceLoader
+from utils.settings_manager import SettingsManager
 
 def render_settings():
-    """Render the settings page."""
-    # Load settings CSS
-    ResourceLoader.load_css(["css/components/settings.css"])
+    """Render the settings page with a 3-column grid layout."""
+    # Load settings CSS, but use the improved ResourceLoader method
+    # to ensure CSS is loaded as styles only once, not as content
+    ResourceLoader.load_css([
+        "css/components/settings/base.css",
+        "css/components/settings/theme.css",
+        "css/components/settings/canvas.css",
+        "css/components/settings/app_info.css",
+        "css/components/settings/grid.css"
+    ])
+    
+    # Single spacing element with proper margin
+    st.markdown("<div style='margin-top: 40px;'></div>", unsafe_allow_html=True)
     
     # Main settings header
-    st.markdown("""
-    <div class="content-card">
-        <h1>Settings</h1>
-        <p>Configure application preferences and drawing options.</p>
-    </div>
-    """, unsafe_allow_html=True)
+    header_html = ResourceLoader.load_template("views/settings/header.html")
+    st.markdown(header_html, unsafe_allow_html=True)
     
-    # Theme settings
-    render_theme_settings()
+    # Add spacing between settings header and content
+    st.markdown("<div style='margin-top: 30px;'></div>", unsafe_allow_html=True)
     
-    # Canvas settings
-    render_canvas_settings()
+    # Create a 3-column grid layout
+    col1, col2, col3 = st.columns(3)
     
-    # Application info
-    render_app_info()
+    # Render theme settings in column 1
+    with col1:
+        render_theme_settings()
+    
+    # Render canvas settings in column 2  
+    with col2:
+        render_canvas_settings()
+    
+    # Render app info in column 3
+    with col3:
+        render_app_info()
+    
+    # Load settings JavaScript - use the improved method
+    ResourceLoader.load_js(["settings/theme_toggle.js"])
 
 def render_theme_settings():
-    """Render theme settings section with an improved toggle."""
-    # Prepare template variables
-    current_theme = "Dark Mode" if st.session_state.dark_mode else "Light Mode"
-    checkbox_state = "checked" if st.session_state.dark_mode else ""
-    toggle_label = "Switch to Light Mode" if st.session_state.dark_mode else "Switch to Dark Mode"
+    """Render theme settings section with improved toggle."""
+    # Get theme settings
+    theme_settings = SettingsManager.get_theme_settings()
     
-    # Load and render the theme settings template
-    theme_settings_html = ResourceLoader.load_template(
-        "views/settings/theme_settings.html",
-        CURRENT_THEME=current_theme,
-        CHECKBOX_STATE=checkbox_state,
-        TOGGLE_LABEL=toggle_label
+    # Start settings card
+    st.markdown("""
+    <div class="settings-card">
+    """, unsafe_allow_html=True)
+    
+    # Render card header
+    header_html = ResourceLoader.load_template(
+        "views/settings/sections/theme_card_header.html",
+        TITLE=theme_settings["title"],
+        ICON=theme_settings["icon"]
     )
+    st.markdown(header_html, unsafe_allow_html=True)
     
-    st.markdown(theme_settings_html, unsafe_allow_html=True)
+    # Start content section
+    st.markdown("""
+    <div class="settings-content">
+    """, unsafe_allow_html=True)
+    
+    # Render current theme info
+    current_theme_html = ResourceLoader.load_template(
+        "views/settings/sections/current_theme_info.html",
+        CURRENT_THEME=theme_settings["current_theme"]
+    )
+    st.markdown(current_theme_html, unsafe_allow_html=True)
+    
+    # Render theme toggle
+    toggle_html = ResourceLoader.load_template(
+        "views/settings/controls/theme_toggle.html",
+        CHECKBOX_STATE=theme_settings["checkbox_state"],
+        TOGGLE_LABEL=theme_settings["toggle_label"]
+    )
+    st.markdown(toggle_html, unsafe_allow_html=True)
     
     # Hidden button for theme toggle, activated by JavaScript
     if st.button("Toggle Theme", key="theme_toggle_settings", on_click=ThemeManager.toggle_dark_mode):
         pass
     
-    # Add JavaScript to connect checkbox to the hidden button
+    # Close content and card divs
     st.markdown("""
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const checkbox = document.getElementById('themeCheckbox');
-            if (checkbox) {
-                checkbox.addEventListener('change', function() {
-                    // Find and click the hidden button
-                    const buttons = Array.from(document.querySelectorAll('button'));
-                    const themeButton = buttons.find(button => 
-                        button.innerText.includes('Toggle Theme')
-                    );
-                    if (themeButton) {
-                        themeButton.click();
-                    }
-                });
-            }
-        });
-    </script>
+    </div>
+    </div>
     """, unsafe_allow_html=True)
 
 def render_canvas_settings():
     """Render canvas settings section with improved visuals."""
-    # First part with Streamlit controls
+    # Get canvas settings configuration
+    canvas_config = SettingsManager.get_canvas_settings()
+    
+    # Start settings card
     st.markdown("""
     <div class="settings-card">
-        <div class="settings-header">
-            <h2>Canvas Settings</h2>
-            <div class="settings-icon">🖌️</div>
-        </div>
-        <div class="settings-content">
+    """, unsafe_allow_html=True)
+    
+    # Render card header
+    header_html = ResourceLoader.load_template(
+        "views/settings/sections/theme_card_header.html",
+        TITLE=canvas_config.get("title", "Canvas Settings"),
+        ICON=canvas_config.get("icon", "🖌️")
+    )
+    st.markdown(header_html, unsafe_allow_html=True)
+    
+    # Start content section
+    st.markdown("""
+    <div class="settings-content">
     """, unsafe_allow_html=True)
     
     # Brush size slider
-    brush_size = st.slider("Brush Size", min_value=1, max_value=50, value=st.session_state.brush_size)
+    brush_size_config = canvas_config.get("brushSize", {})
+    brush_size = st.slider(
+        brush_size_config.get("label", "Brush Size"),
+        min_value=brush_size_config.get("min", 1),
+        max_value=brush_size_config.get("max", 50),
+        step=brush_size_config.get("step", 1),
+        value=st.session_state.brush_size
+    )
     if brush_size != st.session_state.brush_size:
         st.session_state.brush_size = brush_size
     
@@ -90,37 +133,68 @@ def render_canvas_settings():
     
     # Preview
     preview_size = min(brush_size * 2, 100)
-    st.markdown(f"""
-    <div class="brush-preview-container">
-        <h3>Brush Preview</h3>
-        <div class="brush-preview" style="width: {preview_size}px; height: {preview_size}px; background-color: {brush_color};"></div>
-    </div>
-    """, unsafe_allow_html=True)
+    preview_html = ResourceLoader.load_template(
+        "views/settings/controls/brush_preview.html",
+        PREVIEW_TITLE=canvas_config.get("previewTitle", "Brush Preview"),
+        PREVIEW_SIZE=str(preview_size),
+        BRUSH_COLOR=brush_color
+    )
+    st.markdown(preview_html, unsafe_allow_html=True)
     
-    # Reset button (styled better)
+    # Reset button
     st.markdown("""
     <div style="display: flex; justify-content: center; margin-top: 1.5rem;">
     """, unsafe_allow_html=True)
     
     if st.button("🔄 Reset to Defaults", key="reset_canvas", use_container_width=True):
-        st.session_state.brush_size = 20
-        st.session_state.brush_color = "#000000"
+        SettingsManager.reset_canvas_to_defaults()
         st.success("Canvas settings reset to defaults.")
         st.rerun()
     
+    # Close content and card divs
     st.markdown("""
         </div>
+    </div>
     </div>
     """, unsafe_allow_html=True)
 
 def render_app_info():
     """Render application information with improved layout."""
-    # Load app info from template
-    app_info_html = ResourceLoader.load_template(
-        "views/settings/app_info_settings.html",
-        APP_VERSION="1.0.0",
-        MODEL_VERSION="MNIST-CNN-v1",
-        LAST_UPDATED="March 2023"
-    )
+    # Get app info configuration
+    app_info = SettingsManager.get_app_info()
+    versions = app_info.get("versions", {})
     
-    st.markdown(app_info_html, unsafe_allow_html=True) 
+    # Start settings card
+    st.markdown("""
+    <div class="settings-card">
+    """, unsafe_allow_html=True)
+    
+    # Render card header
+    header_html = ResourceLoader.load_template(
+        "views/settings/sections/theme_card_header.html",
+        TITLE=app_info.get("title", "About This Application"),
+        ICON=app_info.get("icon", "ℹ️")
+    )
+    st.markdown(header_html, unsafe_allow_html=True)
+    
+    # Start content section
+    st.markdown("""
+    <div class="settings-content">
+    """, unsafe_allow_html=True)
+    
+    # App info content
+    app_info_html = ResourceLoader.load_template(
+        "views/settings/sections/app_info_content.html",
+        DESCRIPTION=app_info.get("description", ""),
+        TECH_STACK=app_info.get("techStack", ""),
+        APP_VERSION=versions.get("app", "1.0.0"),
+        MODEL_VERSION=versions.get("model", "MNIST-CNN-v1"),
+        LAST_UPDATED=versions.get("lastUpdated", "March 2025")
+    )
+    st.markdown(app_info_html, unsafe_allow_html=True)
+    
+    # Close content and card divs
+    st.markdown("""
+    </div>
+    </div>
+    """, unsafe_allow_html=True) 
