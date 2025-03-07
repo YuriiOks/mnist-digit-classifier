@@ -1,0 +1,40 @@
+/* Fix white background for specific menu items */
+[data-testid="stSidebar"] li,
+[data-testid="stSidebar"] a,
+[data-testid="stSidebar"] .css-1544g2n,
+[data-testid="stSidebar"] .st-be,
+[data-testid="stSidebar"] .st-bs,
+[data-testid="stSidebar"] div[role="button"],
+[data-testid="stSidebar"] *[class*="element-container"] {
+    background-color: transparent !important;
+}
+
+/* Target specifically the active white background */
+[data-testid="stSidebar"] *[class*="item-container"],
+[data-testid="stSidebar"] a[href*="history"],
+[data-testid="stSidebar"] *[style*="background-color"] {
+    background-color: transparent !important;
+}
+
+/* Force the parent containers to be transparent */
+[data-testid="stSidebar"] li > *,
+[data-testid="stSidebar"] a > *,
+[data-testid="stSidebar"] div > a {
+    background-color: transparent !important;
+}
+
+/* Override any white elements that might be using RGB format */
+[data-testid="stSidebar"] *[style*="background-color: rgb(255, 255, 255)"],
+[data-testid="stSidebar"] *[style*="background-color: rgb(248, 248, 248)"],
+[data-testid="stSidebar"] *[style*="background-color: rgba(255, 255, 255"],
+[data-testid="stSidebar"] *[style*="background: white"],
+[data-testid="stSidebar"] *[style*="background: #fff"] {
+    background-color: transparent !important;
+    background: transparent !important;
+}
+
+/* Try to target any element with a background color style */
+[data-testid="stSidebar"] [style*="background"] {
+    background-color: transparent !important;
+    background: transparent !important;
+}
