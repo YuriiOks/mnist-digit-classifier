@@ -1,0 +1,27 @@
+/* Base styles for home page components */
+.content-card {
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.content-card:hover {
+    transform: translateY(-2px);
+}
+
+.welcome-text {
+    font-size: 1.2rem;
+    margin-top: 1rem;
+}
+
+.feature-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.instructions-list {
+    margin-left: 1.5rem;
+    margin-top: 1rem;
+} 
