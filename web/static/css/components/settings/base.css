@@ -26,8 +26,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 100px; /* Fixed height for all headers */
-    min-height: 100px; /* Ensure minimum height */
+    min-height: 100px; /* Minimum height */
+    height: auto; /* Allow height to adjust automatically */
 }
 
 .settings-header h2 {
@@ -89,4 +89,56 @@ div[data-testid="column"] {
     font-size: 1.2rem;
     color: var(--primary-color);
     margin-bottom: 1rem;
+}
+
+/* Make this selector more specific to override the base.css rules */
+.settings-card .settings-header h2 {
+    margin: 0;
+    font-weight: 600;
+    font-size: 1.4rem;
+    font-family: var(--font-main);
+    color: white !important; /* Force white text for settings headers */
+}
+
+/* Specific targeting for h2 elements inside Streamlit heading containers in settings headers */
+.settings-header [data-testid="stHeadingWithActionElements"],
+.settings-header [data-testid="stHeadingWithActionElements"] h2,
+.settings-header h2 {
+    color: white !important;
+    margin: 0 !important;
+    font-family: var(--font-main) !important;
+    font-weight: 600 !important;
+    font-size: 1.4rem !important;
+    /* Reset any positioning from Streamlit */
+    position: static !important;
+}
+
+/* Ensure the header layout properly centers content vertically */
+.settings-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+    padding: 1.5rem;
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* Center items vertically */
+    min-height: 100px; /* Minimum height */
+    height: auto; /* Allow height to adjust automatically */
+}
+
+/* Ensure the link icon inside headers is also white */
+.settings-header .st-emotion-cache-yinll1 svg {
+    color: white !important;
+    opacity: 0.8 !important;
+}
+
+.settings-header .st-emotion-cache-yinll1:hover svg {
+    opacity: 1 !important;
+}
+
+/* Ensure the header content is properly centered */
+.settings-header > div {
+    display: flex !important;
+    align-items: center !important;
+    height: 100% !important;
 } 
