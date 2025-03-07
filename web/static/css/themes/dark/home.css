@@ -9,14 +9,54 @@
     background: linear-gradient(145deg, #2C3E50 0%, #1a1a1a 100%);
 }
 
+/* Target Streamlit's heading elements */
+.content-card [data-testid="stHeadingWithActionElements"] h1,
+.content-card [data-testid="stHeadingWithActionElements"] h2,
+.content-card [data-testid="stHeadingWithActionElements"] h3 {
+    color: #ffffff !important;
+}
+
+/* Style the link icons in headers */
+.content-card [data-testid="stHeaderActionElements"] svg {
+    stroke: #64c4d2 !important;
+}
+
+.content-card [data-testid="stHeaderActionElements"] a:hover svg {
+    stroke: #ffffff !important;
+}
+
+.welcome-text {
+    color: #ffffff !important;
+}
+
 .feature-title {
-    color: #64c4d2;
+    color: #64c4d2 !important;
 }
 
 .feature-description {
-    color: #f0f0f0;
+    color: #ffffff !important;
+}
+
+.how-to-card h2 {
+    color: #ffffff !important;
 }
 
 .instructions-list {
-    color: #e0e0e0;
+    color: #ffffff !important;
+}
+
+.instructions-list li {
+    color: #ffffff !important;
+}
+
+/* Make bold text more visible in dark mode */
+.instructions-list b {
+    color: #64c4d2 !important;
+}
+
+/* Override any Streamlit default text colors */
+.st-emotion-cache-te000z,
+.st-emotion-cache-1xvjzxl,
+.st-emotion-cache-gi0tri {
+    color: #ffffff !important;
 } 
