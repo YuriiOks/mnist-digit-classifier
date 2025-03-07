@@ -20,15 +20,17 @@ class ResourceLoader:
             css_files: List of CSS files to load (relative to static/css)
         """
         try:
+            all_css = ""
             for css_file in css_files:
                 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
                 css_path = os.path.join(base_dir, "static", css_file)
                 
                 with open(css_path, "r", encoding="utf-8") as f:
-                    css = f.read()
-                
-                # Inject the CSS into the app
-                st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
+                    all_css += f.read() + "\n"
+            
+            # Inject all CSS at once to prevent multiple style elements
+            if all_css:
+                st.markdown(f"<style>{all_css}</style>", unsafe_allow_html=True)
         except Exception as e:
             st.error(f"Error loading CSS: {str(e)}")
     
@@ -40,15 +42,17 @@ class ResourceLoader:
             js_files: List of JS files to load (relative to static/js)
         """
         try:
+            all_js = ""
             for js_file in js_files:
                 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
                 js_path = os.path.join(base_dir, "static", "js", js_file)
                 
                 with open(js_path, "r", encoding="utf-8") as f:
-                    js = f.read()
-                
-                # Inject the JavaScript into the app
-                st.markdown(f"<script>{js}</script>", unsafe_allow_html=True)
+                    all_js += f.read() + "\n"
+            
+            # Inject all JavaScript at once to prevent multiple script elements
+            if all_js:
+                st.markdown(f"<script>{all_js}</script>", unsafe_allow_html=True)
         except Exception as e:
             st.error(f"Error loading JavaScript: {str(e)}")
     
