@@ -1,0 +1,48 @@
+<div class="theme-preview-container">
+    <div class="theme-preview light-theme ${LIGHT_ACTIVE}" id="light-theme-preview">
+        <div class="preview-header"></div>
+        <div class="preview-content">
+            <div class="preview-content-bar"></div>
+            <div class="preview-content-bar short"></div>
+        </div>
+        <div class="preview-label">Light</div>
+    </div>
+    
+    <div class="theme-preview dark-theme ${DARK_ACTIVE}" id="dark-theme-preview">
+        <div class="preview-header"></div>
+        <div class="preview-content">
+            <div class="preview-content-bar"></div>
+            <div class="preview-content-bar short"></div>
+        </div>
+        <div class="preview-label">Dark</div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const lightPreview = document.getElementById('light-theme-preview');
+    const darkPreview = document.getElementById('dark-theme-preview');
+    
+    if (lightPreview && darkPreview) {
+        lightPreview.addEventListener('click', function() {
+            if (document.body.classList.contains('dark')) {
+                // Find and click the theme toggle
+                const themeToggle = document.querySelector('#themeCheckbox');
+                if (themeToggle) {
+                    themeToggle.click();
+                }
+            }
+        });
+        
+        darkPreview.addEventListener('click', function() {
+            if (!document.body.classList.contains('dark')) {
+                // Find and click the theme toggle
+                const themeToggle = document.querySelector('#themeCheckbox');
+                if (themeToggle) {
+                    themeToggle.click();
+                }
+            }
+        });
+    }
+});
+</script> 
