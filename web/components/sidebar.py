@@ -1,16 +1,25 @@
 import streamlit as st
 from streamlit_option_menu import option_menu
 from utils.theme_manager import ThemeManager
+from utils.resource_loader import ResourceLoader
 
 def render_sidebar():
     """Render the sidebar with navigation and theme toggle."""
     with st.sidebar:
-        st.markdown("## Navigation")
+        st.markdown('<div class="navigation-title">Navigation</div>', unsafe_allow_html=True)
         
-        # Theme toggle in sidebar with styled button
-        render_theme_toggle()
+        # Load sidebar CSS
+        ResourceLoader.load_css(["css/components/sidebar.css"])
         
-        st.markdown("---")
+        # Theme toggle in sidebar using template
+        theme_icon = ThemeManager.get_theme_icon()
+        sidebar_toggle_html = ResourceLoader.load_template(
+            "components/sidebar_toggle.html",
+            THEME_ICON=theme_icon
+        )
+        st.markdown(sidebar_toggle_html, unsafe_allow_html=True)
+        
+        st.markdown('<div class="sidebar-divider"></div>', unsafe_allow_html=True)
         
         # Option menu for navigation
         selected = option_menu(
