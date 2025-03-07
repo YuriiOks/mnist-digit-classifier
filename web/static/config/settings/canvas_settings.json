@@ -1,0 +1,15 @@
+{
+  "title": "Canvas Settings",
+  "icon": "🖌️",
+  "defaults": {
+    "brushSize": 20,
+    "brushColor": "#000000"
+  },
+  "brushSize": {
+    "min": 1,
+    "max": 50,
+    "step": 1,
+    "label": "Brush Size"
+  },
+  "previewTitle": "Brush Preview"
+} 
