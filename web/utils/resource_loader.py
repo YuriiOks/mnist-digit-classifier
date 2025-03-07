@@ -1,5 +1,6 @@
 import os
 import streamlit as st
+import string
 
 class ResourceLoader:
     """Utility class for loading external resources like CSS, JS, and HTML templates."""
@@ -13,63 +14,69 @@ class ResourceLoader:
     
     @staticmethod
     def load_css(css_files):
-        """Load CSS files from static directory.
+        """Load CSS files and inject them into the Streamlit app.
         
         Args:
-            css_files: List of CSS file paths relative to static directory
+            css_files: List of CSS files to load (relative to static/css)
         """
-        app_dir = ResourceLoader.get_app_dir()
-        for css_file in css_files:
-            css_path = os.path.join(app_dir, "static", css_file)
-            if os.path.exists(css_path):
-                with open(css_path, "r") as f:
-                    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
-            else:
-                st.warning(f"CSS file not found: {css_path}")
+        try:
+            for css_file in css_files:
+                base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+                css_path = os.path.join(base_dir, "static", css_file)
+                
+                with open(css_path, "r", encoding="utf-8") as f:
+                    css = f.read()
+                
+                # Inject the CSS into the app
+                st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
+        except Exception as e:
+            st.error(f"Error loading CSS: {str(e)}")
     
     @staticmethod
     def load_js(js_files):
-        """Load JavaScript files from static/js directory.
+        """Load JavaScript files and inject them into the Streamlit app.
         
         Args:
-            js_files: List of JS file names in the static/js directory
+            js_files: List of JS files to load (relative to static/js)
         """
-        app_dir = ResourceLoader.get_app_dir()
-        js_code = ""
-        for js_file in js_files:
-            js_path = os.path.join(app_dir, "static", "js", js_file)
-            if os.path.exists(js_path):
-                with open(js_path, "r") as f:
-                    js_code += f.read() + "\n"
-            else:
-                st.warning(f"JS file not found: {js_path}")
-        
-        if js_code:
-            st.markdown(f"<script>{js_code}</script>", unsafe_allow_html=True)
+        try:
+            for js_file in js_files:
+                base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+                js_path = os.path.join(base_dir, "static", "js", js_file)
+                
+                with open(js_path, "r", encoding="utf-8") as f:
+                    js = f.read()
+                
+                # Inject the JavaScript into the app
+                st.markdown(f"<script>{js}</script>", unsafe_allow_html=True)
+        except Exception as e:
+            st.error(f"Error loading JavaScript: {str(e)}")
     
     @staticmethod
-    def load_template(template_name, **kwargs):
-        """Load and render HTML template with placeholders replaced.
+    def load_template(template_path, **kwargs):
+        """Load an HTML template and replace any placeholders.
         
         Args:
-            template_name: Template file path relative to templates directory
-            **kwargs: Key-value pairs to replace in the template
+            template_path: Path to the template relative to templates directory
+            **kwargs: Key-value pairs for placeholder replacement
             
         Returns:
-            Rendered HTML template string
+            Processed HTML content with placeholders replaced
         """
-        app_dir = ResourceLoader.get_app_dir()
-        template_path = os.path.join(app_dir, "templates", template_name)
-        if os.path.exists(template_path):
-            with open(template_path, "r") as f:
+        try:
+            # Build the full path to the template
+            base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            full_path = os.path.join(base_dir, "templates", template_path)
+            
+            # Read the template file
+            with open(full_path, "r", encoding="utf-8") as f:
                 template = f.read()
             
-            # Replace all placeholders in the template
-            for key, value in kwargs.items():
-                placeholder = f"{{{{{key}}}}}"
-                template = template.replace(placeholder, str(value))
+            # Replace placeholders using string.Template
+            if kwargs:
+                template = string.Template(template).substitute(kwargs)
             
             return template
-        else:
-            st.warning(f"Template not found: {template_path}")
-            return "" 
+        except Exception as e:
+            st.error(f"Error loading template {template_path}: {str(e)}")
+            return f"<div>Error loading template: {str(e)}</div>" 
