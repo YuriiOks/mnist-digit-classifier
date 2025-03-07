@@ -1,0 +1,51 @@
+/* Navigation menu styling */
+.navigation-container {
+    margin-top: 1rem;
+}
+
+/* Default style overrides for option-menu */
+#MainMenu {
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: transparent !important;
+}
+
+/* Navigation link styling */
+.nav-link {
+    font-size: 16px !important; 
+    text-align: left !important; 
+    margin: 0px !important; 
+    transition: all 0.3s ease !important;
+}
+
+/* Selected navigation link */
+.nav-link.active {
+    background-color: var(--secondary-color) !important;
+    font-weight: 600 !important;
+}
+
+/* Hover state for navigation links */
+.nav-link:hover {
+    background-color: var(--hover-bg) !important;
+}
+
+/* Icon styling */
+.nav-link i {
+    color: var(--primary-color) !important;
+    font-size: 20px !important;
+}
+
+/* Menu title styling */
+.menu-title {
+    margin-bottom: 15px !important;
+    font-size: 18px !important;
+}
+
+/* Light/dark specific styles for menu title */
+.light-mode .menu-title {
+    color: #2C3E50 !important;
+}
+
+.dark-mode .menu-title {
+    color: #64c4d2 !important;
+} 
