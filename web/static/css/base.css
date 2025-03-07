@@ -5,9 +5,43 @@
     box-sizing: border-box;
 }
 
+:root {
+    --primary-color: #4CA1AF;
+    --secondary-color: #2C3E50;
+    --background-color: #f8f9fa;
+    --text-color: #333;
+    --card-bg: white;
+    --card-border: #e0e0e0;
+    --card-shadow: rgba(0, 0, 0, 0.1);
+    --hover-bg: #f1f1f1;
+    --success-color: #28a745;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+    --font-main: 'Roboto', 'Segoe UI', Arial, sans-serif;
+    --transition-speed: 0.3s;
+}
+
+/* Dark mode variables */
+.dark {
+    --primary-color: #64c4d2;
+    --secondary-color: #34495e;
+    --background-color: #121212;
+    --text-color: #f0f0f0;
+    --card-bg: #1e1e1e;
+    --card-border: #333;
+    --card-shadow: rgba(0, 0, 0, 0.4);
+    --hover-bg: #2a2a2a;
+    --success-color: #48d368;
+    --warning-color: #ffda44;
+    --danger-color: #ff6b6b;
+}
+
 body {
-    font-family: 'Arial', sans-serif;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    font-family: var(--font-main);
+    color: var(--text-color);
+    background-color: var(--background-color);
+    transition: background-color var(--transition-speed) ease, 
+                color var(--transition-speed) ease;
 }
 
 /* Force full width on containers */
@@ -15,7 +49,7 @@ body {
     max-width: 100% !important;
     padding-left: 1rem !important;
     padding-right: 1rem !important;
-    padding-top: 1rem !important;
+    padding-top: 0.5rem !important;
 }
 
 /* Hide Streamlit branding */
@@ -23,19 +57,43 @@ body {
 footer {visibility: hidden;}
 header {visibility: hidden;}
 
-/* Hide toggle button and any extra elements */
-div.row-widget.stButton, button[kind="secondary"] {
-    display: none !important;
-    height: 0 !important;
-    width: 0 !important;
-    position: absolute !important;
-    top: -9999px !important;
-    left: -9999px !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-    margin: 0 !important;
-    padding: 0 !important;
+/* Streamlit element styling */
+div.stButton > button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    box-shadow: 0 2px 5px var(--card-shadow);
+    transition: all 0.2s ease;
+}
+
+div.stButton > button:hover {
+    background-color: var(--secondary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px var(--card-shadow);
+}
+
+div.stButton > button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 3px var(--card-shadow);
+}
+
+/* Card style for content sections */
+.content-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px var(--card-shadow);
+    margin-bottom: 1.5rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.content-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px var(--card-shadow);
 }
 
 /* Animation */
@@ -43,6 +101,12 @@ div.row-widget.stButton, button[kind="secondary"] {
     0% { transform: scale(1); }
     50% { transform: scale(1.1); }
     100% { transform: scale(1); }
+}
+
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-5px); }
+    100% { transform: translateY(0px); }
 }
 
 /* Common utility classes */
@@ -62,9 +126,46 @@ div.row-widget.stButton, button[kind="secondary"] {
     padding: 0 20px;
 }
 
+/* Canvas container styling */
+.canvas-container {
+    border: 2px solid var(--primary-color);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px var(--card-shadow);
+    background-color: var(--card-bg);
+    transition: all 0.3s ease;
+}
+
+.canvas-container:hover {
+    box-shadow: 0 8px 16px var(--card-shadow);
+    border-color: var(--secondary-color);
+}
+
+/* Prediction result styling */
+.prediction-result {
+    font-size: 5rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    text-align: center;
+    animation: float 3s ease-in-out infinite;
+}
+
+.confidence-badge {
+    background-color: var(--secondary-color);
+    color: white;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+}
+
 /* Responsive breakpoints */
 @media (max-width: 768px) {
     .hide-mobile {
         display: none !important;
+    }
+    
+    div.stButton > button {
+        width: 100%;
     }
 } 
