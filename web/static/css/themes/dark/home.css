@@ -1,0 +1,22 @@
+/* Dark theme styles for home page */
+.content-card {
+    background: linear-gradient(145deg, #222 0%, #1a1a1a 100%);
+    border: 1px solid #444;
+    box-shadow: 0 7px 14px rgba(0, 0, 0, 0.8);
+}
+
+.welcome-card {
+    background: linear-gradient(145deg, #2C3E50 0%, #1a1a1a 100%);
+}
+
+.feature-title {
+    color: #64c4d2;
+}
+
+.feature-description {
+    color: #f0f0f0;
+}
+
+.instructions-list {
+    color: #e0e0e0;
+} 
