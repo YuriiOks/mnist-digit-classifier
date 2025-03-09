@@ -12,6 +12,29 @@ from ui.views.base_view import BaseView
 from ui.components.cards.content_card import ContentCard
 from core.app_state.navigation_state import NavigationState
 
+# Try to import the view utils if available
+try:
+    from utils.ui.view_utils import create_welcome_card
+except ImportError:
+    # Fallback function if the import fails
+    def create_welcome_card(title, icon, content):
+        # Format content to ensure paragraphs are properly wrapped
+        if not content.startswith('<p>'):
+            paragraphs = content.split('\n')
+            content = ''.join([f'<p>{p.strip()}</p>' for p in paragraphs if p.strip()])
+        
+        return f"""
+        <div class="card card-elevated content-card welcome-card animate-fade-in">
+            <div class="card-title">
+                <span class="card-icon">{icon}</span>
+                {title}
+            </div>
+            <div class="card-content">
+                {content}
+            </div>
+        </div>
+        """
+
 logger = logging.getLogger(__name__)
 
 class HomeView(BaseView):
@@ -33,52 +56,21 @@ class HomeView(BaseView):
         """Render the home view content."""
         self.logger.debug("Rendering home view")
         try:
-            # Add some custom css for proper alignment
-            st.markdown("""
-            <style>
-            /* Fix content alignment */
-            .block-container {
-                max-width: 100% !important;
-                padding-top: 1rem !important;
-                padding-left: 1rem !important;
-                padding-right: 1rem !important;
-            }
+            # Apply common layout styling
+            self.apply_common_layout()
             
-            /* Make headers look better */
-            h1, h2, h3 {
-                margin-bottom: 1rem;
-                margin-top: 0.5rem;
-                font-family: var(--font-primary, 'Poppins', sans-serif);
-            }
+            # Welcome card with consistent styling
+            welcome_content = """
+            This application allows you to draw digits and have them recognized 
+            by a machine learning model.
             
-            /* Add space around elements */
-            .stMarkdown {
-                margin-bottom: 0.5rem;
-            }
+            The model is trained on the MNIST dataset, which contains thousands 
+            of handwritten digit images.
             
-            /* Remove empty columns */
-            .stColumn:empty {
-                display: none !important;
-            }
-            </style>
-            """, unsafe_allow_html=True)
-            
-            # Welcome card - FIXED content format for proper rendering
-            st.markdown("""
-            <div class="card card-elevated content-card welcome-card animate-fade-in">
-                <div class="card-title">
-                    <span class="card-icon">👋</span>
-                    Welcome
-                </div>
-                <div class="card-content">
-                    <p>This application allows you to draw digits and have them recognized 
-                       by a machine learning model.</p>
-                    <p>The model is trained on the MNIST dataset, which contains thousands 
-                       of handwritten digit images.</p>
-                    <p>Draw any digit from 0-9 and let our AI predict what you've written!</p>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
+            Draw any digit from 0-9 and let our AI predict what you've written!
+            """
+            welcome_card = create_welcome_card("Welcome", "👋", welcome_content)
+            st.markdown(welcome_card, unsafe_allow_html=True)
             
             # How it works section
             st.markdown("<h2>How It Works</h2>", unsafe_allow_html=True)
