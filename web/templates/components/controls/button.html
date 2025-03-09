@@ -1,0 +1,15 @@
+<button id="${ID}" class="${CLASSES}" ${ATTRIBUTES}>
+    <div class="btn-content icon-${ICON_POSITION}">
+      <!-- Left icon -->
+      <span class="btn-icon left-icon" style="${ICON_POSITION != 'left' ? 'display:none;' : ''}">${BUTTON_ICON}</span>
+      
+      <!-- Button text -->
+      <span class="btn-text" style="${!BUTTON_LABEL ? 'display:none;' : ''}">${BUTTON_LABEL}</span>
+      
+      <!-- Right icon -->
+      <span class="btn-icon right-icon" style="${ICON_POSITION != 'right' ? 'display:none;' : ''}">${BUTTON_ICON}</span>
+      
+      <!-- Center icon (for icon-only buttons) -->
+      <span class="btn-icon center-icon" style="${ICON_POSITION != 'center' ? 'display:none;' : ''}">${BUTTON_ICON}</span>
+    </div>
+  </button>
