@@ -6,8 +6,16 @@
 
 """UI utilities for the MNIST Digit Classifier application."""
 
-# Import modules for easier access - but avoid circular imports
-# from utils.ui.layout import apply_standard_layout, fix_layout_issues
+# Import for easier access
+from utils.ui.layout import fix_layout_issues
 
-# __all__ will be populated by the imported modules
-__all__ = [] 
+# Import only what exists in view_utils.py
+from utils.ui.view_utils import apply_view_styling, create_welcome_card, create_section_container, close_section_container
+
+__all__ = [
+    'fix_layout_issues', 
+    'apply_view_styling', 
+    'create_welcome_card', 
+    'create_section_container',
+    'close_section_container'
+]
