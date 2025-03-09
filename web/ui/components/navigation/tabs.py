@@ -6,7 +6,7 @@
 
 import streamlit as st
 import logging
-from typing import Dict, Any, Optional, List, Union, Callable, NamedTuple
+from typing import Dict, Any, Optional, List, Union, Callable, NamedTuple, Tuple
 import uuid
 
 from ui.components.base.component import Component
@@ -234,3 +234,60 @@ class Tabs(Component):
             self.logger.error(f"Error displaying tabs component: {str(e)}", exc_info=True)
             st.error("Error displaying tabs")
             return self.active_tab
+
+
+class InputTabs(Tabs):
+    """Specialized tabs for input selection (Draw, Upload, URL)."""
+    
+    def __init__(
+        self,
+        default_tab: Optional[str] = None,
+        on_change: Optional[Callable[[str], None]] = None,
+        key: str = "input_tabs"
+    ):
+        """Initialize input tabs component.
+        
+        Args:
+            default_tab: The tab to select by default
+            on_change: Callback when tab selection changes
+            key: Unique key for the component
+        """
+        tabs = ["Draw", "Upload", "URL"]
+        super().__init__(
+            tabs=tabs,
+            default_tab=default_tab or tabs[0],
+            on_change=on_change,
+            key=key
+        )
+        
+    def render(self) -> Tuple[str, List[st._DeltaGenerator]]:
+        """Render the input tabs component.
+        
+        Returns:
+            Tuple containing the selected tab label and tab containers
+        """
+        self.logger.debug("Rendering input tabs")
+        
+        try:
+            # Create tabs
+            tab_list = st.tabs(self.tabs, key=self.key)
+            
+            # Determine selected tab
+            tab_index = 0  # Default to first tab
+            if self.key in st.session_state and st.session_state[self.key] < len(self.tabs):
+                tab_index = st.session_state[self.key]
+                
+            selected_tab = self.tabs[tab_index]
+            
+            # Call on_change callback if provided
+            if self.on_change:
+                self.on_change(selected_tab)
+                
+            self.logger.debug(f"Selected input tab: {selected_tab}")
+            return selected_tab, tab_list
+        
+        except Exception as e:
+            self.logger.error(f"Error rendering input tabs: {str(e)}", exc_info=True)
+            st.error(f"An error occurred while rendering input tabs: {str(e)}")
+            # Return fallback values
+            return self.tabs[0], [st.container() for _ in self.tabs]
