@@ -1,243 +1,169 @@
 # MNIST Digit Classifier
 # Copyright (c) 2025
 # File: core/app_state/history_state.py
-# Description: Manages prediction history state
+# Description: State management for prediction history
 # Created: 2024-05-01
 
 import logging
-from typing import List, Dict, Any, Optional
-import time
+from typing import Dict, Any, List, Optional
 import uuid
-import numpy as np
 from datetime import datetime
+import base64
 
 from core.app_state.session_state import SessionState
 
 logger = logging.getLogger(__name__)
 
 class HistoryState:
-    """Manages prediction history state."""
+    """Manage prediction history state."""
     
-    # State keys
-    HISTORY_KEY = "_prediction_history"
-    
-    # Default values
-    DEFAULT_MAX_HISTORY = 50
+    HISTORY_KEY = "prediction_history"
+    CURRENT_PREDICTION_KEY = "current_prediction"
     
     @classmethod
     def initialize(cls) -> None:
-        """Initialize history state if not already initialized."""
-        logger.debug("Initializing history state")
-        try:
-            if not SessionState.has_key(cls.HISTORY_KEY):
-                logger.debug("Setting empty prediction history")
-                SessionState.set(cls.HISTORY_KEY, [])
-            logger.debug("History state initialization complete")
-        except Exception as e:
-            logger.error(f"Error initializing history state: {str(e)}", exc_info=True)
-            raise
+        """Initialize history state if not already present."""
+        if not SessionState.has_key(cls.HISTORY_KEY):
+            logger.debug("Initializing prediction history")
+            # Initialize with an empty list
+            SessionState.set(cls.HISTORY_KEY, [])
+        
+        if not SessionState.has_key(cls.CURRENT_PREDICTION_KEY):
+            SessionState.set(cls.CURRENT_PREDICTION_KEY, None)
     
     @classmethod
-    def get_history(cls) -> List[Dict[str, Any]]:
-        """Get the prediction history.
+    def get_predictions(cls) -> List[Dict[str, Any]]:
+        """Get full prediction history.
         
         Returns:
-            List[Dict[str, Any]]: List of prediction entries
+            List[Dict[str, Any]]: List of all stored predictions
         """
-        logger.debug("Getting prediction history")
-        try:
-            cls.initialize()
-            history = SessionState.get(cls.HISTORY_KEY, [])
-            logger.debug(f"Retrieved prediction history with {len(history)} entries")
-            return history
-        except Exception as e:
-            logger.error(f"Error getting prediction history: {str(e)}", exc_info=True)
-            return []
+        cls.initialize()
+        predictions = SessionState.get(cls.HISTORY_KEY, [])
+        logger.debug(f"Retrieved {len(predictions)} predictions from history")
+        return predictions
     
     @classmethod
-    def add_prediction(
-        cls,
-        image: np.ndarray,
-        prediction: int,
-        confidence: float,
-        all_confidences: Optional[Dict[int, float]] = None,
-        max_history: Optional[int] = None
-    ) -> str:
-        """Add a prediction to the history.
+    def get_latest_prediction(cls) -> Optional[Dict[str, Any]]:
+        """Get the most recent prediction.
+        
+        Returns:
+            Optional[Dict[str, Any]]: The most recent prediction or None
+        """
+        cls.initialize()
+        history = SessionState.get(cls.HISTORY_KEY, [])
+        if history:
+            return history[-1]
+        return None
+    
+    @classmethod
+    def add_prediction(cls, digit: int, confidence: float, image_data: Optional[str] = None) -> Dict[str, Any]:
+        """Add a new prediction to history.
         
         Args:
-            image: Image as numpy array
-            prediction: Predicted digit
+            digit: The predicted digit
             confidence: Confidence score (0-1)
-            all_confidences: Confidence scores for all classes
-            max_history: Maximum number of history entries
+            image_data: Optional base64 encoded image data
             
         Returns:
-            str: ID of the added prediction
+            Dict[str, Any]: The newly created prediction entry
         """
-        logger.debug(f"Adding prediction: {prediction} with confidence {confidence:.4f}")
-        try:
-            cls.initialize()
-            
-            # Generate a unique ID for this prediction
-            prediction_id = str(uuid.uuid4())
-            
-            # Create prediction entry
-            entry = {
-                "id": prediction_id,
-                "timestamp": datetime.now().isoformat(),
-                "unix_time": time.time(),
-                "image": image.copy() if image is not None else None,
-                "prediction": prediction,
-                "confidence": confidence,
-                "all_confidences": all_confidences or {},
-            }
-            
-            # Get current history
-            history = cls.get_history()
-            
-            # Add new entry
-            history.append(entry)
-            
-            # Trim history if needed
-            max_entries = max_history or cls.DEFAULT_MAX_HISTORY
-            if len(history) > max_entries:
-                logger.debug(f"Trimming history to {max_entries} entries")
-                history = history[-max_entries:]
-            
-            # Save updated history
-            SessionState.set(cls.HISTORY_KEY, history)
-            
-            logger.info(f"Added prediction {prediction_id} to history, now {len(history)} entries")
-            return prediction_id
-        except Exception as e:
-            logger.error(f"Error adding prediction to history: {str(e)}", exc_info=True)
-            raise
-    
-    @classmethod
-    def get_prediction(cls, prediction_id: str) -> Optional[Dict[str, Any]]:
-        """Get a specific prediction by ID.
+        cls.initialize()
         
-        Args:
-            prediction_id: ID of the prediction to retrieve
-            
-        Returns:
-            Optional[Dict[str, Any]]: Prediction entry or None if not found
-        """
-        logger.debug(f"Getting prediction with ID: {prediction_id}")
-        try:
-            history = cls.get_history()
-            
-            # Find prediction by ID
-            for entry in history:
-                if entry.get("id") == prediction_id:
-                    logger.debug(f"Found prediction {prediction_id}")
-                    return entry
-            
-            logger.warning(f"Prediction {prediction_id} not found in history")
-            return None
-        except Exception as e:
-            logger.error(f"Error getting prediction {prediction_id}: {str(e)}", exc_info=True)
-            return None
+        # Create prediction entry
+        prediction = {
+            "id": str(uuid.uuid4()),
+            "digit": digit,
+            "confidence": confidence,
+            "timestamp": datetime.now(),
+            "image": image_data
+        }
+        
+        # Add to history
+        history = SessionState.get(cls.HISTORY_KEY, [])
+        history.append(prediction)
+        SessionState.set(cls.HISTORY_KEY, history)
+        
+        # Update current prediction
+        SessionState.set(cls.CURRENT_PREDICTION_KEY, prediction)
+        
+        logger.debug(f"Added prediction for digit {digit} to history")
+        return prediction
     
     @classmethod
     def clear_history(cls) -> None:
-        """Clear the prediction history."""
-        logger.debug("Clearing prediction history")
-        try:
-            cls.initialize()
-            SessionState.set(cls.HISTORY_KEY, [])
-            logger.info("Prediction history cleared")
-        except Exception as e:
-            logger.error(f"Error clearing prediction history: {str(e)}", exc_info=True)
-            raise
+        """Clear all prediction history."""
+        cls.initialize()
+        SessionState.set(cls.HISTORY_KEY, [])
+        SessionState.set(cls.CURRENT_PREDICTION_KEY, None)
+        logger.debug("Cleared prediction history")
     
     @classmethod
-    def delete_prediction(cls, prediction_id: str) -> bool:
-        """Delete a specific prediction by ID.
+    def get_history(cls) -> List[Dict[str, Any]]:
+        """Alias for get_predictions for backward compatibility."""
+        return cls.get_predictions()
+
+    @classmethod
+    def get_paginated_history(cls, page: int = 1, page_size: int = 10) -> List[Dict[str, Any]]:
+        """Get paginated prediction history.
         
         Args:
-            prediction_id: ID of the prediction to delete
+            page: Page number (1-based)
+            page_size: Number of items per page
             
         Returns:
-            bool: True if deleted, False if not found
+            List of prediction entries for the requested page
         """
-        logger.debug(f"Deleting prediction with ID: {prediction_id}")
-        try:
-            history = cls.get_history()
-            
-            # Find and remove prediction
-            for i, entry in enumerate(history):
-                if entry.get("id") == prediction_id:
-                    del history[i]
-                    
-                    # Save updated history
-                    SessionState.set(cls.HISTORY_KEY, history)
-                    logger.info(f"Deleted prediction {prediction_id} from history")
-                    return True
-            
-            logger.warning(f"Prediction {prediction_id} not found, nothing deleted")
-            return False
-        except Exception as e:
-            logger.error(f"Error deleting prediction {prediction_id}: {str(e)}", exc_info=True)
-            return False
+        cls.initialize()
+        history = SessionState.get(cls.HISTORY_KEY)
+        
+        start_idx = (page - 1) * page_size
+        end_idx = start_idx + page_size
+        
+        return history[start_idx:end_idx]
     
     @classmethod
-    def get_statistics(cls) -> Dict[str, Any]:
-        """Get statistics about the prediction history.
+    def get_history_size(cls) -> int:
+        """Get total number of history entries.
         
         Returns:
-            Dict[str, Any]: Dictionary of statistics
+            Number of entries in history
         """
-        logger.debug("Getting prediction history statistics")
-        try:
-            history = cls.get_history()
-            
-            if not history:
-                logger.debug("History is empty, returning empty statistics")
-                return {
-                    "count": 0,
-                    "classes": {},
-                    "avg_confidence": 0,
-                    "max_confidence": 0,
-                    "min_confidence": 0
-                }
-            
-            # Count by class
-            classes = {}
-            confidences = []
-            
-            for entry in history:
-                prediction = entry.get("prediction")
-                confidence = entry.get("confidence", 0)
+        cls.initialize()
+        return len(SessionState.get(cls.HISTORY_KEY))
+    
+    @classmethod
+    def get_current_prediction(cls) -> Optional[Dict[str, Any]]:
+        """Get current prediction result.
+        
+        Returns:
+            Current prediction entry or None
+        """
+        cls.initialize()
+        return SessionState.get(cls.CURRENT_PREDICTION_KEY)
+    
+    @classmethod
+    def set_user_correction(cls, entry_id: str, correct_digit: int) -> None:
+        """Set user correction for a prediction.
+        
+        Args:
+            entry_id: ID of history entry to update
+            correct_digit: The correct digit value (0-9)
+        """
+        cls.initialize()
+        
+        history = SessionState.get(cls.HISTORY_KEY)
+        for entry in history:
+            if entry["id"] == entry_id:
+                entry["user_correction"] = correct_digit
+                break
                 
-                # Count by class
-                if prediction is not None:
-                    classes[prediction] = classes.get(prediction, 0) + 1
-                
-                # Track confidences
-                if confidence is not None:
-                    confidences.append(confidence)
+        SessionState.set(cls.HISTORY_KEY, history)
+        
+        # Update current prediction if it matches
+        current = SessionState.get(cls.CURRENT_PREDICTION_KEY)
+        if current and current["id"] == entry_id:
+            current["user_correction"] = correct_digit
+            SessionState.set(cls.CURRENT_PREDICTION_KEY, current)
             
-            # Calculate statistics
-            stats = {
-                "count": len(history),
-                "classes": classes,
-                "avg_confidence": sum(confidences) / len(confidences) if confidences else 0,
-                "max_confidence": max(confidences) if confidences else 0,
-                "min_confidence": min(confidences) if confidences else 0,
-                "recent_predictions": [entry.get("prediction") for entry in history[-5:]]
-            }
-            
-            logger.debug(f"Calculated history statistics: {len(history)} entries, {len(classes)} classes")
-            return stats
-        except Exception as e:
-            logger.error(f"Error getting prediction history statistics: {str(e)}", exc_info=True)
-            return {
-                "count": 0,
-                "classes": {},
-                "avg_confidence": 0,
-                "max_confidence": 0,
-                "min_confidence": 0,
-                "error": str(e)
-            } 
+        logger.debug(f"User correction set for entry {entry_id}: {correct_digit}") 
