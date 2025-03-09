@@ -1,0 +1,131 @@
+/* MNIST Digit Classifier
+ * Copyright (c) 2025
+ * File: assets/css/components/layout/sidebar.css
+ * Description: Styles for the application sidebar
+ * Created: 2024-05-01
+ */
+
+.app-sidebar {
+  background-color: var(--color-card);
+  width: var(--sidebar-width);
+  height: calc(100vh - var(--header-height) - var(--footer-height));
+  position: fixed;
+  top: var(--header-height);
+  left: 0;
+  z-index: var(--z-index-header);
+  border-right: 1px solid var(--color-border);
+  overflow-y: auto;
+}
+
+.sidebar-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.sidebar-header {
+  padding: var(--spacing-md);
+  border-bottom: 1px solid var(--color-border);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--color-text);
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: var(--spacing-md) 0;
+}
+
+.nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nav-list li {
+  margin: 0;
+  padding: 0;
+}
+
+.nav-list a {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-md) var(--spacing-lg);
+  color: var(--color-text);
+  text-decoration: none;
+  transition: all var(--transition-speed-fast) var(--transition-timing);
+  border-left: 3px solid transparent;
+}
+
+.nav-list a:hover {
+  background-color: var(--color-highlight);
+  border-left-color: var(--color-primary);
+}
+
+.nav-list a.active {
+  background-color: var(--color-highlight);
+  border-left-color: var(--color-primary);
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.nav-list .nav-icon {
+  margin-right: var(--spacing-md);
+  width: 20px;
+  text-align: center;
+}
+
+.sidebar-footer {
+  padding: var(--spacing-md);
+  border-top: 1px solid var(--color-border);
+  font-size: 0.875rem;
+  color: var(--color-text-light);
+}
+
+/* For when sidebar is collapsed */
+.app-sidebar.collapsed {
+  width: 60px;
+}
+
+.app-sidebar.collapsed .sidebar-header,
+.app-sidebar.collapsed .nav-list span:not(.nav-icon),
+.app-sidebar.collapsed .sidebar-footer {
+  display: none;
+}
+
+.app-sidebar.collapsed .nav-list a {
+  justify-content: center;
+  padding: var(--spacing-md);
+}
+
+.app-sidebar.collapsed .nav-list .nav-icon {
+  margin-right: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .app-sidebar {
+    transform: translateX(-100%);
+    transition: transform var(--transition-speed-normal) var(--transition-timing);
+  }
+  
+  .app-sidebar.open {
+    transform: translateX(0);
+  }
+  
+  /* When sidebar is open, add overlay */
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: var(--header-height);
+    left: 0;
+    width: 100%;
+    height: calc(100vh - var(--header-height) - var(--footer-height));
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: calc(var(--z-index-header) - 1);
+  }
+  
+  .sidebar-overlay.visible {
+    display: block;
+  }
+} 
