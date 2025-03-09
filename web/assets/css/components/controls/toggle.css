@@ -1,0 +1,170 @@
+/* MNIST Digit Classifier
+ * Copyright (c) 2025
+ * File: assets/css/components/controls/toggles.css
+ * Description: Styles for toggle switch components
+ * Created: 2024-05-01
+ */
+
+/* Toggle wrapper */
+.toggle-wrapper {
+    margin-bottom: var(--spacing-md);
+    display: inline-flex;
+  }
+  
+  /* Toggle component */
+  .toggle {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    width: fit-content;
+    --toggle-active-color: var(--color-primary);
+    --toggle-width: 50px;
+    --toggle-height: 24px;
+    --toggle-indicator-size: 18px;
+    --toggle-indicator-offset: 3px;
+  }
+  
+  /* Toggle track */
+  .toggle-track {
+    position: relative;
+    display: inline-block;
+    width: var(--toggle-width);
+    height: var(--toggle-height);
+    background-color: var(--color-background-alt);
+    border-radius: calc(var(--toggle-height) / 2);
+    transition: background-color var(--transition-speed-normal) var(--transition-timing);
+    border: 1px solid var(--color-border);
+  }
+  
+  .toggle.toggle-on .toggle-track {
+    background-color: var(--toggle-active-color);
+    border-color: var(--toggle-active-color);
+  }
+  
+  /* Toggle indicator (the circle that slides) */
+  .toggle-indicator {
+    position: absolute;
+    top: var(--toggle-indicator-offset);
+    left: var(--toggle-indicator-offset);
+    width: var(--toggle-indicator-size);
+    height: var(--toggle-indicator-size);
+    background-color: var(--color-card);
+    border-radius: 50%;
+    box-shadow: var(--shadow-sm);
+    transition: transform var(--transition-speed-normal) var(--transition-timing),
+                background-color var(--transition-speed-normal) var(--transition-timing);
+    transform: translateX(0);
+  }
+  
+  .toggle.toggle-on .toggle-indicator {
+    transform: translateX(calc(var(--toggle-width) - var(--toggle-indicator-size) - var(--toggle-indicator-offset) * 2));
+  }
+  
+  /* Toggle labels */
+  .toggle-labels {
+    margin-left: var(--spacing-sm);
+    font-size: 0.9rem;
+    display: flex;
+  }
+  
+  .toggle-labels[data-show="false"] {
+    display: none;
+  }
+  
+  .toggle-label {
+    opacity: 0;
+    transition: opacity var(--transition-speed-normal) var(--transition-timing);
+    position: absolute;
+  }
+  
+  .toggle-label-off {
+    opacity: 1;
+  }
+  
+  .toggle.toggle-on .toggle-label-off {
+    opacity: 0;
+  }
+  
+  .toggle.toggle-on .toggle-label-on {
+    opacity: 1;
+  }
+  
+  /* Focus styles for accessibility */
+  .toggle:focus {
+    outline: none;
+  }
+  
+  .toggle:focus .toggle-track {
+    box-shadow: 0 0 0 2px var(--color-background), 0 0 0 4px var(--color-primary);
+  }
+  
+  /* Disabled state */
+  .toggle[data-disabled="true"] {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  /* Size variations */
+  .toggle-small {
+    --toggle-width: 36px;
+    --toggle-height: 18px;
+    --toggle-indicator-size: 12px;
+    --toggle-indicator-offset: 3px;
+    font-size: 0.8rem;
+  }
+  
+  .toggle-medium {
+    --toggle-width: 50px;
+    --toggle-height: 24px;
+    --toggle-indicator-size: 18px;
+    --toggle-indicator-offset: 3px;
+    font-size: 0.9rem;
+  }
+  
+  .toggle-large {
+    --toggle-width: 60px;
+    --toggle-height: 30px;
+    --toggle-indicator-size: 22px;
+    --toggle-indicator-offset: 4px;
+    font-size: 1rem;
+  }
+  
+  /* Theme toggle specifics */
+  .theme-toggle .toggle-track {
+    background-color: var(--color-background-alt);
+    overflow: hidden;
+  }
+  
+  .theme-toggle .toggle-indicator {
+    background-color: var(--color-card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .theme-toggle .toggle-indicator::before {
+    content: "☀️";
+    font-size: calc(var(--toggle-indicator-size) * 0.7);
+    transition: opacity var(--transition-speed-normal) var(--transition-timing);
+  }
+  
+  .theme-toggle.toggle-on .toggle-indicator::before {
+    content: "🌙";
+  }
+  
+  /* Hide Streamlit's default input field */
+  .element-container:has(+ .toggle-wrapper) {
+    position: absolute;
+    visibility: hidden;
+    height: 0;
+    width: 0;
+    overflow: hidden;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .toggle-labels {
+      font-size: 0.8rem;
+    }
+  }
