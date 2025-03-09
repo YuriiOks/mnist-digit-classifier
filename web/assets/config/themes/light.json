@@ -1,0 +1,15 @@
+{
+  "name": "light",
+  "colors": {
+    "primary": "#4361ee",
+    "secondary": "#3f37c9",
+    "accent": "#4895ef",
+    "background": "#f8f9fa",
+    "card": "#ffffff",
+    "text": "#212529",
+    "border": "#dee2e6",
+    "success": "#4cc9f0",
+    "warning": "#f72585",
+    "error": "#e63946"
+  }
+} 
