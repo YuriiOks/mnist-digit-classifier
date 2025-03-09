@@ -5,9 +5,10 @@
 # Created: 2024-05-01
 
 import logging
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 
 from core.app_state.session_state import SessionState
+from core.app_state.settings_state import SettingsState
 from utils.file.file_loader import load_json_file, FileLoadError
 
 logger = logging.getLogger(__name__)
@@ -353,3 +354,57 @@ class ThemeState:
             bool: True if the theme state has been initialized, False otherwise.
         """
         return SessionState.has_key(cls.CURRENT_THEME_KEY)
+
+    @classmethod
+    def get_theme_mode(cls) -> str:
+        """Get the current theme mode.
+        
+        Returns:
+            Current theme mode (light or dark)
+        """
+        cls.initialize()
+        return SessionState.get(cls.CURRENT_THEME_KEY, cls.DEFAULT_THEME)
+    
+    @classmethod
+    def set_theme_mode(cls, mode: str) -> None:
+        """Set the theme mode.
+        
+        Args:
+            mode: Theme mode to set (light or dark)
+        """
+        # Validate mode
+        if mode not in [cls.THEME_LIGHT, cls.THEME_DARK]:
+            logger.warning(f"Invalid theme mode: {mode}")
+            mode = cls.DEFAULT_THEME
+            
+        # Set theme mode
+        SessionState.set(cls.CURRENT_THEME_KEY, mode)
+        
+        # Update settings if available
+        try:
+            SettingsState.set_setting("theme", "mode", mode)
+        except Exception as e:
+            logger.warning(f"Could not update theme setting: {e}")
+            
+        logger.debug(f"Theme mode set to {mode}")
+    
+    @classmethod
+    def toggle_theme_mode(cls) -> str:
+        """Toggle between light and dark theme modes.
+        
+        Returns:
+            New theme mode after toggle
+        """
+        current_mode = cls.get_theme_mode()
+        new_mode = cls.THEME_DARK if current_mode == cls.THEME_LIGHT else cls.THEME_LIGHT
+        cls.set_theme_mode(new_mode)
+        return new_mode
+    
+    @classmethod
+    def is_dark_mode(cls) -> bool:
+        """Check if dark mode is active.
+        
+        Returns:
+            True if dark mode is active, False otherwise
+        """
+        return cls.get_theme_mode() == cls.THEME_DARK
