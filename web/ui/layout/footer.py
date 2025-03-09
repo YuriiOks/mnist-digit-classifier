@@ -70,8 +70,7 @@ class Footer(Component):
                 f"4.42-3.58-8-8-8z\"/>"
                 f"</svg>"
                 f"GitHub"
-                f"</span>"
-                f"</a>"
+                f"</span></a>"
             )
         else:
             self.content = content
