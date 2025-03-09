@@ -285,4 +285,44 @@ class BaseView(ABC):
                     
                 # Auxiliary content in right column
                 with cols[2]:
-                    self.render_auxiliary() 
+                    self.render_auxiliary()
+    
+    def apply_common_layout(self):
+        """Apply common layout styling to ensure consistency across views."""
+        try:
+            # Import and apply view styling utility if available
+            try:
+                from utils.ui.view_utils import apply_view_styling
+                apply_view_styling()
+            except ImportError:
+                # Fallback to direct CSS injection if utility isn't available
+                st.markdown("""
+                <style>
+                /* Fix content alignment */
+                .block-container {
+                    max-width: 100% !important;
+                    padding-top: 1rem !important;
+                    padding-left: 1rem !important;
+                    padding-right: 1rem !important;
+                }
+                
+                /* Make headers look better */
+                h1, h2, h3 {
+                    margin-bottom: 1rem !important;
+                    margin-top: 0.5rem !important;
+                    font-family: var(--font-primary, 'Poppins', sans-serif) !important;
+                }
+                
+                /* Add space around elements */
+                .stMarkdown {
+                    margin-bottom: 0.5rem !important;
+                }
+                
+                /* Remove empty columns */
+                .stColumn:empty {
+                    display: none !important;
+                }
+                </style>
+                """, unsafe_allow_html=True)
+        except Exception as e:
+            self.logger.error(f"Error applying common layout: {str(e)}") 
