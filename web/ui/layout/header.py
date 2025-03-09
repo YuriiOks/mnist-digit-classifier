@@ -13,6 +13,7 @@ from ui.theme.theme_manager import ThemeManager
 
 logger = logging.getLogger(__name__)
 
+
 class Header(Component):
     """Header component for the application.
     
@@ -37,7 +38,8 @@ class Header(Component):
             toggle_theme_callback: Function to call when theme toggle is clicked.
             id: HTML ID attribute for the component.
             classes: List of CSS classes to apply to the component.
-            attributes: Dictionary of HTML attributes to apply to the component.
+            attributes: Dictionary of HTML attributes to apply to the 
+                component.
         """
         super().__init__(
             component_type="layout",
