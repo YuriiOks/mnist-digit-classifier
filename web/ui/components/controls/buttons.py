@@ -1,300 +1,184 @@
 # MNIST Digit Classifier
 # Copyright (c) 2025
 # File: ui/components/controls/buttons.py
-# Description: Button components for user interactions
+# Description: Custom button components
 # Created: 2024-05-01
 
 import streamlit as st
 import logging
-from typing import Dict, Any, Optional, List, Union, Callable
-import uuid
+from typing import Dict, Any, Callable, Optional, List, Union
 
 from ui.components.base.component import Component
 
 logger = logging.getLogger(__name__)
 
-
-class Button(Component):
-    """Base button component.
-    
-    This component provides a flexible button with styling and click handling.
-    """
+class Button:
+    """Base button component."""
     
     def __init__(
         self,
         label: str,
-        *,
-        on_click: Optional[Callable[[], Any]] = None,
-        type: str = "default",
-        size: str = "medium",
+        key: Optional[str] = None,
+        on_click: Optional[Callable] = None,
+        args: tuple = (),
+        kwargs: Optional[Dict[str, Any]] = None,
         disabled: bool = False,
-        full_width: bool = False,
-        icon: Optional[str] = None,
-        icon_position: str = "left",
-        id: Optional[str] = None,
-        classes: Optional[List[str]] = None,
-        attributes: Optional[Dict[str, str]] = None
+        help: Optional[str] = None,
+        type: str = "default"
     ):
-        """Initialize a button component.
+        """Initialize a button.
         
         Args:
-            label: Text to display on the button.
-            on_click: Function to call when the button is clicked.
-            type: Button type ('default', 'primary', 'secondary', 'text', 'icon').
-            size: Button size ('small', 'medium', 'large').
-            disabled: Whether the button is disabled.
-            full_width: Whether the button should take up the full width.
-            icon: Optional icon to display on the button.
-            icon_position: Position of the icon ('left' or 'right').
-            id: HTML ID attribute for the component.
-            classes: List of CSS classes to apply to the component.
-            attributes: Dictionary of HTML attributes to apply to the component.
+            label: Button text
+            key: Unique key for the button
+            on_click: Function to call when button is clicked
+            args: Arguments to pass to on_click
+            kwargs: Keyword arguments to pass to on_click
+            disabled: Whether the button is disabled
+            help: Tooltip text
+            type: Button type (default, primary, secondary, etc.)
         """
-        logger.debug(f"Initializing Button component with label: {label}")
-        # Generate a key for Streamlit button
-        self.key = f"btn_{uuid.uuid4().hex[:8]}"
-        
-        # Prepare classes
-        button_classes = ["btn", f"btn-{type}", f"btn-{size}"]
-        if full_width:
-            button_classes.append("btn-full-width")
-        if disabled:
-            button_classes.append("btn-disabled")
-        if classes:
-            button_classes.extend(classes)
-        
-        # Prepare attributes
-        button_attributes = attributes or {}
-        if disabled:
-            button_attributes["disabled"] = "disabled"
-            button_attributes["aria-disabled"] = "true"
-        
-        super().__init__(
-            "controls",
-            "button",
-            id=id or self.key,
-            classes=button_classes,
-            attributes=button_attributes
-        )
-        
         self.label = label
+        self.key = key
         self.on_click = on_click
-        self.type = type
-        self.size = size
+        self.args = args
+        self.kwargs = kwargs or {}
         self.disabled = disabled
-        self.full_width = full_width
-        self.icon = icon
-        self.icon_position = icon_position if icon else "none"
-        self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
-        self.logger.debug(f"Button initialized with type: {type}, disabled: {disabled}")
+        self.help = help
+        self.type = type
     
-    def get_template_variables(self) -> Dict[str, Any]:
-        """Get template variables for rendering.
+    def render(self) -> bool:
+        """Render the button.
         
         Returns:
-            Dict[str, Any]: Dictionary of variables for template rendering.
+            True if the button was clicked, False otherwise
         """
-        variables = super().get_template_variables()
-        
-        # Prepare icon HTML
-        icon_html = f'<span class="btn-icon">{self.icon}</span>' if self.icon else ""
-        
-        variables.update({
-            "BUTTON_LABEL": self.label,
-            "BUTTON_ICON": icon_html,
-            "ICON_POSITION": self.icon_position
-        })
-        
-        return variables
-    
-    def display(self) -> bool:
-        """Display the button and handle clicks.
-        
-        This method renders the visual button using our template system
-        and also creates a Streamlit button to handle the click event.
-        
-        Returns:
-            bool: True if the button was clicked, False otherwise.
-        """
-        self.logger.debug("Displaying button component")
         try:
-            # Render the HTML button
-            html = self.safe_render()
-            
-            # Create a simple button without nested columns
-            clicked = st.button(
-                self.label,
+            return st.button(
+                label=self.label,
                 key=self.key,
+                on_click=self.on_click,
+                args=self.args,
+                kwargs=self.kwargs,
                 disabled=self.disabled,
-                help=self.label,
-                type=self.type if self.type in ['primary', 'secondary'] else None,
-                use_container_width=self.full_width,
+                help=self.help,
+                type=self.type
             )
-            
-            # Apply custom styling via HTML
-            st.markdown(
-                f"<style>#{self.id} {{ /* Custom styles here */ }}</style>",
-                unsafe_allow_html=True
-            )
-            
-            # Handle click if the button was clicked and not disabled
-            if clicked and not self.disabled and self.on_click:
-                self.logger.info(f"Executing click handler for button: {self.label}")
-                self.on_click()
-            
-            self.logger.debug("Button component displayed successfully")
-            return clicked
         except Exception as e:
-            self.logger.error(f"Error displaying button component: {str(e)}", exc_info=True)
-            st.error("Error displaying button")
-            return False
+            logger.error(f"Error rendering button '{self.label}': {str(e)}")
+            # Fallback to basic button
+            return st.button(self.label, key=self.key, disabled=True, 
+                            help="Error: Could not render button properly")
+
 
 class PrimaryButton(Button):
-    """Primary button component.
-    
-    A prominent button for primary actions.
-    """
+    """Primary action button with prominent styling."""
     
     def __init__(
         self,
         label: str,
-        *,
-        on_click: Optional[Callable[[], Any]] = None,
-        size: str = "medium",
+        key: Optional[str] = None,
+        on_click: Optional[Callable] = None,
+        args: tuple = (),
+        kwargs: Optional[Dict[str, Any]] = None,
         disabled: bool = False,
-        full_width: bool = False,
-        icon: Optional[str] = None,
-        icon_position: str = "left",
-        id: Optional[str] = None,
-        classes: Optional[List[str]] = None,
-        attributes: Optional[Dict[str, str]] = None
+        help: Optional[str] = None
     ):
-        """Initialize a primary button.
-        
-        Args:
-            label: Text to display on the button.
-            on_click: Function to call when the button is clicked.
-            size: Button size ('small', 'medium', 'large').
-            disabled: Whether the button is disabled.
-            full_width: Whether the button should take up the full width.
-            icon: Optional icon to display on the button.
-            icon_position: Position of the icon ('left' or 'right').
-            id: HTML ID attribute for the component.
-            classes: List of CSS classes to apply to the component.
-            attributes: Dictionary of HTML attributes to apply to the component.
-        """
-        logger.debug(f"Initializing PrimaryButton component with label: {label}")
+        """Initialize a primary button."""
         super().__init__(
-            label,
+            label=label,
+            key=key,
             on_click=on_click,
-            type="primary",
-            size=size,
+            args=args,
+            kwargs=kwargs,
             disabled=disabled,
-            full_width=full_width,
-            icon=icon,
-            icon_position=icon_position,
-            id=id,
-            classes=classes,
-            attributes=attributes
+            help=help,
+            type="primary"
         )
-        self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
-        self.logger.debug("PrimaryButton initialized")
 
 
 class SecondaryButton(Button):
-    """Secondary button component.
-    
-    A less prominent button for secondary actions.
-    """
+    """Secondary action button with less prominent styling."""
     
     def __init__(
         self,
         label: str,
-        *,
-        on_click: Optional[Callable[[], Any]] = None,
-        size: str = "medium",
+        key: Optional[str] = None,
+        on_click: Optional[Callable] = None,
+        args: tuple = (),
+        kwargs: Optional[Dict[str, Any]] = None,
         disabled: bool = False,
-        full_width: bool = False,
-        icon: Optional[str] = None,
-        icon_position: str = "left",
-        id: Optional[str] = None,
-        classes: Optional[List[str]] = None,
-        attributes: Optional[Dict[str, str]] = None
+        help: Optional[str] = None
     ):
-        """Initialize a secondary button.
-        
-        Args:
-            label: Text to display on the button.
-            on_click: Function to call when the button is clicked.
-            size: Button size ('small', 'medium', 'large').
-            disabled: Whether the button is disabled.
-            full_width: Whether the button should take up the full width.
-            icon: Optional icon to display on the button.
-            icon_position: Position of the icon ('left' or 'right').
-            id: HTML ID attribute for the component.
-            classes: List of CSS classes to apply to the component.
-            attributes: Dictionary of HTML attributes to apply to the component.
-        """
+        """Initialize a secondary button."""
         super().__init__(
-            label,
+            label=label,
+            key=key,
             on_click=on_click,
-            type="secondary",
-            size=size,
+            args=args,
+            kwargs=kwargs,
             disabled=disabled,
-            full_width=full_width,
-            icon=icon,
-            icon_position=icon_position,
-            id=id,
-            classes=classes,
-            attributes=attributes
+            help=help,
+            type="secondary"
         )
 
 
-class IconButton(Button):
-    """Icon-only button component.
-    
-    A button that displays only an icon.
-    """
+class IconButton:
+    """Button represented by an icon."""
     
     def __init__(
         self,
         icon: str,
-        *,
-        label: str,  # For accessibility, even though it's not displayed
-        on_click: Optional[Callable[[], Any]] = None,
-        size: str = "medium",
+        key: Optional[str] = None,
+        on_click: Optional[Callable] = None,
+        args: tuple = (),
+        kwargs: Optional[Dict[str, Any]] = None,
         disabled: bool = False,
-        id: Optional[str] = None,
-        classes: Optional[List[str]] = None,
-        attributes: Optional[Dict[str, str]] = None
+        help: Optional[str] = None,
+        label: Optional[str] = None
     ):
         """Initialize an icon button.
         
         Args:
-            icon: Icon to display on the button.
-            label: Accessible label for the button (not displayed).
-            on_click: Function to call when the button is clicked.
-            size: Button size ('small', 'medium', 'large').
-            disabled: Whether the button is disabled.
-            id: HTML ID attribute for the component.
-            classes: List of CSS classes to apply to the component.
-            attributes: Dictionary of HTML attributes to apply to the component.
+            icon: Icon to display (emoji or icon class)
+            key: Unique key for the button
+            on_click: Function to call when button is clicked
+            args: Arguments to pass to on_click
+            kwargs: Keyword arguments to pass to on_click
+            disabled: Whether the button is disabled
+            help: Tooltip text
+            label: Optional text label to display alongside the icon
         """
-        # Prepare attributes for accessibility
-        button_attributes = attributes or {}
-        button_attributes["aria-label"] = label
-        button_attributes["title"] = label
+        self.icon = icon
+        self.key = key
+        self.on_click = on_click
+        self.args = args
+        self.kwargs = kwargs or {}
+        self.disabled = disabled
+        self.help = help
+        self.label = label
+    
+    def render(self) -> bool:
+        """Render the icon button.
         
-        super().__init__(
-            "",  # Empty label for icon-only button
-            on_click=on_click,
-            type="icon",
-            size=size,
-            disabled=disabled,
-            full_width=False,  # Icon buttons are never full-width
-            icon=icon,
-            icon_position="center",  # Special position for icon-only buttons
-            id=id,
-            classes=classes,
-            attributes=button_attributes
-        )
+        Returns:
+            True if the button was clicked, False otherwise
+        """
+        try:
+            # If we have a label, use it with the icon
+            display_label = f"{self.icon} {self.label}" if self.label else self.icon
+            
+            return st.button(
+                label=display_label,
+                key=self.key,
+                on_click=self.on_click,
+                args=self.args,
+                kwargs=self.kwargs,
+                disabled=self.disabled,
+                help=self.help
+            )
+        except Exception as e:
+            logger.error(f"Error rendering icon button '{self.icon}': {str(e)}")
+            # Fallback to basic button
+            return st.button("⚠️", key=self.key, disabled=True, 
+                            help="Error: Could not render button properly")
