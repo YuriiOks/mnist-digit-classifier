@@ -1,1 +1,75 @@
- 
+/* MNIST Digit Classifier
+ * Copyright (c) 2025
+ * File: assets/css/global/view_layout.css
+ * Description: Unified layout styling for all views
+ * Created: 2024-05-01
+ */
+
+/* Standard view container */
+.view-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+/* Welcome card styling for all views */
+.welcome-card {
+  margin-bottom: 2rem !important;
+  padding: var(--spacing-lg, 1.5rem) !important;
+}
+
+.welcome-card .card-title {
+  font-size: 1.5rem !important;
+  margin-bottom: 1.25rem !important;
+}
+
+.welcome-card .card-content p {
+  margin-bottom: 0.75rem !important;
+  font-size: 1.05rem !important;
+  line-height: 1.6 !important;
+}
+
+/* Two-column layout */
+.two-column-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .two-column-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Content cards in grid layout */
+.feature-card, .primary-card, .secondary-card, .accent-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Card action buttons */
+.card-actions {
+  margin-top: auto;
+  padding-top: 1rem;
+}
+
+/* Standard section spacing */
+.view-section {
+  margin-bottom: 2rem;
+}
+
+/* Consistent form controls */
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+.form-label {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  display: block;
+} 
