@@ -1,0 +1,102 @@
+/* MNIST Digit Classifier
+ * Copyright (c) 2025
+ * File: assets/css/themes/dark/variables.css
+ * Description: Dark theme variables for the MNIST Digit Classifier
+ * Created: 2024-05-01
+ */
+
+:root {
+  /* Theme specific colors */
+  --color-background: #121212;
+  --color-background-alt: #1e1e1e;
+  --color-card: #1e1e1e;
+  --color-card-alt: #252525;
+  
+  /* Text colors */
+  --color-text: #e0e0e0;
+  --color-text-light: #a0a0a0;
+  --color-text-muted: #6c7280;
+  
+  /* UI colors */
+  --color-border: #333333;
+  --color-shadow: rgba(0, 0, 0, 0.25);
+  
+  /* Brand colors - adjusted for dark mode */
+  --color-primary: #6c6cff;
+  --color-primary-dark: #5454ff;
+  --color-primary-light: #8a8aff;
+  --color-secondary: #45c0ff;
+  --color-accent: #ff9370;
+  
+  /* Status colors - adjusted for better visibility */
+  --color-success: #34d399;
+  --color-warning: #fbbf24;
+  --color-error: #f87171;
+  --color-info: #60a5fa;
+  
+  /* UI elements with adjusted shadows for dark mode */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.5);
+  
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  
+  /* Border radius */
+  --border-radius-sm: 0.25rem;
+  --border-radius-md: 0.5rem;
+  --border-radius-lg: 0.75rem;
+  --border-radius-circle: 50%;
+  
+  /* Transitions */
+  --transition-speed-fast: 0.2s;
+  --transition-speed-normal: 0.3s;
+  --transition-speed-slow: 0.5s;
+  --transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dark {
+  /* Dark theme colors */
+  --color-primary: #4cc9f0;
+  --color-primary-rgb: 76, 201, 240; /* RGB values for #4cc9f0 */
+  --color-secondary: #4895ef;
+  --color-accent: #4361ee;
+  --color-background: #121212;
+  --color-card: #1e1e1e;
+  --color-text: #f8f9fa;
+  --color-text-light: #adb5bd;
+  --color-border: #333333;
+  --color-success: #4cc9f0;
+  --color-warning: #f72585;
+  --color-error: #e63946;
+  
+  /* Additional dark theme specific colors */
+  --color-background-alt: #2a2a2a;
+  --color-shadow: rgba(0, 0, 0, 0.5);
+  --color-shadow-dark: rgba(0, 0, 0, 0.8);
+  --color-highlight: rgba(76, 201, 240, 0.1);
+  
+  /* Canvas colors */
+  --color-canvas-background: #1e1e1e;
+  --color-canvas-grid: #333333;
+  --color-canvas-border: #4d4d4d;
+  
+  /* Input colors */
+  --color-input-background: #2a2a2a;
+  --color-input-border: #4d4d4d;
+  --color-input-focus: #4cc9f0;
+  
+  /* Button colors */
+  --color-button-primary-bg: #4cc9f0;
+  --color-button-primary-text: #121212;
+  --color-button-secondary-bg: #333333;
+  --color-button-secondary-text: #f8f9fa;
+  
+  /* Nav colors */
+  --color-nav-active: #4cc9f0;
+  --color-nav-hover: #4895ef;
+} 
