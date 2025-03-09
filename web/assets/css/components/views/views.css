@@ -1,0 +1,115 @@
+/* MNIST Digit Classifier
+ * Copyright (c) 2025
+ * File: assets/css/components/views/views.css
+ * Description: Styles for application views
+ * Created: 2024-05-01
+ */
+
+/* Common view container styling */
+.view-container {
+    margin-bottom: 2rem;
+}
+
+/* View header styling */
+.view-header {
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 0.75rem;
+}
+
+.view-title {
+    margin: 0;
+    padding: 0;
+    font-size: 1.8rem;
+    color: var(--color-text);
+    display: flex;
+    align-items: center;
+}
+
+.view-title-icon {
+    margin-right: 0.5rem;
+    font-size: 2rem;
+}
+
+.view-description {
+    margin-top: 0.5rem;
+    color: var(--color-text-light);
+    font-size: 1rem;
+}
+
+/* Section styling */
+.view-section {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    border-radius: var(--border-radius-md);
+    background-color: var(--color-card);
+    border: 1px solid var(--color-border);
+}
+
+.view-section-title {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+    color: var(--color-text);
+}
+
+/* Canvas view specific */
+.canvas-container {
+    background-color: var(--color-canvas-background);
+    border: 2px solid var(--color-canvas-border);
+    border-radius: var(--border-radius-md);
+    width: 100%;
+    padding-top: 100%; /* 1:1 Aspect ratio */
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.canvas-instructions {
+    background-color: var(--color-background-alt);
+    padding: 1rem;
+    border-radius: var(--border-radius-md);
+    margin-bottom: 1rem;
+}
+
+/* History view specific */
+.history-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    text-align: center;
+    color: var(--color-text-light);
+}
+
+.history-empty-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+/* Settings view specific */
+.settings-section {
+    margin-bottom: 1.5rem;
+}
+
+.settings-option {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.settings-option:last-child {
+    border-bottom: none;
+}
+
+.settings-option-label {
+    font-weight: 500;
+}
+
+.settings-description {
+    color: var(--color-text-light);
+    font-size: 0.9rem;
+    margin-top: 0.25rem;
+} 
