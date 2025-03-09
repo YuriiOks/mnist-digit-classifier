@@ -114,6 +114,7 @@ logging.basicConfig(
 
 # Create a module-level logger
 logger = logging.getLogger(__name__)
+logger.info("Application starting")
 
 # SAFETY MECHANISM: Add a try-except around the ENTIRE app
 try:
@@ -143,6 +144,7 @@ try:
     # Initialize app state
     from core.app_state import initialize_app_state
     initialize_app_state()
+    logger.info("App state initialized")
     
     # Initialize theme and load styles
     ThemeManager.initialize()
