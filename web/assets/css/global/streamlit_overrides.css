@@ -1,0 +1,107 @@
+/* MNIST Digit Classifier
+ * Copyright (c) 2025
+ * File: assets/css/global/streamlit_overrides.css
+ * Description: Override Streamlit default styles
+ * Created: 2024-05-01
+ */
+
+/* Make Streamlit containers full width */
+.block-container {
+  max-width: none !important;
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+  padding-top: 1rem !important;
+}
+
+/* Style Streamlit buttons to match our theme */
+.stButton > button {
+  background-color: var(--color-primary) !important;
+  color: white !important;
+  border-radius: var(--border-radius-md) !important;
+  border: none !important;
+  padding: 0.5rem 1rem !important;
+  font-weight: 500 !important;
+  transition: all 0.2s !important;
+}
+
+.stButton > button:hover {
+  background-color: var(--color-primary-dark) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+
+.stButton > button:active {
+  transform: translateY(0) !important;
+}
+
+/* Style Streamlit text inputs */
+div.stTextInput > div > div > input {
+  border-radius: var(--border-radius-md) !important;
+  border: 1px solid var(--color-border) !important;
+  padding: 0.5rem 0.75rem !important;
+  transition: all 0.2s !important;
+}
+
+div.stTextInput > div > div > input:focus {
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 2px rgba(var(--color-primary-rgb), 0.2) !important;
+}
+
+/* Style Streamlit selectbox */
+div.stSelectbox > div > div {
+  border-radius: var(--border-radius-md) !important;
+}
+
+/* Style Streamlit sliders */
+div.stSlider > div {
+  padding-top: 0.5rem !important;
+  padding-bottom: 1rem !important;
+}
+
+div.stSlider > div > div > div > div {
+  background-color: var(--color-primary) !important;
+}
+
+/* Style Streamlit checkbox */
+div.stCheckbox > label > div[role="checkbox"] {
+  background-color: var(--color-primary) !important;
+}
+
+/* Style Streamlit progress bar */
+div.stProgress > div > div > div {
+  background-color: var(--color-primary) !important;
+}
+
+/* Style Streamlit markdown */
+div.stMarkdown {
+  color: var(--color-text) !important;
+}
+
+/* Remove menu hamburger icon */
+.stApp header {
+  display: none !important;
+}
+
+/* Reduce top padding for main container */
+.main .block-container {
+  padding-top: 1rem !important;
+}
+
+/* Footer fixes */
+footer {
+  visibility: hidden;
+}
+
+/* Make radio buttons match our theme */
+.stRadio > div {
+  padding-top: 0.5rem !important;
+  padding-bottom: 0.5rem !important;
+}
+
+.stRadio > div > div > label > div[role="radio"] {
+  border-color: var(--color-primary) !important;
+}
+
+.stRadio > div > div > label > div[role="radio"][aria-checked="true"] {
+  background-color: var(--color-primary) !important;
+} 
