@@ -1,0 +1,73 @@
+/* MNIST Digit Classifier
+ * Copyright (c) 2025
+ * File: assets/css/global/theme_transitions.css
+ * Description: CSS for smooth theme transitions
+ * Created: 2024-05-01
+ */
+
+/* Apply transitions to all elements for smooth theme switching */
+html {
+  transition-property: color, background-color, border-color, box-shadow;
+  transition-duration: 0.3s;
+  transition-timing-function: ease;
+}
+
+body * {
+  transition-property: color, background-color, border-color, box-shadow, fill, stroke;
+  transition-duration: 0.3s;
+  transition-timing-function: ease;
+}
+
+/* Transition exceptions for better performance */
+img, video {
+  transition: opacity 0.3s ease;
+}
+
+/* Theme switch animation */
+.theme-transition {
+  animation: theme-fade 0.3s ease-in-out;
+}
+
+/* Key animation for theme switch */
+@keyframes theme-fade {
+  0% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Theme toggle animation */
+.theme-toggle .toggle-thumb {
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.theme-toggle input:checked + .toggle-track .toggle-thumb {
+  transform: translateX(100%);
+}
+
+/* Theme icons animation */
+.theme-icon {
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.light-icon {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+}
+
+.dark-icon {
+  opacity: 0;
+  transform: rotate(90deg) scale(0.5);
+}
+
+[data-theme="dark"] .light-icon {
+  opacity: 0;
+  transform: rotate(-90deg) scale(0.5);
+}
+
+[data-theme="dark"] .dark-icon {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+} 
