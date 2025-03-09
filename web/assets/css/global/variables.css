@@ -1,0 +1,155 @@
+/* MNIST Digit Classifier
+ * Copyright (c) 2025
+ * File: assets/css/global/variables.css
+ * Description: Global CSS variables for the MNIST Digit Classifier
+ * Created: 2024-05-01
+ */
+
+/* Default theme variables (light) */
+:root {
+  /* Theme specific colors */
+  --color-background: #f8f9fa;
+  --color-background-alt: #ffffff;
+  --color-card: #ffffff;
+  --color-card-alt: #f7f9fc;
+  
+  /* Text colors */
+  --color-text: #212529;
+  --color-text-light: #495057;
+  --color-text-muted: #6c757d;
+  
+  /* UI colors */
+  --color-border: #e2e8f0;
+  --color-shadow: rgba(0, 0, 0, 0.08);
+  
+  /* Brand colors */
+  --color-primary: #5B5BF9;
+  --color-primary-dark: #4040e4;
+  --color-primary-light: #7d7dff;
+  --color-secondary: #38b6ff;
+  --color-accent: #FF7F50;
+  
+  /* Status colors */
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: #3b82f6;
+  
+  /* UI elements */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  
+  /* Border radius */
+  --border-radius-sm: 0.25rem;
+  --border-radius-md: 0.5rem;
+  --border-radius-lg: 0.75rem;
+  --border-radius-circle: 50%;
+  
+  /* Transitions */
+  --transition-speed-fast: 0.2s;
+  --transition-speed-normal: 0.3s;
+  --transition-speed-slow: 0.5s;
+  --transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Add a special class to match the design specification */
+.gradient-border {
+  position: relative;
+}
+
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(to right, var(--color-primary), var(--color-secondary));
+  border-radius: var(--border-radius-md) var(--border-radius-md) 0 0;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes shine {
+  0% { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}
+
+/* Animation utilities */
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.animate-slide-up {
+  animation: slideInUp 0.5s ease-out;
+}
+
+.animate-pulse {
+  animation: pulse 2s infinite;
+}
+
+/* Layout variables */
+--container-max-width: 1200px;
+--sidebar-width: 300px;
+--header-height: 60px;
+--footer-height: 60px;
+
+/* Border radius */
+--border-radius-sm: 4px;
+--border-radius-md: 8px;
+--border-radius-lg: 12px;
+--border-radius-xl: 16px;
+--border-radius-circle: 50%;
+
+/* Shadow variables */
+--shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+--shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+--shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+--shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1);
+
+/* Z-index variables */
+--z-index-background: -1;
+--z-index-default: 1;
+--z-index-header: 100;
+--z-index-dropdown: 200;
+--z-index-modal: 300;
+--z-index-toast: 400;
+
+/* Animation variables */
+--transition-speed-fast: 150ms;
+--transition-speed-normal: 300ms;
+--transition-speed-slow: 500ms;
+--transition-timing: ease-in-out;
+
+/* Spacing variables */
+--spacing-xxs: 0.125rem;   /* 2px */
+--spacing-xxl: 3rem;       /* 48px */
