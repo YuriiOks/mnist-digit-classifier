@@ -1,0 +1,15 @@
+{
+  "name": "dark",
+  "colors": {
+    "primary": "#4cc9f0",
+    "secondary": "#4895ef",
+    "accent": "#4361ee",
+    "background": "#121212",
+    "card": "#1e1e1e",
+    "text": "#f8f9fa",
+    "border": "#333333",
+    "success": "#4cc9f0",
+    "warning": "#f72585",
+    "error": "#e63946"
+  }
+} 
