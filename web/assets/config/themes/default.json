@@ -1,0 +1,12 @@
+{
+  "fonts": {
+    "heading": "system-ui, sans-serif",
+    "body": "system-ui, sans-serif",
+    "code": "monospace"
+  },
+  "settings": {
+    "animations_enabled": true,
+    "transitions_speed": "normal",
+    "border_radius": "4px"
+  }
+} 
