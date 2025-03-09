@@ -1,0 +1,14 @@
+<div id="${ID}" class="input-wrapper ${CLASSES} ${HAS_LABEL} ${HAS_ERROR} ${IS_REQUIRED} ${IS_DISABLED}" ${ATTRIBUTES}>
+    <div class="input-container">
+      <label for="${INPUT_NAME}" class="input-label" style="${!INPUT_LABEL ? 'display:none;' : ''}">
+        ${INPUT_LABEL}
+        <span class="required-indicator" style="${!IS_REQUIRED ? 'display:none;' : ''}">*</span>
+      </label>
+      <div class="input-field-container">
+        <input id="${INPUT_NAME}" class="input-field" ${INPUT_ATTRIBUTES}>
+        <div class="input-error-icon" style="${!HAS_ERROR ? 'display:none;' : ''}">!</div>
+      </div>
+      <div class="input-help-text" style="${!INPUT_HELP_TEXT ? 'display:none;' : ''}">${INPUT_HELP_TEXT}</div>
+      <div class="input-error-message" style="${!INPUT_ERROR ? 'display:none;' : ''}">${INPUT_ERROR}</div>
+    </div>
+  </div>
