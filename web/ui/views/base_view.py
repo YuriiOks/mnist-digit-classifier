@@ -161,13 +161,6 @@ class BaseView(ABC):
             # Only render the title - completely skip the description
             st.markdown(f"<h1 class='view-title'>{title_html}</h1>", unsafe_allow_html=True)
             
-            # Description rendering is completely disabled
-            # if self.description:
-            #     st.markdown(
-            #         f"<p class='view-description'>{self.description}</p>",
-            #         unsafe_allow_html=True
-            #     )
-            
             self.logger.debug(f"Title rendered successfully for view: {self.view_id}")
         except Exception as e:
             self.logger.error(f"Error rendering title for view {self.view_id}: {str(e)}", exc_info=True)
@@ -195,28 +188,8 @@ class BaseView(ABC):
         self.logger.debug(f"Exiting safe_render for view: {self.view_id}")
     
     def display(self) -> None:
-        """Display the view."""
-        view_container_styles = """
-        <style>
-        .view-container-{} {{
-            padding: 0.5rem;
-        }}
-        
-        .view-title {{
-            margin-bottom: 1rem;
-            color: var(--text-color-primary);
-        }}
-        
-        .view-description {{
-            margin-bottom: 2rem;
-            color: var(--text-color-secondary);
-            font-size: 1.1rem;
-        }}
-        </style>
-        """.format(self.view_id)
-        
-        st.markdown(view_container_styles, unsafe_allow_html=True)
-        
+        """Display the view (calls render internally)."""
+        self.logger.debug(f"Entering display for view: {self.view_id}")    
         # Render title
         self.render_title()
         
@@ -256,7 +229,7 @@ class BaseView(ABC):
             try:
                 from utils.ui.view_utils import apply_view_styling
                 apply_view_styling()
-            except ImportError:
+            except ImportError: 
                 # Fallback to direct CSS injection if utility isn't available
                 st.markdown("""
                 <style>
