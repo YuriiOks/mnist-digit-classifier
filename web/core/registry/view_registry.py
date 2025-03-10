@@ -65,4 +65,28 @@ class ViewRegistry:
         Returns:
             List of view IDs
         """
-        return list(cls._views.keys()) 
+        return list(cls._views.keys())
+
+    @classmethod
+    def register_default_views(cls):
+        """Register the default views for the application."""
+        logger.debug("Registering default views")
+        
+        # Import views here to avoid circular imports
+        from ui.views.home.home_view import HomeView
+        from ui.views.draw.draw_view import DrawView
+        from ui.views.history.history_view import HistoryView
+        from ui.views.settings.settings_view import SettingsView
+        
+        # Register the views
+        cls.register_view(HomeView())
+        cls.register_view(DrawView())
+        cls.register_view(HistoryView())
+        cls.register_view(SettingsView())
+        
+        # Register debug views if in debug mode
+        try:
+            from ui.views.debug.debug_view import DebugView
+            cls.register_view(DebugView())
+        except ImportError:
+            logger.debug("Debug view not available") 
