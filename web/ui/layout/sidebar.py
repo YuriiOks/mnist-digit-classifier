@@ -1,130 +1,137 @@
 # MNIST Digit Classifier
 # Copyright (c) 2025
 # File: ui/layout/sidebar.py
+# Description: Application sidebar with navigation
+# Created: 2024-05-01
 
 import streamlit as st
-from typing import Dict, Any, Optional, List, Callable
 import logging
-import uuid
+from typing import List, Dict, Any, Optional
 
-from ui.components.base.component import Component
 from core.app_state.navigation_state import NavigationState
+from core.app_state.theme_state import ThemeState
+from ui.components.navigation.option_menu import create_option_menu
 from ui.theme.theme_manager import ThemeManager
 
 logger = logging.getLogger(__name__)
 
-class Sidebar(Component):
-    """Sidebar layout component for the application."""
+class Sidebar:
+    """Application sidebar with navigation and settings."""
     
-    def __init__(
-        self,
-        title: str = "Navigation",
-        footer_text: Optional[str] = None
-    ):
-        """Initialize the sidebar component."""
-        logger.debug(f"Initializing Sidebar with title: {title}")
-        super().__init__(component_type="layout", component_name="sidebar")
-        self.title = title
-        self.footer_text = footer_text
+    def __init__(self):
         self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
     
-    def display(self) -> None:
-        """Display the sidebar component."""
+    def display(self):
+        """Display the sidebar with navigation and settings."""
         try:
-            self.logger.debug("Rendering sidebar")
-            
             with st.sidebar:
-                # Display sidebar title
-                self.logger.debug(f"Displaying sidebar title: {self.title}")
-                st.markdown(f"## {self.title}")
+                # Fancy header with gradient text
+                st.markdown("""
+                <style>
+                .sidebar-header {
+                    text-align: center;
+                    margin-bottom: 20px;
+                }
+                .gradient-text {
+                    background: linear-gradient(90deg, #4361ee, #4cc9f0);
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                    font-weight: 700;
+                    font-size: 2.2rem;
+                    line-height: 1.2;
+                    margin-bottom: 0.2rem;
+                }
+                .sidebar-subheader {
+                    opacity: 0.8;
+                    font-size: 0.9rem;
+                    margin-bottom: 15px;
+                    text-align: center;
+                }
                 
-                # Get navigation routes
-                routes = NavigationState.get_routes()
-                active_view = NavigationState.get_active_view()
-                self.logger.debug(f"Retrieved {len(routes)} navigation routes, active view: {active_view}")
+                /* Custom button styling */
+                div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"] button {
+                    width: 100% !important;
+                    border-radius: 8px !important;
+                    margin-bottom: 8px !important;
+                    font-weight: 500 !important;
+                    border: none !important;
+                    padding: 10px 15px !important;
+                    transition: all 0.3s !important;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.1) !important;
+                }
                 
-                # Create simple navigation using Streamlit components
-                for route in routes:
-                    item_id = route.get("id")
-                    label = route.get("label", "")
-                    icon = route.get("icon", "")
-                    
-                    # Generate a unique key for each button
-                    # This prevents conflicts with session state keys
-                    button_key = f"nav_btn_{item_id}_{uuid.uuid4().hex[:4]}"
-                    self.logger.debug(f"Creating navigation button for {item_id} with key {button_key}")
-                    
-                    # Create a clickable button for each navigation item
-                    if st.button(
-                        f"{icon} {label}", 
-                        key=button_key,
-                        use_container_width=True,
-                        type="primary" if item_id == active_view else "secondary"
-                    ):
-                        self.logger.info(f"Navigation button clicked: {item_id}")
-                        NavigationState.set_active_view(item_id)
-                        self.logger.debug("Triggering app rerun to apply navigation change")
-                        st.rerun()
+                div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"] button:hover {
+                    transform: translateY(-2px) !important;
+                    box-shadow: 0 4px 8px rgba(0,0,0,0.15) !important;
+                }
                 
-                # Add spacer
-                st.markdown("<br><br>", unsafe_allow_html=True)
+                .divider {
+                    margin: 20px 0;
+                    border-top: 1px solid rgba(128, 128, 128, 0.2);
+                }
+                </style>
                 
-                # Display footer if provided
-                if self.footer_text:
-                    self.logger.debug(f"Displaying sidebar footer text: {self.footer_text}")
-                    st.markdown(
-                        f"<div style='position: fixed; bottom: 20px; width: 100%;'>{self.footer_text}</div>", 
-                        unsafe_allow_html=True
-                    )
+                <div class="sidebar-header">
+                    <div class="gradient-text">MNIST App</div>
+                    <div class="sidebar-subheader">Digit Classification AI</div>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                # Navigation buttons - consistent styling
+                st.markdown("### Navigation")
+                
+                # Home button
+                if st.button("🏠 Home", key="nav_home_btn", use_container_width=True, type="primary"):
+                    NavigationState.navigate_to("home")
+                    st.rerun()
+                
+                # Draw button
+                if st.button("✏️ Draw & Classify", key="nav_draw_btn", use_container_width=True, type="primary"):
+                    NavigationState.navigate_to("draw")
+                    st.rerun()
+                
+                # History button
+                if st.button("📊 View History", key="nav_history_btn", use_container_width=True, type="primary"):
+                    NavigationState.navigate_to("history")
+                    st.rerun()
+                
+                # Settings button
+                if st.button("⚙️ Settings", key="nav_settings_btn", use_container_width=True, type="primary"):
+                    NavigationState.navigate_to("settings")
+                    st.rerun()
+                
+                # Add a visual divider
+                st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
+                
+                # Theme toggle
+                st.markdown("### Appearance")
+                is_dark = st.toggle("Dark Mode", 
+                                  ThemeState.is_dark_mode(),
+                                  key="theme_toggle_sidebar")
+                
+                # Handle theme change
+                if is_dark != ThemeState.is_dark_mode():
+                    ThemeState.set_theme_mode("dark" if is_dark else "light")
+                    ThemeManager.toggle_theme()
+                    st.rerun()
+                
+                # Add another visual divider
+                st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
+                
+                # Footer info in sidebar
+                st.markdown("""
+                <div style="text-align: center; font-size: 0.8rem; opacity: 0.7; margin-top: 30px;">
+                    <p>Version 1.0.0</p>
+                    <p>© 2025 MNIST Classifier</p>
+                </div>
+                """, unsafe_allow_html=True)
             
-            self.logger.debug("Sidebar rendered successfully")
         except Exception as e:
             self.logger.error(f"Error displaying sidebar: {str(e)}", exc_info=True)
-            st.sidebar.error(f"Error loading navigation: {str(e)}")
-    
-    def get_template_variables(self) -> dict:
-        """Get template variables for rendering.
-        
-        Returns:
-            dict: Template variables
-        """
-        self.logger.debug("Getting template variables for sidebar")
-        try:
-            variables = super().get_template_variables()
+            st.sidebar.error("Error in navigation")
             
-            # Get navigation items
-            routes = NavigationState.get_routes()
-            active_view = NavigationState.get_active_view()
-            self.logger.debug(f"Preparing navigation items: {len(routes)} routes, active: {active_view}")
-            
-            # Format for template
-            sidebar_items = ""
-            for route in routes:
-                item_id = route.get("id", "")
-                label = route.get("label", "")
-                icon = route.get("icon", "")
-                is_active = item_id == active_view
-                
-                # Add to sidebar items HTML
-                sidebar_items += f"""
-                <li class="sidebar-item {('active' if is_active else '')}">
-                    <a href="javascript:void(0);" data-view="{item_id}">{icon} {label}</a>
-                </li>
-                """
-            
-            variables.update({
-                "SIDEBAR_TITLE": self.title,
-                "SIDEBAR_ITEMS": sidebar_items,
-                "SIDEBAR_FOOTER": self.footer_text or ""
-            })
-            
-            self.logger.debug("Template variables prepared successfully")
-            return variables
-        except Exception as e:
-            self.logger.error(f"Error getting template variables: {str(e)}", exc_info=True)
-            # Return basic variables to prevent rendering failure
-            return {
-                "SIDEBAR_TITLE": self.title,
-                "SIDEBAR_ITEMS": "",
-                "SIDEBAR_FOOTER": self.footer_text or ""
-            }
+            # Emergency navigation in case of errors
+            st.sidebar.write("Emergency Navigation")
+            if st.sidebar.button("🏠 Home"):
+                NavigationState.navigate_to("home")
+                st.rerun()
