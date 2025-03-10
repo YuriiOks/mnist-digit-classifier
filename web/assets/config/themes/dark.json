@@ -1,15 +1,21 @@
 {
   "name": "dark",
   "colors": {
-    "primary": "#4cc9f0",
-    "secondary": "#4895ef",
-    "accent": "#4361ee",
+    "primary": "#ee4347",
+    "secondary": "#f0c84c",
+    "accent": "#5e81f4",
     "background": "#121212",
     "card": "#1e1e1e",
+    "card-alt": "#252525",
     "text": "#f8f9fa",
-    "border": "#333333",
-    "success": "#4cc9f0",
-    "warning": "#f72585",
-    "error": "#e63946"
+    "text-light": "#d1d5db",
+    "text-muted": "#9ca3af",
+    "border": "#383838",
+    "shadow": "rgba(0, 0, 0, 0.3)",
+    
+    "success": "#34d399",
+    "warning": "#fbbf24",
+    "error": "#f87171",
+    "info": "#60a5fa"
   }
-} 
+}
