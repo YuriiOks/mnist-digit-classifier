@@ -1,185 +1,109 @@
 # MNIST Digit Classifier
 # Copyright (c) 2025
 # File: ui/components/cards/card.py
-# Description: Card component for UI
+# Description: Base card UI component
 # Created: 2024-05-01
 
 import streamlit as st
 import logging
-from typing import Dict, Any, Optional, List
+from typing import List, Optional, Dict, Any, Literal
 
-from ui.components.base.component import Component
+from ui.components.base_component import BaseComponent
 
 logger = logging.getLogger(__name__)
 
-class Card(Component):
-    """Card component for UI.
-    
-    This component renders a card with title and content.
-    """
+class Card(BaseComponent):
+    """Base card component for displaying content with consistent styling."""
     
     def __init__(
         self,
-        title: str = "",
-        content: str = "",
-        *,
+        title: str,
+        key: Optional[str] = None,
         elevated: bool = False,
-        id: Optional[str] = None,
+        size: Literal["small", "large", "default"] = "default",
         classes: Optional[List[str]] = None,
-        attributes: Optional[Dict[str, str]] = None
+        attributes: Optional[Dict[str, str]] = None,
+        **kwargs
     ):
-        """Initialize a card component.
+        """Initialize a new card component.
         
         Args:
-            title: Card title.
-            content: Card content (HTML).
-            elevated: Whether the card should have elevation (shadow).
-            id: HTML ID attribute for the component.
-            classes: List of CSS classes to apply to the component.
-            attributes: Dictionary of HTML attributes to apply to the component.
+            title: The card title text
+            key: Optional unique key for the component
+            elevated: Whether to display the card with elevation (shadow)
+            size: Size of the card, which determines color scheme
+                 - "small": Uses secondary color
+                 - "large": Uses primary color
+                 - "default": No specific size/color (use other classes)
+            classes: Additional CSS classes to apply to the card
+            attributes: Additional HTML attributes for the card
+            **kwargs: Additional keyword arguments for the component
         """
-        logger.debug(f"Initializing Card with title: {title}")
-        class_list = ["card"]
-        if elevated:
-            class_list.append("card-elevated")
-        if classes:
-            class_list.extend(classes)
-            
-        super().__init__(
-            component_type="cards", 
-            component_name="card",
-            id=id,
-            classes=class_list,
-            attributes=attributes
-        )
+        super().__init__(key=key, **kwargs)
         self.title = title
-        self.content = content
-        self.logger = logging.getLogger(
-            f"{__name__}.{self.__class__.__name__}"
-        )
+        self.elevated = elevated
+        self.size = size
+        self.classes = classes or []
+        self.attributes = attributes or {}
+        
+        # Add basic card class
+        if "card" not in self.classes:
+            self.classes.append("card")
+        
+        # Add elevated class if needed
+        if self.elevated and "elevated" not in self.classes:
+            self.classes.append("elevated")
+        
+        # Add size class if specified
+        if self.size == "small":
+            self.classes.append("small")
+        elif self.size == "large":
+            self.classes.append("large")
+        
+        self.logger.debug(f"Card initialized with title: {title}, size: {size}, classes: {self.classes}")
     
-    def get_template_variables(self) -> Dict[str, Any]:
-        """Get template variables for rendering."""
-        variables = super().get_template_variables()
-        variables.update({
-            "TITLE": self.title,
-            "CONTENT": self.content,
-        })
-        return variables
+    def get_html(self) -> str:
+        """Generate the HTML for the card component.
+        
+        Returns:
+            str: The HTML representation of the card
+        """
+        # Combine all classes
+        class_str = " ".join(self.classes)
+        
+        # Combine all attributes
+        attr_str = " ".join([f'{k}="{v}"' for k, v in self.attributes.items()])
+        
+        # Create card HTML
+        html = f"""
+        <div class="{class_str}" {attr_str}>
+            <div class="card-title">
+                {self.title}
+            </div>
+            <div class="card-content">
+                {self.get_content()}
+            </div>
+        </div>
+        """
+        
+        return html
+    
+    def get_content(self) -> str:
+        """Get the content of the card. To be overridden by subclasses.
+        
+        Returns:
+            str: The HTML content to display in the card
+        """
+        return "Card content goes here."
     
     def display(self) -> None:
-        """Display the card component."""
+        """Display the card in the Streamlit app."""
         self.logger.debug(f"Displaying card: {self.title}")
         try:
-            # Build card HTML
-            card_html = f"""
-            <div class="card {' '.join(self.classes)}" id="{self.id or ''}" 
-                {' '.join([f'{k}="{v}"' for k, v in self.attributes.items()])}>
-                <div class="card-title">{self.title}</div>
-                <div class="card-content">{self.content}</div>
-            </div>
-            """
-            
-            # Add CSS for the card
-            card_css = """
-            <style>
-            /* Card styling */
-            .card {
-                background-color: var(--color-card, white);
-                border: 1px solid var(--color-border, #e5e7eb);
-                border-radius: 0.75rem;
-                padding: 1.5rem;
-                margin-bottom: 1.5rem;
-                transition: all 0.3s ease;
-                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-                position: relative;
-                overflow: hidden;
-            }
-            
-            /* Card with elevation */
-            .card-elevated {
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
-            }
-            
-            /* Hover effects */
-            .card:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
-                border-color: var(--color-primary-light, rgba(99, 102, 241, 0.4));
-            }
-            
-            /* Card title */
-            .card-title {
-                font-size: 1.25rem;
-                font-weight: 600;
-                margin-bottom: 1rem;
-                color: var(--color-text, #111827);
-                line-height: 1.4;
-            }
-            
-            /* Card content */
-            .card-content {
-                color: var(--color-text-light, #4b5563);
-                line-height: 1.6;
-            }
-            
-            /* Shine effect on hover */
-            .card::after {
-                content: '';
-                position: absolute;
-                top: -50%;
-                left: -50%;
-                width: 200%;
-                height: 200%;
-                background: linear-gradient(
-                    to right,
-                    rgba(255, 255, 255, 0) 0%,
-                    rgba(255, 255, 255, 0.1) 50%,
-                    rgba(255, 255, 255, 0) 100%
-                );
-                transform: rotate(30deg);
-                opacity: 0;
-                transition: opacity 0.3s ease;
-                pointer-events: none;
-            }
-            
-            .card:hover::after {
-                opacity: 1;
-                animation: shine 1.5s ease-in-out;
-            }
-            
-            @keyframes shine {
-                0% {
-                    transform: rotate(30deg) translate(-100%, -100%);
-                }
-                100% {
-                    transform: rotate(30deg) translate(100%, 100%);
-                }
-            }
-            
-            /* Dark mode adjustments */
-            [data-theme="dark"] .card {
-                background-color: var(--color-card, #2a2a2a);
-                border-color: var(--color-border, #444444);
-            }
-            
-            [data-theme="dark"] .card-title {
-                color: var(--color-text, #e0e0e0);
-            }
-            
-            [data-theme="dark"] .card-content {
-                color: var(--color-text-light, #b0b0b0);
-            }
-            
-            [data-theme="dark"] .card:hover {
-                border-color: rgba(129, 140, 248, 0.4);
-            }
-            </style>
-            """
-            
-            # Render the component
-            st.markdown(card_css + card_html, unsafe_allow_html=True)
-            self.logger.debug("Card displayed successfully")
+            # We don't need to load CSS here since it's loaded globally via components_css.py
+            # Just render the HTML
+            st.markdown(self.get_html(), unsafe_allow_html=True)
+            self.logger.debug(f"Card {self.title} displayed successfully")
         except Exception as e:
             self.logger.error(f"Error displaying card: {str(e)}", exc_info=True)
             st.error(f"Error displaying card: {str(e)}")
