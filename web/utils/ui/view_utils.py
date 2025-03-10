@@ -6,81 +6,29 @@
 
 import streamlit as st
 import logging
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
 def apply_view_styling():
-    """Apply consistent styling to all views.
-    
-    This function injects CSS that ensures all views have the same layout and styling,
-    eliminating the need for each view to implement its own layout CSS.
-    """
+    """Apply consistent styling to all views by loading external CSS."""
     logger.debug("Applying consistent view styling")
     
-    # Apply common view styling
-    st.markdown("""
-    <style>
-    /* Fix content alignment */
-    .block-container {
-        max-width: 100% !important;
-        padding-top: 1rem !important;
-        padding-left: 1rem !important;
-        padding-right: 1rem !important;
-    }
+    # Get the path to the CSS file
+    current_dir = Path(__file__).resolve().parent
+    css_path = current_dir.parent.parent / "assets" / "css" / "views" / "view_styles.css"
     
-    /* View containers */
-    .view-container {
-        width: 100%;
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 1rem;
-    }
-    
-    /* Make headers look better */
-    h1, h2, h3 {
-        margin-bottom: 1rem !important;
-        margin-top: 0.5rem !important;
-        font-family: var(--font-primary, 'Poppins', sans-serif) !important;
-    }
-    
-    /* Add space around elements */
-    .stMarkdown {
-        margin-bottom: 0.5rem !important;
-    }
-    
-    /* Remove empty columns */
-    .stColumn:empty {
-        display: none !important;
-    }
-    
-    /* Ensure cards have consistent styling */
-    .card, .content-card {
-        margin-bottom: 1.5rem !important;
-    }
-    
-    /* Ensure welcome card is consistent across views */
-    .welcome-card {
-        margin-bottom: 2rem !important;
-    }
-    
-    /* Two-column layout */
-    .two-column-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1.5rem;
-        margin-bottom: 2rem;
-    }
-    
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
-        .two-column-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-    </style>
-    """, unsafe_allow_html=True)
+    if css_path.exists():
+        # Load and inject the CSS
+        with open(css_path, "r") as css_file:
+            css_content = css_file.read()
+            st.markdown(f"<style>{css_content}</style>", unsafe_allow_html=True)
+        logger.debug("View styling applied successfully")
+    else:
+        logger.warning(f"View styles CSS file not found at {css_path}")
 
-def create_welcome_card(title, icon, content):
+def create_welcome_card(title: str, icon: str, content: str,
+                        template_loader) -> str:
     """Create a consistent welcome card for any view.
     
     Args:
@@ -91,22 +39,13 @@ def create_welcome_card(title, icon, content):
     Returns:
         str: HTML for the welcome card
     """
-    # Format content to ensure paragraphs are properly wrapped
-    if not content.startswith('<p>'):
-        paragraphs = content.split('\n')
-        content = ''.join([f'<p>{p.strip()}</p>' for p in paragraphs if p.strip()])
     
-    return f"""
-    <div class="card card-elevated content-card welcome-card animate-fade-in">
-        <div class="card-title">
-            <span class="card-icon">{icon}</span>
-            {title}
-        </div>
-        <div class="card-content">
-            {content}
-        </div>
-    </div>
-    """
+    formatted_content = ''.join(f'<p>{p.strip()}</p>' for p in content.split('\n') if p.strip())
+    return template_loader("/home/welcome_card.html", {
+        "title": title,
+        "icon": icon,
+        "content": formatted_content
+    })
     
 def create_section_container(section_id, classes=None):
     """Create a container for a view section with proper styling.
