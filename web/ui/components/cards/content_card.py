@@ -1,189 +1,126 @@
 # MNIST Digit Classifier
 # Copyright (c) 2025
 # File: ui/components/cards/content_card.py
-# Description: Content card component for UI
+# Description: Card component for displaying formatted content
 # Created: 2024-05-01
 
 import streamlit as st
 import logging
-from typing import Dict, Any, Optional, List
+from typing import List, Optional, Dict, Any, Literal
 
 from ui.components.cards.card import Card
 
 logger = logging.getLogger(__name__)
 
-
 class ContentCard(Card):
-    """Content card component for UI.
-    
-    This component renders a card with icon, title, and content.
-    """
+    """Card component specifically for displaying rich content."""
     
     def __init__(
         self,
-        title: str = "",
-        content: str = "",
-        *,
-        icon: str = "",
+        title: str,
+        content: str,
+        icon: Optional[str] = None,
+        key: Optional[str] = None,
         elevated: bool = False,
-        id: Optional[str] = None,
+        size: Literal["small", "large", "default"] = "default",
         classes: Optional[List[str]] = None,
-        attributes: Optional[Dict[str, str]] = None
+        attributes: Optional[Dict[str, str]] = None,
+        **kwargs
     ):
-        """Initialize a content card component.
+        """Initialize a new content card component.
         
         Args:
-            title: Card title.
-            content: Card content (HTML).
-            icon: Icon to display with the title.
-            elevated: Whether the card should have elevation (shadow).
-            id: HTML ID attribute for the component.
-            classes: List of CSS classes to apply to the component.
-            attributes: Dict of HTML attributes to apply to the component.
+            title: The card title text
+            content: The HTML content to display in the card
+            icon: Optional icon (emoji or FontAwesome) to display next to the title
+            key: Optional unique key for the component
+            elevated: Whether to display the card with elevation (shadow)
+            size: Size of the card, which determines color scheme
+                 - "small": Uses secondary color
+                 - "large": Uses primary color
+                 - "default": No specific size/color (use other classes)
+            classes: Additional CSS classes to apply to the card
+            attributes: Additional HTML attributes for the card
+            **kwargs: Additional keyword arguments for the component
         """
-        logger.debug(
-            f"Initializing ContentCard with title: {title}, icon: {icon}"
-        )
-        class_list = ["content-card"]
-        if classes:
-            class_list.extend(classes)
+        # Add content-card class if not provided
+        classes = classes or []
+        if "content-card" not in classes:
+            classes.append("content-card")
             
         super().__init__(
             title=title,
-            content=content,
+            key=key,
             elevated=elevated,
-            id=id,
-            classes=class_list,
-            attributes=attributes
+            size=size,
+            classes=classes,
+            attributes=attributes,
+            **kwargs
         )
-        self.component_name = "content_card"  # Override the component name
+        
+        self.content = self.sanitize_html_content(content)
         self.icon = icon
-        self.logger = logging.getLogger(
-            f"{__name__}.{self.__class__.__name__}"
-        )
+        self.logger.debug(f"ContentCard initialized with title: {title}, size: {size}")
     
-    def get_template_variables(self) -> Dict[str, Any]:
-        """Get template variables for rendering."""
-        variables = super().get_template_variables()
-        variables.update({
-            "ICON": self.icon if self.icon else ""
-        })
-        return variables
+    def get_html(self) -> str:
+        """Generate the HTML for the content card component.
+        
+        Returns:
+            str: The HTML representation of the content card
+        """
+        # Combine all classes
+        class_str = " ".join(self.classes)
+        
+        # Combine all attributes
+        attr_str = " ".join([f'{k}="{v}"' for k, v in self.attributes.items()])
+        
+        # Add icon to title if provided
+        title_with_icon = self.title
+        if self.icon:
+            title_with_icon = f"""<span class="card-icon">{self.icon}</span> {self.title}"""
+        
+        # Create card HTML - Using more concise HTML to avoid potential formatting issues
+        card_html = f"""<div class="{class_str}" {attr_str}><div class="card-title">{title_with_icon}</div><div class="card-content">{self.content}</div></div>"""
+        
+        return card_html
+    
+    def get_content(self) -> str:
+        """Get the content of the card.
+        
+        Returns:
+            str: The HTML content to display in the card
+        """
+        return self.content
     
     def display(self) -> None:
-        """Display the content card component."""
-        self.logger.debug(f"Displaying content card: {self.title}")
-        
-        # Use direct HTML generation for maximum reliability
-        icon_html = (
-            f'<span class="card-icon">{self.icon}</span>' 
-            if self.icon else ''
-        )
-        class_attr = " ".join(self.classes)
-        attrs = " ".join(
-            [f'{k}="{v}"' for k, v in self.attributes.items()]
-        ) if self.attributes else ""
-        
-        # Ensure content is properly sanitized and formatted
-        content = self.content.strip()
-        
-        # Generate simple, robust HTML
-        card_html = f"""
-        <div class="{class_attr}" id="{self.id}" {attrs}>
-            <div class="card-title">
-                {icon_html}
-                {self.title}
-            </div>
-            <div class="card-content">
-                {content}
-            </div>
-        </div>
-        """
-        
-        # Add essential CSS for consistent rendering
-        card_css = """
-        <style>
-        /* Essential card styling */
-        .content-card {
-            background-color: #ffffff;
-            border: 1px solid #e0e0e0;
-            border-radius: 0.75rem;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            position: relative;
-            overflow: hidden;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        /* Card title styling */
-        .card-title {
-            font-family: 'Poppins', sans-serif;
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            color: #333333;
-            display: flex;
-            align-items: center;
-        }
-        
-        /* Card content styling */
-        .card-content {
-            font-family: 'Nunito', sans-serif;
-            line-height: 1.6;
-            color: #666666;
-            flex-grow: 1;
-        }
-        
-        .card-content p {
-            margin-bottom: 0.75rem;
-        }
-        
-        /* Dark mode adjustments */
-        [data-theme="dark"] .content-card {
-            background-color: #2a2a2a;
-            border-color: #444444;
-        }
-        
-        [data-theme="dark"] .card-title {
-            color: #e0e0e0;
-        }
-        
-        [data-theme="dark"] .card-content,
-        [data-theme="dark"] .card-content p {
-            color: #b0b0b0;
-        }
-        </style>
-        """
-        
-        # Render the component - ensure unsafe_allow_html is True
-        st.markdown(card_css + card_html, unsafe_allow_html=True)
-        self.logger.debug("ContentCard displayed successfully")
+        """Display the content card in the Streamlit app."""
+        self.logger.debug(f"Displaying ContentCard: {self.title}")
+        try:
+            # Generate the HTML
+            card_html = self.get_html()
+            
+            # Render the component - ensure unsafe_allow_html is True
+            st.markdown(card_html, unsafe_allow_html=True)
+            self.logger.debug("ContentCard displayed successfully")
+        except Exception as e:
+            self.logger.error(f"Error displaying ContentCard: {str(e)}", exc_info=True)
+            st.error(f"Error displaying content card: {str(e)}")
 
     @staticmethod
-    def sanitize_html_content(content):
+    def sanitize_html_content(content: str) -> str:
         """Ensure HTML content is properly formatted for rendering."""
         # Remove any leading/trailing whitespace that could affect rendering
         content = content.strip()
         
-        # Ensure content doesn't have extra div tags that could break structure
-        if content.startswith('<div') and content.endswith('</div>'):
-            # Content already has a div wrapper, keep it as is
-            return content
-        
         # If content has paragraphs but not wrapped properly, ensure they're formatted
-        if '<p>' in content and not content.startswith('<p>'):
+        if not content.startswith('<p>') and not content.startswith('<div'):
             # Split content and wrap each line in paragraph tags if needed
-            lines = content.split('\n')
+            lines = [line.strip() for line in content.split('\n') if line.strip()]
             formatted_lines = []
             for line in lines:
-                line = line.strip()
-                if (line and not line.startswith('<') 
-                        and not line.endswith('>')):
+                if not (line.startswith('<') and line.endswith('>')):
                     line = f'<p>{line}</p>'
                 formatted_lines.append(line)
-            return ''.join(formatted_lines)
+            content = ''.join(formatted_lines)
         
         return content
