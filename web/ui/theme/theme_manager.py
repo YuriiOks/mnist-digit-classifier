@@ -6,8 +6,10 @@
 
 import streamlit as st
 import json
+import os
 from typing import Dict, Any, Literal, Optional
 import logging
+from pathlib import Path
 
 from core.app_state.theme_state import ThemeState
 from utils.file.path_utils import get_project_root
@@ -19,516 +21,107 @@ logger = logging.getLogger(__name__)
 ThemeType = Literal["light", "dark"]
 
 class ThemeManager:
-    """Manager for application theming.
-    
-    Handles theme switching, theme-specific styling, and theme utilities.
-    """
-    
-    # Theme options
-    LIGHT_THEME = "light"
-    DARK_THEME = "dark"
-    
-    # Theme configuration files
-    _config_path = "assets/config/themes"
-    _default_config = "default.json"
-    _light_config = "light.json"
-    _dark_config = "dark.json"
-    
-    # Cache for theme configurations
-    _theme_cache: Dict[str, Dict[str, Any]] = {}
-    
-    @classmethod
-    def initialize(cls) -> None:
-        """Initialize the theme manager."""
-        logger.info("Initializing ThemeManager")
-        # Set default theme if not already set
-        if "theme" not in st.session_state:
-            st.session_state["theme"] = "light"
-        
-        # Apply theme on initialization
-        cls.apply_theme()
-        logger.info(f"Theme initialized: {cls.get_theme()}")
+    """Manages theme loading, switching, and application throughout the app."""
     
     def __init__(self):
-        """Initialize theme manager."""
-        logger.debug("Initializing ThemeManager")
-        try:
-            # Ensure theme state is initialized
-            if not ThemeState.is_initialized():
-                logger.debug("Theme state not initialized, initializing now")
-                ThemeState.initialize()
+        self.themes = {}
+        self.current_theme = None
+        self.themes_dir = Path("assets/config/themes")
+        self._load_themes()
+    
+    def _load_themes(self) -> None:
+        """Load all theme files from the themes directory."""
+        for theme_file in self.themes_dir.glob("*.json"):
+            if theme_file.name == "default.json":
+                continue  # Skip default as it's loaded as a base
                 
-            # Load theme configurations if not already loaded
-            if not self._theme_cache:
-                logger.debug("Theme cache empty, loading theme configurations")
-                self._load_theme_configs()
-                
-            logger.debug("ThemeManager initialization complete")
-        except Exception as e:
-            logger.error(
-                f"Error initializing ThemeManager: {str(e)}", 
-                exc_info=True
-            )
-            raise
+            with open(theme_file, "r") as f:
+                theme_data = json.load(f)
+                theme_name = theme_data.get("name", theme_file.stem)
+                self.themes[theme_name] = theme_data
     
-    @classmethod
-    def _load_theme_configs(cls) -> None:
-        """Load theme configurations from JSON files."""
-        logger.debug("Loading theme configurations")
-        try:
-            root_path = get_project_root()
-            logger.debug(f"Project root path: {root_path}")
+    def get_theme(self, name: str) -> Dict[str, Any]:
+        """Get a theme by name, with fallback to default."""
+        # Always load the default theme as the base
+        with open(self.themes_dir / "default.json", "r") as f:
+            theme = json.load(f)
             
-            # Load default config
-            default_path = f"{root_path}/{cls._config_path}/{cls._default_config}"
-            logger.debug(f"Loading default theme config from: {default_path}")
-            with open(default_path, 'r') as f:
-                cls._theme_cache["default"] = json.load(f)
+        # If requesting a specific theme, overlay it on default
+        if name != "default" and name in self.themes:
+            # Merge with priority to the requested theme for any overlapping keys
+            self._deep_merge(theme, self.themes[name])
             
-            # Load light theme config
-            light_path = f"{root_path}/{cls._config_path}/{cls._light_config}"
-            logger.debug(f"Loading light theme config from: {light_path}")
-            with open(light_path, 'r') as f:
-                cls._theme_cache[cls.LIGHT_THEME] = json.load(f)
-            
-            # Load dark theme config
-            dark_path = f"{root_path}/{cls._config_path}/{cls._dark_config}"
-            logger.debug(f"Loading dark theme config from: {dark_path}")
-            with open(dark_path, 'r') as f:
-                cls._theme_cache[cls.DARK_THEME] = json.load(f)
-                
-            logger.info(f"Successfully loaded theme configurations: {list(cls._theme_cache.keys())}")
-        except Exception as e:
-            logger.error(f"Error loading theme configurations: {str(e)}", exc_info=True)
-            # Initialize with empty configs as fallback
-            logger.warning("Initializing with empty theme configurations as fallback")
-            if "default" not in cls._theme_cache:
-                cls._theme_cache["default"] = {}
-            if cls.LIGHT_THEME not in cls._theme_cache:
-                cls._theme_cache[cls.LIGHT_THEME] = {}
-            if cls.DARK_THEME not in cls._theme_cache:
-                cls._theme_cache[cls.DARK_THEME] = {}
+        return theme
     
-    @classmethod
-    def get_theme(cls) -> ThemeType:
-        """Get the current theme.
-        
-        Returns:
-            ThemeType: Current theme ("light" or "dark").
-        """
-        return st.session_state.get("theme", "light")
-    
-    @classmethod
-    def set_theme(cls, theme: ThemeType) -> None:
-        """Set the theme.
-        
-        Args:
-            theme: Theme to set ("light" or "dark").
-        """
-        logger.debug(f"Setting theme to: {theme}")
-        st.session_state["theme"] = theme
-        cls.apply_theme()
-    
-    @classmethod
-    def toggle_theme(cls) -> None:
-        """Toggle between light and dark themes."""
-        current_theme = cls.get_theme()
-        new_theme = "dark" if current_theme == "light" else "light"
-        logger.debug(f"Toggling theme from {current_theme} to {new_theme}")
-        cls.set_theme(new_theme)
-    
-    @classmethod
-    def is_dark_mode(cls) -> bool:
-        """Check if dark mode is active.
-        
-        Returns:
-            bool: True if dark mode is active, False otherwise
-        """
-        logger.debug("Checking if dark mode is active")
-        try:
-            is_dark = cls.get_theme() == cls.DARK_THEME
-            logger.debug(f"Dark mode active: {is_dark}")
-            return is_dark
-        except Exception as e:
-            logger.error(f"Error checking dark mode: {str(e)}", exc_info=True)
-            return False
-    
-    @classmethod
-    def get_theme_color(cls, color_name: str, for_inline: bool = False) -> str:
-        """Get color value from current theme.
-        
-        Args:
-            color_name: Color name from theme configuration
-            for_inline: Whether to return CSS variable (False) or actual value (True)
-            
-        Returns:
-            str: Color value or CSS variable
-        """
-        logger.debug(f"Getting theme color: {color_name} (for_inline={for_inline})")
-        try:
-            if for_inline:
-                theme = cls.get_theme()
-                if theme not in cls._theme_cache:
-                    logger.debug(f"Theme {theme} not in cache, loading theme configs")
-                    cls._load_theme_configs()
-                
-                if (
-                    theme in cls._theme_cache and 
-                    "colors" in cls._theme_cache[theme] and 
-                    color_name in cls._theme_cache[theme]["colors"]
-                ):
-                    color = cls._theme_cache[theme]["colors"][color_name]
-                    logger.debug(f"Found color value: {color}")
-                    return color
-                logger.warning(f"Color {color_name} not found in theme {theme}, using fallback")
-                return "#000000"  # Fallback color
+    def _deep_merge(self, base: Dict, overlay: Dict) -> None:
+        """Deep merge overlay dict into base dict."""
+        for key, value in overlay.items():
+            if key in base and isinstance(base[key], dict) and isinstance(value, dict):
+                self._deep_merge(base[key], value)
             else:
-                css_var = f"var(--{color_name}-color)"
-                logger.debug(f"Returning CSS variable: {css_var}")
-                return css_var
-        except Exception as e:
-            logger.error(f"Error getting theme color {color_name}: {str(e)}", exc_info=True)
-            return "#000000" if for_inline else f"var(--{color_name}-color)"
+                base[key] = value
     
-    @classmethod
-    def get_theme_config(cls, key: str, default: Any = None) -> Any:
-        """Get configuration value from current theme.
+    def apply_theme(self, name: str) -> None:
+        """Apply a theme by name to the application."""
+        theme = self.get_theme(name)
+        self.current_theme = name
         
-        Args:
-            key: Configuration key path (dot notation)
-            default: Default value if key not found
+        # Apply theme colors to streamlit
+        self._apply_theme_colors(theme)
+        
+        # Apply CSS variables for custom components
+        self._inject_css_variables(theme)
+    
+    def _apply_theme_colors(self, theme: Dict[str, Any]) -> None:
+        """Apply theme colors to Streamlit config."""
+        colors = theme.get("colors", {})
+        # This would integrate with Streamlit's theming if applicable
+        # For now, store in session state for custom components
+        st.session_state.theme_colors = colors
+    
+    def _inject_css_variables(self, theme: Dict[str, Any]) -> None:
+        """Inject CSS variables based on theme into the page."""
+        css = ":root {\n"
+        
+        # Add color variables
+        for key, value in theme.get("colors", {}).items():
+            css += f"  --color-{key}: {value};\n"
+        
+        # Add font variables
+        for key, value in theme.get("fonts", {}).items():
+            css += f"  --font-{key}: {value};\n"
             
-        Returns:
-            Any: Configuration value
+        # Add setting variables
+        for key, value in theme.get("settings", {}).items():
+            css += f"  --{key}: {value};\n"
+            
+        css += "}\n"
+        
+        # Inject CSS into Streamlit
+        st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
+    
+    @staticmethod
+    def toggle_theme():
+        """Toggle between light and dark themes.
+        
+        This is a static convenience method that uses ThemeState to toggle themes.
         """
-        theme = cls.get_theme()
-        if theme not in cls._theme_cache:
-            cls._load_theme_configs()
+        logger.debug("Toggling theme via static method")
         
-        # Handle dot notation for nested configs
-        parts = key.split('.')
-        config = cls._theme_cache.get(theme, {})
+        # Toggle the theme mode through ThemeState
+        new_mode = ThemeState.toggle_theme_mode()
+        logger.debug(f"Theme toggled to: {new_mode}")
         
-        for part in parts:
-            if part in config:
-                config = config[part]
-            else:
-                return default
+        # Get a ThemeManager instance to apply the theme
+        theme_manager = ThemeManager()
+        theme_manager.apply_theme(new_mode)
         
-        return config
+        return new_mode
     
-    @classmethod
-    def get_font(cls, font_type: str = "body") -> str:
-        """Get font family based on type.
-        
-        Args:
-            font_type: Font type (body, heading, code)
-            
-        Returns:
-            str: Font family value
-        """
-        if "default" not in cls._theme_cache:
-            cls._load_theme_configs()
-            
-        if (
-            "default" in cls._theme_cache and 
-            "fonts" in cls._theme_cache["default"] and 
-            font_type in cls._theme_cache["default"]["fonts"]
-        ):
-            return cls._theme_cache["default"]["fonts"][font_type]
-        
-        # Fallback fonts
-        if font_type == "heading":
-            return "system-ui, sans-serif"
-        elif font_type == "code":
-            return "monospace"
-        else:
-            return "system-ui, sans-serif"
-    
-    @classmethod
-    def get_theme_icon(cls, icon_name: str) -> str:
-        """Get theme-specific icon path.
-        
-        Args:
-            icon_name: Icon name without extension
-            
-        Returns:
-            str: Path to icon for current theme
-        """
-        theme = cls.get_theme()
-        return f"assets/images/icons/{theme}/{icon_name}.svg"
-    
-    @classmethod
-    def inject_theme_css(cls) -> None:
-        """Inject theme-specific CSS."""
-        # Load global CSS first
-        load_css("assets/css/global/variables.css")
-        load_css("assets/css/global/reset.css")
-        load_css("assets/css/global/typography.css")
-        
-        # Load theme-specific variables
-        theme = cls.get_theme()
-        load_css(f"assets/css/themes/{theme}/variables.css")
-        
-        # Add transition CSS for smooth theme switching
-        transition_css = """
-        <style>
-        body, * {
-            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease,
-                        box-shadow 0.3s ease, fill 0.3s ease, stroke 0.3s ease;
-        }
-        </style>
-        """
-        st.markdown(transition_css, unsafe_allow_html=True)
-    
-    @classmethod
-    def inject_theme_scripts(cls) -> None:
-        """Inject theme-related JavaScript."""
-        # Load theme detector script to detect system preferences
-        load_js("assets/js/theme/theme_detector.js")
-        
-        # Load theme toggle script
-        load_js("assets/js/theme/theme_toggle.js")
-    
-    @classmethod
-    def apply_theme_js(cls) -> None:
-        """Apply theme changes using JavaScript for a more responsive experience."""
-        logger.debug("Applying theme via JavaScript")
-        try:
-            current_theme = cls.get_theme()
-            logger.debug(f"Applying theme via JavaScript: {current_theme}")
-            
-            # JavaScript to update theme without page refresh
-            js_code = f"""
-            <script>
-                (function() {{
-                    // Apply theme immediately
-                    document.documentElement.setAttribute('data-theme', '{current_theme}');
-                    
-                    // Handle body class for dark theme
-                    if ('{current_theme}' === 'dark') {{
-                        document.body.classList.add('dark');
-                    }} else {{
-                        document.body.classList.remove('dark');
-                    }}
-                    
-                    console.log('Theme updated via JS: {current_theme}');
-                }})();
-            </script>
-            """
-            st.markdown(js_code, unsafe_allow_html=True)
-            logger.debug("Theme JS applied successfully")
-        except Exception as e:
-            logger.error(f"Error applying theme JS: {str(e)}", exc_info=True)
-            # Don't raise, allow application to continue
-    
-    @classmethod
-    def initialize_theme_system(cls) -> None:
-        """Initialize the theme system.
-        
-        This method should be called at application startup to ensure
-        theme state is properly initialized.
-        """
-        logger.debug("Initializing theme system")
-        try:
-            # Initialize theme state
-            if not ThemeState.is_initialized():
-                logger.debug("Theme state not initialized, initializing now")
-                ThemeState.initialize()
-            
-            # Load theme configurations
-            if not cls._theme_cache:
-                logger.debug("Theme cache empty, loading theme configurations")
-                cls._load_theme_configs()
-            
-            # Load theme CSS
-            logger.debug("Loading theme CSS")
-            theme = cls.get_theme()
-            load_theme_css(theme)
-            
-            # Load theme JavaScript
-            logger.debug("Loading theme JavaScript")
-            theme_toggle_js = "assets/js/theme/theme_toggle.js"
-            theme_detector_js = "assets/js/theme/theme_detector.js"
-            load_js(theme_toggle_js)
-            load_js(theme_detector_js)
-            
-            logger.info("Theme system initialization complete")
-        except Exception as e:
-            logger.error(f"Error initializing theme system: {str(e)}", exc_info=True)
-            raise
-    
-    @classmethod
-    def detect_system_preference(cls) -> None:
-        """Detect and apply system color scheme preference."""
-        js_code = """
-        <script>
-            (function() {
-                if (window.detectSystemThemePreference) {
-                    window.detectSystemThemePreference();
-                }
-            })();
-        </script>
-        """
-        st.markdown(js_code, unsafe_allow_html=True)
-    
-    @classmethod
-    def get_contrast_color(cls, background_color: str) -> str:
-        """Get contrasting color (light or dark) for given background.
-        
-        Args:
-            background_color: Background color to contrast against
-            
-        Returns:
-            str: Contrasting color (white or black)
-        """
-        # Simple algorithm to determine if text should be light or dark
-        # This is a simplified version; more sophisticated algorithms exist
-        if background_color.startswith('#'):
-            # Convert hex to RGB
-            r = int(background_color[1:3], 16)
-            g = int(background_color[3:5], 16)
-            b = int(background_color[5:7], 16)
-            
-            # Calculate luminance using the formula (0.299*R + 0.587*G + 0.114*B)
-            luminance = 0.299 * r + 0.587 * g + 0.114 * b
-            
-            # Return white for dark backgrounds, black for light backgrounds
-            return "#ffffff" if luminance < 128 else "#000000"
-        
-        # Fallback for non-hex colors
-        return "#ffffff" if cls.is_dark_mode() else "#000000" 
-    
-    @classmethod
-    def apply_theme(cls) -> None:
-        """Apply the current theme by injecting theme CSS and setting attributes."""
-        theme_name = cls.get_theme()
-        logger.debug(f"Applying theme: {theme_name}")
-        
-        try:
-            # Load theme CSS
-            theme_css = load_theme_css(theme_name)
-            
-            # Apply theme attribute to body to enable CSS selectors
-            theme_attribute = f"""
-            <script>
-                (function() {{
-                    document.body.setAttribute('data-theme', '{theme_name}');
-                    console.log('Theme applied:', '{theme_name}');
-                }})();
-            </script>
-            """
-            
-            # Inject theme CSS and attribute
-            inject_css(theme_css)
-            st.markdown(theme_attribute, unsafe_allow_html=True)
-            
-            # Add additional optimization for Streamlit elements
-            streamlit_theme_fixes = f"""
-            <style>
-                /* Apply theme to Streamlit components */
-                .stApp {{
-                    background-color: var(--color-background);
-                    color: var(--color-text);
-                }}
-                
-                /* Style for buttons to match our theme */
-                .stButton button {{
-                    background-color: var(--color-primary);
-                    color: white;
-                    border-radius: var(--border-radius-md);
-                    transition: all var(--transition-speed-fast) var(--transition-timing);
-                }}
-                
-                .stButton button:hover {{
-                    background-color: var(--color-primary-dark);
-                    box-shadow: var(--shadow-md);
-                }}
-                
-                /* Make sure content area has the right background */
-                .main-content {{
-                    background-color: var(--color-background);
-                    padding: var(--spacing-md);
-                    border-radius: var(--border-radius-md);
-                }}
-            </style>
-            """
-            st.markdown(streamlit_theme_fixes, unsafe_allow_html=True)
-            
-            logger.debug(f"Theme {theme_name} applied successfully")
-        except Exception as e:
-            logger.error(f"Error applying theme {theme_name}: {str(e)}", exc_info=True)
-    
-    @classmethod
-    def inject_card_styles(cls) -> None:
-        """Inject CSS styles for cards."""
-        logger.debug("Injecting card styles")
-        try:
-            # Load global card styles
-            try:
-                card_css = load_css_file("assets/css/global/cards.css")
-                inject_css(card_css)
-                logger.debug("Injected global card styles")
-            except Exception as e:
-                logger.warning(f"Failed to load global card styles: {str(e)}")
-                
-                # Fallback to inline styles if file loading fails
-                fallback_css = """
-                .card, .content-card {
-                  background-color: white;
-                  border: 1px solid #ddd;
-                  border-radius: 0.5rem;
-                  padding: 1.5rem;
-                  margin-bottom: 1.5rem;
-                  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                }
-                
-                .card-title, .content-card .card-title {
-                  font-size: 1.25rem;
-                  font-weight: 600;
-                  margin-bottom: 1rem;
-                  color: #333;
-                }
-                
-                .card-content {
-                  color: #555;
-                  line-height: 1.5;
-                }
-                
-                .card-icon {
-                  margin-right: 0.5rem;
-                }
-                
-                [data-theme="dark"] .card, [data-theme="dark"] .content-card {
-                  background-color: #2a2a2a;
-                  border-color: #444;
-                  color: #eee;
-                }
-                
-                [data-theme="dark"] .card-title, [data-theme="dark"] .content-card .card-title {
-                  color: #eee;
-                }
-                
-                [data-theme="dark"] .card-content {
-                  color: #ccc;
-                }
-                """
-                inject_css(fallback_css)
-                logger.debug("Injected fallback card styles")
-            
-            # Also load component-specific styles for Cards
-            try:
-                component_card_css = load_css_file("assets/css/components/cards/card.css")
-                content_card_css = load_css_file("assets/css/components/cards/content_card.css")
-                inject_css(component_card_css)
-                inject_css(content_card_css)
-                logger.debug("Injected component-specific card styles")
-            except Exception as e:
-                logger.warning(f"Failed to load component card styles: {str(e)}")
-                
-            logger.debug("Card styles injected successfully")
-        except Exception as e:
-            logger.error(f"Error injecting card styles: {str(e)}", exc_info=True)
+    def get_available_themes(self) -> Dict[str, str]:
+        """Get a dictionary of available themes with name and display name."""
+        return {name: data.get("display_name", name.capitalize()) 
+                for name, data in self.themes.items()}
 
 def apply_custom_css():
     css = """
