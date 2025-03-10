@@ -5,5 +5,8 @@
 # Created: 2024-05-01 
 
 # Import key functions to make them available at the package level
-from utils.html.html_loader import load_html_template, load_component_template, load_view_template
-from utils.html.template_engine import TemplateEngine
+from utils.html.html_loader import load_html_template
+
+__all__ = [
+    "load_html_template"
+]
