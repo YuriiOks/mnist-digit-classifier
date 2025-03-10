@@ -243,3 +243,7 @@ def debug_css():
             logger.error(f"Error checking CSS file {css_file}: {str(e)}")
     
     logger.debug("CSS debug view rendered")
+
+# def load_all_css():
+#     """Load all CSS files."""
+#     ensure_css_loaded()
