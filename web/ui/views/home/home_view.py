@@ -18,22 +18,14 @@ try:
 except ImportError:
     # Fallback function if the import fails
     def create_welcome_card(title, icon, content):
+        """Create a welcome card with consistent styling."""
         # Format content to ensure paragraphs are properly wrapped
         if not content.startswith('<p>'):
-            paragraphs = content.split('\n')
-            content = ''.join([f'<p>{p.strip()}</p>' for p in paragraphs if p.strip()])
+            paragraphs = [p.strip() for p in content.split('\n') if p.strip()]
+            content = ''.join([f'<p>{p}</p>' for p in paragraphs])
         
-        return f"""
-        <div class="card card-elevated content-card welcome-card animate-fade-in">
-            <div class="card-title">
-                <span class="card-icon">{icon}</span>
-                {title}
-            </div>
-            <div class="card-content">
-                {content}
-            </div>
-        </div>
-        """
+        # Create concise HTML without extra whitespace and newlines
+        return f"""<div class="card card-elevated content-card welcome-card large animate-fade-in"><div class="card-title"><span class="card-icon">{icon}</span> {title}</div><div class="card-content">{content}</div></div>"""
 
 logger = logging.getLogger(__name__)
 
@@ -44,10 +36,7 @@ class HomeView(BaseView):
         """Initialize the home view."""
         super().__init__(
             view_id="home",
-            title="Welcome to MNIST Digit Classifier",
-            description=(
-                "Draw and classify handwritten digits using machine learning"
-            ),
+            title="Welcome to MNIST Digit Classifier", 
             icon="🏠"
         )
         self.logger = logging.getLogger(__name__)
@@ -59,17 +48,21 @@ class HomeView(BaseView):
             # Apply common layout styling
             self.apply_common_layout()
             
-            # Welcome card with consistent styling
-            welcome_content = """
-            This application allows you to draw digits and have them recognized 
-            by a machine learning model.
+            # Apply button styling from our CSS file
+            from utils.css.button_css import load_button_css
+            load_button_css()
             
-            The model is trained on the MNIST dataset, which contains thousands 
-            of handwritten digit images.
+            # Welcome card with consistent styling - this replaces the title
+            welcome_content = """
+            <b>Welcome to the MNIST Digit Classifier!</b>
+            
+            This application allows you to draw digits and have them recognized by a machine learning model.
+            
+            The model is trained on the MNIST dataset, which contains thousands of handwritten digit images.
             
             Draw any digit from 0-9 and let our AI predict what you've written!
             """
-            welcome_card = create_welcome_card("Welcome", "👋", welcome_content)
+            welcome_card = create_welcome_card("MNIST Digit Classifier", "👋", welcome_content)
             st.markdown(welcome_card, unsafe_allow_html=True)
             
             # How it works section
@@ -83,12 +76,10 @@ class HomeView(BaseView):
                 card1 = ContentCard(
                     title="1. Draw a Digit",
                     icon="✏️",
-                    content="""
-                    <p>Navigate to the Drawing Canvas and use your mouse or touch to draw any digit from 0-9.</p>
-                    <p>You can adjust the brush size and use the clear button to start over.</p>
-                    """,
+                    content="<p>Navigate to the Drawing Canvas and use your mouse or touch to draw any digit from 0-9.</p><p>You can adjust the brush size and use the clear button to start over.</p>",
                     elevated=True,
-                    classes=["feature-card", "primary-card"]
+                    size="small",  # Explicitly use small size for secondary color scheme
+                    classes=["feature-card"]
                 )
                 card1.display()
             
@@ -110,13 +101,13 @@ class HomeView(BaseView):
                 # View history feature
                 card3 = ContentCard(
                     title="3. View History",
-                    icon="📊",
+                    icon="📖",
                     content="""
                     <p>All your predictions are saved to your session history.</p>
                     <p>You can view past predictions, compare results, and see statistics about your drawing classifications.</p>
                     """,
                     elevated=True,
-                    classes=["feature-card", "accent-card"]
+                    classes=["feature-card", "secondary-card"]
                 )
                 card3.display()
             
@@ -126,75 +117,15 @@ class HomeView(BaseView):
             # Use columns to place heading and button side by side
             col1, col2 = st.columns([2, 3])
             with col1:
-                st.markdown("<h2 style='margin-top: 5px;'>Ready to try it out?</h2>", unsafe_allow_html=True)
+                st.markdown("<h2>Ready to try it out?</h2>", unsafe_allow_html=True)
 
             with col2:
-                # Button styling - now with smaller size
-                st.markdown("""
-                <style>
-                /* Start Drawing button styling */
-                .stButton button[kind="primary"] {
-                    background: linear-gradient(90deg, var(--color-primary, #4F46E5), var(--color-secondary, #06B6D4)) !important;
-                    color: white !important;
-                    border: none !important;
-                    padding: 0.35rem 1.2rem !important; /* Reduced padding for smaller button */
-                    font-size: 1rem !important; /* Slightly smaller font */
-                    border-radius: 0.5rem !important;
-                    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15) !important;
-                    transition: all 0.3s ease !important;
-                    margin-top: 0 !important;
-                    position: relative !important;
-                    overflow: hidden !important;
-                    font-family: var(--font-primary, 'Poppins', sans-serif) !important;
-                    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
-                }
-                
-                /* Shimmer effect on hover */
-                .stButton button[kind="primary"]::after {
-                    content: '' !important;
-                    position: absolute !important;
-                    top: -50% !important;
-                    left: -50% !important;
-                    width: 200% !important;
-                    height: 200% !important;
-                    background: linear-gradient(
-                        to right,
-                        rgba(255, 255, 255, 0) 0%,
-                        rgba(255, 255, 255, 0.3) 50%,
-                        rgba(255, 255, 255, 0) 100%
-                    ) !important;
-                    transform: rotate(30deg) !important;
-                    opacity: 0 !important;
-                    transition: opacity 0.3s ease !important;
-                    pointer-events: none !important;
-                }
-                
-                .stButton button[kind="primary"]:hover {
-                    transform: translateY(-3px) !important;
-                    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2) !important;
-                }
-                
-                .stButton button[kind="primary"]:hover::after {
-                    opacity: 1 !important;
-                    animation: buttonShine 1.5s ease-in-out !important;
-                }
-                
-                @keyframes buttonShine {
-                    0% {
-                        transform: rotate(30deg) translate(-100%, -100%) !important;
-                    }
-                    100% {
-                        transform: rotate(30deg) translate(100%, 100%) !important;
-                    }
-                }
-                </style>
-                """, unsafe_allow_html=True)
-                
+                # Make sure this button is styled correctly through our button CSS
                 if st.button("Start Drawing", type="primary", use_container_width=False):
                     self.logger.info("Start Drawing button clicked")
                     NavigationState.set_active_view("draw")
                     st.rerun()
-                
+            
             self.logger.debug("Home view rendered successfully")
         except Exception as e:
             self.logger.error(f"Error rendering home view: {str(e)}", exc_info=True)
