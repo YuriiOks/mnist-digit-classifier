@@ -25,7 +25,7 @@ class BaseView(ABC):
     def __init__(
         self,
         view_id: str,
-        title: str,
+        title: Optional[str] = None,
         description: Optional[str] = None,
         icon: Optional[str] = None
     ):
@@ -33,7 +33,7 @@ class BaseView(ABC):
         
         Args:
             view_id: Unique identifier for the view
-            title: Display title for the view
+            title: Display title for the view (not rendered by default)
             description: Optional description of the view
             icon: Optional icon for the view (emoji or icon class)
         """
@@ -46,77 +46,63 @@ class BaseView(ABC):
         self.icon = icon
         self.theme_manager = ThemeManager()
         
+        # Initialize state
+        self._setup()
+        
         self.logger.debug(f"Exiting __init__ for view: {view_id}")
     
-    def display(self) -> None:
-        """Display the view with proper error handling.
-        
-        This method handles the complete view rendering process, including
-        setup, rendering, and error handling.
-        """
-        self.logger.debug(f"Entering display for view: {self.view_id}")
-        try:
-            # Set up the view
-            self._setup()
-            
-            # Display title with icon if present
-            if self.icon:
-                st.title(f"{self.icon} {self.title}")
-            else:
-                st.title(self.title)
-            
-            # Display description if present
-            if self.description:
-                st.write(self.description)
-            
-            # Render the view content
-            self.render()
-            self.logger.debug(f"View {self.view_id} rendered successfully")
-            
-        except Exception as e:
-            self.logger.error(f"Error displaying view {self.view_id}: {str(e)}", exc_info=True)
-            self._handle_error(e)
-            
-        self.logger.debug(f"Exiting display for view: {self.view_id}")
-    
     def _setup(self) -> None:
-        """Set up the view before rendering.
-        
-        This method can be overridden by subclasses to perform initialization
-        tasks before rendering.
-        """
-        self.logger.debug(f"Entering _setup for view: {self.view_id}")
-        # Base implementation does nothing
-        self.logger.debug(f"Exiting _setup for view: {self.view_id}")
+        """Set up the view (can be overridden by subclasses)."""
         pass
     
-    def _handle_error(self, error: Exception) -> None:
-        """Handle errors that occur during view rendering.
-        
-        Args:
-            error: The exception that was raised
-        """
-        self.logger.debug(f"Entering _handle_error for view: {self.view_id}")
-        error_message = f"Error in {self.title} view: {str(error)}"
-        self.logger.error(error_message, exc_info=True)
-        
-        # Display a user-friendly error message
-        st.error(f"An error occurred while displaying this view: {str(error)}")
-        
-        # Show technical details in an expander for debugging
-        with st.expander("Technical Details"):
-            st.code(f"Error type: {type(error).__name__}\nError message: {str(error)}")
-            
-        self.logger.debug(f"Exiting _handle_error for view: {self.view_id}")
+    def display(self) -> None:
+        """Display the view (calls render internally)."""
+        self.logger.debug(f"Entering display for view: {view_id}")
+        try:
+            # Don't render title automatically - let views handle their own headers
+            # Instead, just call render directly
+            self.render()
+        except Exception as e:
+            self.logger.error(f"Error displaying view: {str(e)}", exc_info=True)
+            self._handle_error(e)
+        self.logger.debug(f"Exiting display for view: {view_id}")
     
     @abstractmethod
     def render(self) -> None:
-        """Render the view content.
-        
-        This method must be implemented by all subclasses to render
-        the actual view content.
-        """
+        """Render the view content (must be implemented by subclasses)."""
         pass
+    
+    def get_view_data(self) -> Dict[str, Any]:
+        """Get view-specific data for templates.
+        
+        Returns:
+            Dict[str, Any]: Dictionary of view data
+        """
+        return {
+            "view_id": self.view_id,
+            "title": self.title,
+            "description": self.description,
+            "icon": self.icon
+        }
+    
+    def _handle_error(self, error: Exception) -> None:
+        """Handle view rendering errors.
+        
+        Args:
+            error: The exception that occurred
+        """
+        self.logger.error(f"Error in view {self.view_id}: {str(error)}", exc_info=True)
+        
+        if isinstance(error, UIError):
+            # UI errors are displayed with their specific message
+            st.error(f"UI Error: {str(error)}")
+        else:
+            # Generic errors get a more user-friendly message
+            st.error("An error occurred while displaying this view.")
+            st.error(f"Details: {str(error)}")
+            
+        # Display a help message
+        st.info("Try reloading the page or contact support if the issue persists.")
     
     def get_state(self, key: str, default: Any = None) -> Any:
         """Get a value from the session state.
@@ -163,35 +149,8 @@ class BaseView(ABC):
         self.logger.debug(f"Exiting has_state for key: {key}, result: {result}")
         return result
     
-    def get_view_data(self) -> Dict[str, Any]:
-        """Get view data for rendering templates.
-        
-        Returns:
-            Dict[str, Any]: View data dictionary
-        """
-        self.logger.debug(f"Entering get_view_data for view: {self.view_id}")
-        try:
-            data = {
-                "view_id": self.view_id,
-                "title": self.title,
-                "description": self.description,
-                "icon": self.icon,
-                "is_dark_mode": self.theme_manager.is_dark_mode()
-            }
-            self.logger.debug(f"Exiting get_view_data for view: {self.view_id}")
-            return data
-        except Exception as e:
-            self.logger.error(f"Error getting view data for {self.view_id}: {str(e)}", exc_info=True)
-            # Return basic data to prevent failures
-            return {
-                "view_id": self.view_id,
-                "title": self.title,
-                "description": self.description,
-                "icon": self.icon
-            }
-    
     def render_title(self) -> None:
-        """Render the view title."""
+        """Render the view title (hidden by CSS)."""
         self.logger.debug(f"Entering render_title for view: {self.view_id}")
         try:
             if self.icon:
@@ -199,17 +158,20 @@ class BaseView(ABC):
             else:
                 title_html = self.title
             
+            # Only render the title - completely skip the description
             st.markdown(f"<h1 class='view-title'>{title_html}</h1>", unsafe_allow_html=True)
             
-            if self.description:
-                st.markdown(
-                    f"<p class='view-description'>{self.description}</p>",
-                    unsafe_allow_html=True
-                )
+            # Description rendering is completely disabled
+            # if self.description:
+            #     st.markdown(
+            #         f"<p class='view-description'>{self.description}</p>",
+            #         unsafe_allow_html=True
+            #     )
+            
             self.logger.debug(f"Title rendered successfully for view: {self.view_id}")
         except Exception as e:
             self.logger.error(f"Error rendering title for view {self.view_id}: {str(e)}", exc_info=True)
-            # Fallback to simple title
+            # Fallback to simple title - no description
             st.title(self.title)
         self.logger.debug(f"Exiting render_title for view: {self.view_id}")
     
