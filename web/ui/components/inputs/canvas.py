@@ -128,4 +128,63 @@ class DrawingCanvas(Component):
             
         except Exception as e:
             self.logger.error(f"Error rendering drawing canvas: {str(e)}", exc_info=True)
-            st.error(f"An error occurred while rendering the drawing canvas: {str(e)}") 
+            st.error(f"An error occurred while rendering the drawing canvas: {str(e)}")
+
+def render_canvas(key="drawing_canvas", width=280, height=280):
+    """Render a drawing canvas.
+    
+    Args:
+        key: Unique key for the canvas component
+        width: Canvas width in pixels
+        height: Canvas height in pixels
+        
+    Returns:
+        Canvas result data
+    """
+    try:
+        from streamlit_drawable_canvas import st_canvas
+        
+        # Custom CSS for canvas
+        st.markdown("""
+        <style>
+        .canvas-container {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 5px;
+            margin-bottom: 1rem;
+            background-color: #ffffff;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+        
+        # Render canvas with proper settings
+        return st_canvas(
+            fill_color="rgba(255, 255, 255, 0.0)",
+            stroke_width=15,
+            stroke_color="#000000",
+            background_color="#ffffff",
+            height=height,
+            width=width,
+            drawing_mode="freedraw",
+            key=key,
+            display_toolbar=True,
+            update_streamlit=True,
+        )
+    except Exception as e:
+        st.error(f"Could not load canvas: {str(e)}")
+        st.markdown("""
+        <div style="
+            width: 280px;
+            height: 280px;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        ">
+            <p style="color: #888888; font-size: 1.2em;">
+                Canvas component not available
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+        return None 
