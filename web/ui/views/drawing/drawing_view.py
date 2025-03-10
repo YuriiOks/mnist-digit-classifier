@@ -4,6 +4,14 @@
 # Description: Drawing view for digit classification
 # Created: 2024-05-01
 
+# This file provides compatibility for the "drawing" view path referenced in app.py
+# It simply imports and re-exports the DrawView from the "draw" package
+
+from ui.views.draw.draw_view import DrawView as DrawingView
+
+# Keep the original class name for compatibility
+__all__ = ['DrawingView']
+
 import streamlit as st
 import logging
 import numpy as np
