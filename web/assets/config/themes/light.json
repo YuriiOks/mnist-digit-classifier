@@ -2,7 +2,7 @@
   "name": "light",
   "colors": {
     "primary": "#4361ee",
-    "secondary": "#3f37c9",
+    "secondary": "#4cc9f0",
     "accent": "#4895ef",
     "background": "#f8f9fa",
     "card": "#ffffff",
@@ -11,5 +11,15 @@
     "success": "#4cc9f0",
     "warning": "#f72585",
     "error": "#e63946"
+  },
+  "fonts": {
+    "heading": "system-ui, sans-serif",
+    "body": "system-ui, sans-serif",
+    "code": "monospace"
+  },
+  "settings": {
+    "animations_enabled": true,
+    "transitions_speed": "normal",
+    "border_radius": "4px"
   }
 } 
