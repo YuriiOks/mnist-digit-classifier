@@ -223,9 +223,8 @@ def debug_css():
     css_files = [
         "assets/css/global/reset.css",
         "assets/css/global/variables.css",
-        # Don't use ThemeManager directly here, use a default value
         "assets/css/themes/light/variables.css",
-        # Add more files here
+
     ]
     
     logger.debug(f"Checking existence of {len(css_files)} CSS files")
