@@ -13,7 +13,6 @@ import io
 import random
 
 from ui.views.base_view import BaseView
-from ui.components.cards.content_card import ContentCard
 from core.app_state.canvas_state import CanvasState
 from core.app_state.history_state import HistoryState
 
