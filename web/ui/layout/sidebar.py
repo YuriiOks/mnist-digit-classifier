@@ -81,22 +81,22 @@ class Sidebar:
                 
                 # Home button
                 if st.button("🏠 Home", key="nav_home_btn", use_container_width=True, type="primary"):
-                    NavigationState.navigate_to("home")
+                    NavigationState.set_active_view("home")
                     st.rerun()
                 
                 # Draw button
                 if st.button("✏️ Draw & Classify", key="nav_draw_btn", use_container_width=True, type="primary"):
-                    NavigationState.navigate_to("draw")
+                    NavigationState.set_active_view("draw")
                     st.rerun()
-                
+                    
                 # History button
                 if st.button("📊 View History", key="nav_history_btn", use_container_width=True, type="primary"):
-                    NavigationState.navigate_to("history")
+                    NavigationState.set_active_view("history")
                     st.rerun()
                 
                 # Settings button
                 if st.button("⚙️ Settings", key="nav_settings_btn", use_container_width=True, type="primary"):
-                    NavigationState.navigate_to("settings")
+                    NavigationState.set_active_view("settings")
                     st.rerun()
                 
                 # Add a visual divider
