@@ -18,19 +18,40 @@ logger = logging.getLogger(__name__)
 class Tab:
     """Tab data for tabs navigation."""
 
-    def __init__(
-        self,
-        id: str,
-        label: str,
-        icon: Optional[str] = None,
-        content: Optional[str] = None,
-        disabled: bool = False
-    ):
+    def __init__(self, id: str, label: str,
+                 icon: Optional[str] = None,
+                 content: Optional[str] = None,
+                 disabled: bool = False):
         self.__id = id
         self.__label = label
         self.__icon = icon
         self.__content = content
         self.__disabled = disabled
+
+    @property
+    def id(self) -> str:
+        """Return the tab's unique ID."""
+        return self.__id
+
+    @property
+    def label(self) -> str:
+        """Return the tab's label."""
+        return self.__label
+
+    @property
+    def icon(self) -> Optional[str]:
+        """Return the tab's icon."""
+        return self.__icon
+
+    @property
+    def content(self) -> Optional[str]:
+        """Return the tab's content."""
+        return self.__content
+
+    @property
+    def disabled(self) -> bool:
+        """Return whether the tab is disabled."""
+        return self.__disabled
 
 
 class Tabs(Component):
@@ -40,19 +61,15 @@ class Tabs(Component):
     different contents.
     """
 
-    def __init__(
-        self,
-        tabs: List[Tab],
-        active_tab: Optional[str] = None,
-        on_change: Optional[callable] = None,
-        *,
-        id: Optional[str] = None,
-        classes: Optional[List[str]] = None,
-        attributes: Optional[Dict[str, str]] = None,
-        vertical: bool = False,
-        pill_style: bool = False,
-        template_loader: Optional[Any] = None
-    ):
+    def __init__(self, tabs: List[Tab],
+                 active_tab: Optional[str] = None,
+                 on_change: Optional[callable] = None,
+                 *, id: Optional[str] = None,
+                 classes: Optional[List[str]] = None,
+                 attributes: Optional[Dict[str, str]] = None,
+                 vertical: bool = False,
+                 pill_style: bool = False,
+                 template_loader: Optional[Any] = None):
         """
         Initialize the tabs component.
 
@@ -69,15 +86,12 @@ class Tabs(Component):
         """
         self.vertical = vertical
         self.pill_style = pill_style
-
         comp_id = id or f"tabs_{uuid.uuid4()}"
-        # Prepare classes list.
         tabs_cls = classes or []
         if vertical:
             tabs_cls.append("vertical-tabs")
         else:
             tabs_cls.append("horizontal-tabs")
-
         super().__init__(
             component_type="navigation",
             component_name="tabs",
@@ -85,12 +99,10 @@ class Tabs(Component):
             classes=tabs_cls,
             attributes=attributes
         )
-
         self.__tabs = tabs
         self.__active_tab = active_tab or tabs[0].id
         self.__on_change = on_change
         self.__state_key = f"tabs_state_{comp_id}"
-
         self.logger.debug(
             f"Tabs initialized with active tab: {self.__active_tab}"
         )
@@ -99,18 +111,17 @@ class Tabs(Component):
     def active_tab(self) -> str:
         """Return the current active tab ID."""
         return self.__active_tab
-    
+
     @property
     @AspectUtils.catch_errors
     @AspectUtils.log_method
     def template_variables(self) -> Dict[str, Any]:
         """
         Generate template variables for rendering.
-        
-        Returns:
-            Dict[str, Any]: Dictionary of variables for template rendering.
-        """
 
+        Returns:
+          Dict[str, Any]: Dictionary of template variables.
+        """
         base_vars = super().template_variables.copy()
         tabs_html = ""
         contents_html = ""
@@ -144,7 +155,7 @@ class Tabs(Component):
 
         This function returns a script that:
         - Finds all tabs and content areas using the component_id.
-        - Updates the active state and toggles content display.
+        - Updates active state and toggles content display.
         - Sends the selected tab ID to Streamlit via postMessage.
         """
         return (
@@ -190,14 +201,15 @@ class Tabs(Component):
     def display(self) -> str:
         """
         Render and display the tabs component.
+
+        Returns:
+          str: The ID of the active tab.
         """
         html = self.template_loader.render_template(
             "components/navigation/tabs.html",
             self.template_variables
         )
         st.components.v1.html(html, height=300)
-
-        # Update active tab from session state.
         curr = st.session_state.get(
             self.component_id, self.__active_tab
         )
@@ -209,17 +221,13 @@ class Tabs(Component):
         return self.__active_tab
 
 
-
 class InputTabs(Tabs):
     """Specialized tabs for input selection: Draw, Upload, URL."""
 
-    def __init__(
-        self,
-        default_tab: Optional[str] = None,
-        on_change: Optional[callable] = None,
-        *,
-        key: str = "input_tabs"
-    ):
+    def __init__(self,
+                 default_tab: Optional[str] = None,
+                 on_change: Optional[callable] = None,
+                 *, key: str = "input_tabs"):
         """
         Initialize input selection tabs.
 
