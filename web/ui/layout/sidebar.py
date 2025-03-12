@@ -12,6 +12,8 @@ from core.app_state.navigation_state import NavigationState
 from core.app_state.theme_state import ThemeState
 from ui.components.navigation.option_menu import create_option_menu
 from ui.theme.theme_manager import ThemeManager
+from ui.components.controls.theme_toggle import ThemeToggle
+from ui.components.controls.bb8_toggle import BB8Toggle
 
 logger = logging.getLogger(__name__)
 
@@ -77,9 +79,6 @@ class Sidebar:
                 </div>
                 """, unsafe_allow_html=True)
                 
-                # Navigation buttons - consistent styling
-                st.markdown("### Navigation")
-                
                 # Home button
                 if st.button("🏠 Home", key="nav_home_btn", use_container_width=True, type="primary"):
                     NavigationState.navigate_to("home")
@@ -103,17 +102,10 @@ class Sidebar:
                 # Add a visual divider
                 st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
                 
-                # Theme toggle
-                st.markdown("### Appearance")
-                is_dark = st.toggle("Dark Mode", 
-                                  ThemeState.is_dark_mode(),
-                                  key="theme_toggle_sidebar")
-                
-                # Handle theme change
-                if is_dark != ThemeState.is_dark_mode():
-                    ThemeState.set_theme_mode("dark" if is_dark else "light")
-                    ThemeManager.toggle_theme()
-                    st.rerun()
+                # Theme toggle (BB8 Toggle)
+                theme_manager = ThemeManager()
+                bb8_toggle = BB8Toggle(theme_manager, on_change=None)
+                bb8_toggle.render()
                 
                 # Add another visual divider
                 st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
