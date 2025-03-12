@@ -10,12 +10,12 @@
 from utils.ui.layout import fix_layout_issues
 
 # Import only what exists in view_utils.py
-from utils.ui.view_utils import apply_view_styling, create_welcome_card, create_section_container, close_section_container
+from utils.ui.view_utils import apply_view_styling, create_card, create_section_container, close_section_container
 
 __all__ = [
     "fix_layout_issues", 
     'apply_view_styling', 
-    'create_welcome_card', 
+    'create_card',
     'create_section_container',
     'close_section_container'
 ]
