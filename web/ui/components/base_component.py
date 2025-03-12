@@ -36,14 +36,6 @@ class BaseComponent(ABC):
         """Display the component in the Streamlit app."""
         pass
 
-    def get_html(self) -> str:
-        """Get the HTML representation of the component.
-
-        Returns:
-            str: HTML code for the component
-        """
-        return ""
-
     def handle_error(self, error: Exception) -> None:
         """Handle errors that occur during component rendering.
 
