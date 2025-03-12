@@ -101,22 +101,23 @@ class ThemeManager:
         st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
     
     @staticmethod
-    def toggle_theme():
-        """Toggle between light and dark themes.
-        
-        This is a static convenience method that uses ThemeState to toggle themes.
+    def toggle_theme(new_theme: str):
+        """Toggle the theme and apply it.
+
+        Args:
+            new_theme: The theme to switch to ('light' or 'dark').
         """
-        logger.debug("Toggling theme via static method")
-        
-        # Toggle the theme mode through ThemeState
-        new_mode = ThemeState.toggle_theme_mode()
-        logger.debug(f"Theme toggled to: {new_mode}")
-        
+        logger.debug(f"Toggling theme via static method to: {new_theme}")
+
+        # Update ThemeState
+        ThemeState.set_theme_mode(new_theme)
+        logger.debug(f"ThemeState updated to: {new_theme}")
+
         # Get a ThemeManager instance to apply the theme
         theme_manager = ThemeManager()
-        theme_manager.apply_theme(new_mode)
-        
-        return new_mode
+        theme_manager.apply_theme(new_theme)
+
+        return new_theme
     
     def get_available_themes(self) -> Dict[str, str]:
         """Get a dictionary of available themes with name and display name."""
