@@ -6,9 +6,10 @@
 
 import streamlit as st
 import logging
-from typing import List, Optional, Dict, Any, Literal
+from typing import List, Optional, Dict, Any, Literal, Callable
 
 from ui.components.base_component import BaseComponent
+from utils.ui import create_card
 
 logger = logging.getLogger(__name__)
 
@@ -18,6 +19,8 @@ class Card(BaseComponent):
     def __init__(
         self,
         title: str,
+        content: str,
+        icon: Optional[str] = None,
         key: Optional[str] = None,
         elevated: bool = False,
         size: Literal["small", "large", "default"] = "default",
@@ -40,70 +43,65 @@ class Card(BaseComponent):
             **kwargs: Additional keyword arguments for the component
         """
         super().__init__(key=key, **kwargs)
-        self.title = title
-        self.elevated = elevated
-        self.size = size
-        self.classes = classes or []
-        self.attributes = attributes or {}
+        self.__title = title
+        self.__content = content
+        self.__icon = icon
+        self.__elevated = elevated
+        self.__size = size
+        self.__classes = classes or []
+        self.__attributes = attributes or {}
         
         # Add basic card class
-        if "card" not in self.classes:
-            self.classes.append("card")
+        if "card" not in self.__classes:
+            self.__classes.append("card")
         
         # Add elevated class if needed
-        if self.elevated and "elevated" not in self.classes:
-            self.classes.append("elevated")
+        if self.__elevated and "elevated" not in self.__classes:
+            self.__classes.append("elevated")
         
         # Add size class if specified
-        if self.size == "small":
-            self.classes.append("small")
-        elif self.size == "large":
-            self.classes.append("large")
-        
-        self.logger.debug(f"Card initialized with title: {title}, size: {size}, classes: {self.classes}")
-    
-    def get_html(self) -> str:
-        """Generate the HTML for the card component.
-        
+        if self.__size == "small":
+            self.__classes.append("small")
+        elif self.__size == "large":
+            self.__classes.append("large")
+
+        self.logger.debug(f"Card initialized with title: {self.__title}, size: {self.__size}, classes: {self.__classes}")
+
+    def render(self, title: str, icon: str, content: str,
+               template_loader: Callable[[str], str],
+               type_card: str = "welcome") -> str:
+
+        """Create a rendered card for any view.
+
+        Args:
+            title: Card title
+            icon: Emoji icon to display
+            content: HTML content for the card (paragraphs)
+  
         Returns:
-            str: The HTML representation of the card
+            str: HTML for the welcome card
         """
-        # Combine all classes
-        class_str = " ".join(self.classes)
-        
-        # Combine all attributes
-        attr_str = " ".join([f'{k}="{v}"' for k, v in self.attributes.items()])
-        
-        # Create card HTML
-        html = f"""
-        <div class="{class_str}" {attr_str}>
-            <div class="card-title">
-                {self.title}
-            </div>
-            <div class="card-content">
-                {self.get_content()}
-            </div>
-        </div>
-        """
-        
-        return html
+        formatted_content = ''.join(f'<p>{p.strip()}</p>' for p in content.split('\n') if p.strip())
+        return template_loader(f"/components/controls/cards/{type_card}.html", {
+            "title": title,
+            "icon": icon,
+            "content": formatted_content
+        })
     
-    def get_content(self) -> str:
-        """Get the content of the card. To be overridden by subclasses.
-        
-        Returns:
-            str: The HTML content to display in the card
-        """
-        return "Card content goes here."
-    
-    def display(self) -> None:
+    def display(self, template_loader: Callable[[str], str]) -> None:
         """Display the card in the Streamlit app."""
-        self.logger.debug(f"Displaying card: {self.title}")
+        self.logger.debug(f"Displaying card: {self.__title}")
         try:
             # We don't need to load CSS here since it's loaded globally via components_css.py
             # Just render the HTML
-            st.markdown(self.get_html(), unsafe_allow_html=True)
-            self.logger.debug(f"Card {self.title} displayed successfully")
+            content_to_show = self.render(title=self.__title, 
+                                          icon=self.__icon, 
+                                          content=self.__content,
+                                          template_loader=template_loader,
+                                          type_card=self.__classes[0])
+            print(self.__classes[0])
+            st.markdown(content_to_show, unsafe_allow_html=True)
+            self.logger.debug(f"Card {self.__title} displayed successfully")
         except Exception as e:
             self.logger.error(f"Error displaying card: {str(e)}", exc_info=True)
             st.error(f"Error displaying card: {str(e)}")
