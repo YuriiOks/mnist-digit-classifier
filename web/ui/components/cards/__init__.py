@@ -6,4 +6,4 @@
 
 # Import card components for easier access
 from ui.components.cards.card import Card
-from ui.components.cards.content_card import ContentCard
+
