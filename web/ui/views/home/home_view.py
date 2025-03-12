@@ -39,7 +39,7 @@ class HomeView(BaseView):
             welcome_card = Card(
                 title=welcome_data.get("title", ""),
                 content=welcome_data.get("content", ""),
-                icon=welcome_data.get("icon", ""),  
+                icon=welcome_data.get("icon", ""),
                 elevated=True,
                 size="large",
                 classes=["welcome_card"]
