@@ -12,7 +12,7 @@
   border-radius: var(--border-radius, 8px);
   border: 1px solid var(--color-border, #dee2e6);
   padding: 1.5rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0rem !important;
   transition: all 0.3s ease;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
   position: relative;
@@ -198,13 +198,34 @@ h2 a, h2 span, h2 div {
 
 .welcome-card .card-title {
   font-size: 1.75rem;
-  color: var(--color-primary, #4361ee);
+  color: var(--color-primary, #4361ee) !important;
   border-bottom: none;
   padding-bottom: 0;
+  font-weight: 700;
+}
+
+.welcome-card .card-icon {
+  font-size: 1.75rem;
+  background: var(--color-primary, #4361ee) !important;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-right: 0.75rem;
 }
 
 .welcome-card .card-content {
   font-size: 1.05rem;
+  color: var(--color-primary, #4361ee);
+}
+
+.welcome-card .card-content b,
+.welcome-card .card-content strong {
+  font-weight: 700;
+  color: var(--color-primary, #4361ee);
+}
+
+.welcome-card .card-content p {
+  margin-bottom: 0.75rem;
+  color: var(--color-primary, #4361ee);
 }
 
 /* Feature Cards - Updated for immediate hover effect */
@@ -231,7 +252,7 @@ h2 a, h2 span, h2 div {
 }
 
 .feature-card.small .card-title {
-  color: var(--color-secondary, #4cc9f0);
+  color: var(--color-secondary, #4cc9f0) !important;
 }
 
 /* Backward compatibility for the old class names */
@@ -379,15 +400,61 @@ h2 a, h2 span, h2 div {
   }
 }
 
-/* Make sure the color change for small cards is also immediate */
+/* Update card title hover for small/secondary cards */
 .feature-card.small:hover .card-title,
-.feature-card.secondary-card:hover .card-title {
+.feature-card.secondary-card:hover .card-title,
+.content-card.small:hover .card-title {
   color: var(--color-primary, #4361ee) !important;
-  transition: none !important;
+  transition: none !important; /* Ensure immediate color change */
+}
+
+/* Make sure the card title icon also changes immediately */
+.feature-card.small:hover .card-icon,
+.feature-card.secondary-card:hover .card-icon,
+.content-card.small:hover .card-icon {
+  background: linear-gradient(135deg, var(--color-primary, #4361ee), var(--color-secondary, #4cc9f0)) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  transition: none !important; /* Ensure immediate color change */
 }
 
 /* Remove the sliding animation for small cards */
 .feature-card.small::before,
 .feature-card.secondary-card::before {
   display: none;
+}
+
+/* Make sure text in welcome card titles are properly colored in both themes */
+[data-theme="light"] .welcome-card .card-title,
+[data-theme="dark"] .welcome-card .card-title {
+  color: var(--color-primary) !important;
+}
+
+/* Small cards use secondary color for all text */
+.feature-card.small .card-content,
+.feature-card.secondary-card .card-content,
+.content-card.small .card-content {
+  color: var(--color-secondary, #4cc9f0);
+}
+
+.feature-card.small p,
+.feature-card.secondary-card p,
+.content-card.small p {
+  color: var(--color-secondary, #4cc9f0);
+}
+
+/* All text in feature cards changes to primary on hover */
+.feature-card:hover .card-content,
+.feature-card:hover p {
+  color: var(--color-primary, #4361ee) !important;
+  transition: color 0.3s ease;
+}
+
+/* Ensure immediate color change for small cards on hover */
+.feature-card.small:hover .card-content,
+.feature-card.small:hover p,
+.feature-card.secondary-card:hover .card-content,
+.feature-card.secondary-card:hover p {
+  color: var(--color-primary, #4361ee) !important;
+  transition: none !important;
 }
