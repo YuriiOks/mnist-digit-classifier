@@ -9,7 +9,6 @@ import logging
 from typing import List, Optional, Dict, Any, Literal, Callable
 
 from ui.components.base_component import BaseComponent
-from utils.ui import create_card
 
 logger = logging.getLogger(__name__)
 
