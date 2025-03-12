@@ -149,25 +149,6 @@ class BaseView(ABC):
         self.logger.debug(f"Exiting has_state for key: {key}, result: {result}")
         return result
     
-    def render_title(self) -> None:
-        """Render the view title (hidden by CSS)."""
-        self.logger.debug(f"Entering render_title for view: {self.view_id}")
-        try:
-            if self.icon:
-                title_html = f"{self.icon} {self.title}"
-            else:
-                title_html = self.title
-            
-            # Only render the title - completely skip the description
-            st.markdown(f"<h1 class='view-title'>{title_html}</h1>", unsafe_allow_html=True)
-            
-            self.logger.debug(f"Title rendered successfully for view: {self.view_id}")
-        except Exception as e:
-            self.logger.error(f"Error rendering title for view {self.view_id}: {str(e)}", exc_info=True)
-            # Fallback to simple title - no description
-            st.title(self.title)
-        self.logger.debug(f"Exiting render_title for view: {self.view_id}")
-    
     def safe_render(self) -> None:
         """Safely render the view with error handling."""
         self.logger.debug(f"Entering safe_render for view: {self.view_id}")
@@ -191,7 +172,6 @@ class BaseView(ABC):
         """Display the view (calls render internally)."""
         self.logger.debug(f"Entering display for view: {self.view_id}")    
         # Render title
-        self.render_title()
         
         # Render content
         self.safe_render()
