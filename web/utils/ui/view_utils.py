@@ -30,27 +30,6 @@ def apply_view_styling():
     else:
         logger.warning(f"View styles CSS file not found at {css_path}")
 
-def create_card(title: str, icon: str, content: str,
-                template_loader: Callable[[str], str],
-                type_card: str = "welcome") -> str:
-    """Create a consistent welcome card for any view.
-    
-    Args:
-        title: Card title
-        icon: Emoji icon to display
-        content: HTML content for the card (paragraphs)
-        
-    Returns:
-        str: HTML for the welcome card
-    """
-    
-    formatted_content = ''.join(f'<p>{p.strip()}</p>' for p in content.split('\n') if p.strip())
-    return template_loader(f"/components/controls/cards/{type_card}_card.html", {
-        "title": title,
-        "icon": icon,
-        "content": formatted_content
-    })
-    
 def create_section_container(section_id, classes=None):
     """Create a container for a view section with proper styling.
     
