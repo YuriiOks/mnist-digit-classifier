@@ -113,7 +113,39 @@ def main():
         # Display footer
         footer = Footer()
         footer.display()
-        
+
+        # # Register the callback function in Streamlit
+        # st.components.v1.html(
+        #     """
+        #     <script>
+        #     // Define the function in the Streamlit context
+        #     window.callToggleTheme = function(theme) {
+        #         // Use Streamlit's setComponentValue for more reliability
+        #         if (window.parent && window.parent.streamlit) {
+        #             const data = {
+        #                 theme: theme,
+        #                 isInitialCall: false
+        #             };
+        #             window.parent.streamlit.setComponentValue(data);
+        #         }
+        #     }
+        #     </script>
+        #     """,
+        #     height=0,  # Make it invisible
+        # )
+
+        # Define a callback handler for theme toggle
+        def handle_theme_toggle(theme):
+            if theme and theme != st.session_state.get("current_theme"):
+                ThemeManager.toggle_theme(theme)
+                st.rerun()  # Force a rerun to apply the theme change
+
+        # Register the component callback
+        # components.declare_component(
+        #     "theme_toggle_callback",
+        #     handle_theme_toggle
+        # )
+
     except Exception as e:
         logger.error(f"Error in main application: {str(e)}", exc_info=True)
         st.error(f"An error occurred: {str(e)}")
