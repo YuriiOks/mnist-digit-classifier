@@ -6,18 +6,21 @@
 
 import streamlit as st
 import logging
+from typing import Callable
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
 def apply_view_styling():
     """Apply consistent styling to all views by loading external CSS."""
-    logger.debug("Applying consistent view styling")
+    logger.info("Applying consistent view styling")
     
     # Get the path to the CSS file
     current_dir = Path(__file__).resolve().parent
     css_path = current_dir.parent.parent / "assets" / "css" / "views" / "view_styles.css"
     
+    logger.info(f"View styles CSS path: {css_path}")
+
     if css_path.exists():
         # Load and inject the CSS
         with open(css_path, "r") as css_file:
@@ -27,8 +30,9 @@ def apply_view_styling():
     else:
         logger.warning(f"View styles CSS file not found at {css_path}")
 
-def create_welcome_card(title: str, icon: str, content: str,
-                        template_loader) -> str:
+def create_card(title: str, icon: str, content: str,
+                template_loader: Callable[[str], str],
+                type_card: str = "welcome") -> str:
     """Create a consistent welcome card for any view.
     
     Args:
@@ -41,7 +45,7 @@ def create_welcome_card(title: str, icon: str, content: str,
     """
     
     formatted_content = ''.join(f'<p>{p.strip()}</p>' for p in content.split('\n') if p.strip())
-    return template_loader("/home/welcome_card.html", {
+    return template_loader(f"/components/controls/cards/{type_card}_card.html", {
         "title": title,
         "icon": icon,
         "content": formatted_content
