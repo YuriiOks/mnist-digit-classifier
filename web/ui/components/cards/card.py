@@ -98,7 +98,7 @@ class Card(BaseComponent):
                                           content=self.__content,
                                           template_loader=template_loader,
                                           type_card=self.__classes[0])
-            print(self.__classes[0])
+
             st.markdown(content_to_show, unsafe_allow_html=True)
             self.logger.debug(f"Card {self.__title} displayed successfully")
         except Exception as e:
