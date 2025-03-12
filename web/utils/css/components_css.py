@@ -66,6 +66,13 @@ def apply_component_styles():
     apply_card_styles()
     apply_button_styles()
     
+    # Load sidebar styles
+    try:
+        from utils.css.sidebar_css import load_sidebar_css
+        load_sidebar_css()
+    except ImportError:
+        logger.warning("Could not import sidebar CSS")
+    
     # Hide automatic view titles
     try:
         from utils.css.title_fix_css import hide_view_titles
