@@ -43,20 +43,6 @@ class BaseComponent(ABC):
         """
         return ""
     
-    @staticmethod
-    def sanitize_html_content(content: str) -> str:
-        """Sanitize HTML content for safe rendering.
-        
-        Args:
-            content: HTML content to sanitize
-            
-        Returns:
-            str: Sanitized HTML content
-        """
-        # Basic sanitization - in a real app, use a proper HTML sanitizer
-        content = str(content).strip()
-        return content
-
     def handle_error(self, error: Exception) -> None:
         """Handle errors that occur during component rendering.
         
