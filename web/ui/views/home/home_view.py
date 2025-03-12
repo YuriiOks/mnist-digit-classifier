@@ -55,17 +55,18 @@ class HomeView(BaseView):
             feature_cards = self.load_feature_cards()
             cols = st.columns(3)
 
-            # for col, card_data in zip(cols, feature_cards):
-            #     with col:
-            #         card = Card(
-            #             title=card_data["title"],
-            #             content=card_data["content"],
-            #             icon=card_data["icon"],
-            #             elevated=True,
-            #             size=card_data.get("size", "medium"),
-            #             classes=["feature_card"]
-            #         )
-            #         card.display(self.template_loader.render_template)
+            for col, card_data in zip(cols, feature_cards):
+                with col:
+                    print(card_data)
+                    card = Card(
+                        title=card_data["title"],
+                        content=card_data["content"],
+                        icon=card_data["icon"],
+                        elevated=True,
+                        size=card_data["size"],
+                        classes=["feature_card"]
+                    )
+                    card.display(self.template_loader.render_template)
 
             st.markdown("<hr style='margin: 2rem 0;'>", unsafe_allow_html=True)
 
