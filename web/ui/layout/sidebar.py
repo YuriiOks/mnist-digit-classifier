@@ -12,7 +12,6 @@ from core.app_state.navigation_state import NavigationState
 from core.app_state.theme_state import ThemeState
 from ui.components.navigation.option_menu import create_option_menu
 from ui.theme.theme_manager import ThemeManager
-from ui.components.controls.theme_toggle import ThemeToggle
 from ui.components.controls.bb8_toggle import BB8Toggle
 
 logger = logging.getLogger(__name__)
@@ -27,57 +26,16 @@ class Sidebar:
         """Display the sidebar with navigation and settings."""
         try:
             with st.sidebar:
-                # Fancy header with gradient text
+                # Header with app title and subtitle
                 st.markdown("""
-                <style>
-                .sidebar-header {
-                    text-align: center;
-                    margin-bottom: 20px;
-                }
-                .gradient-text {
-                    background: linear-gradient(90deg, #4361ee, #4cc9f0);
-                    -webkit-background-clip: text;
-                    -webkit-text-fill-color: transparent;
-                    font-weight: 700;
-                    font-size: 2.2rem;
-                    line-height: 1.2;
-                    margin-bottom: 0.2rem;
-                }
-                .sidebar-subheader {
-                    opacity: 0.8;
-                    font-size: 0.9rem;
-                    margin-bottom: 15px;
-                    text-align: center;
-                }
-                
-                /* Custom button styling */
-                div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"] button {
-                    width: 100% !important;
-                    border-radius: 8px !important;
-                    margin-bottom: 8px !important;
-                    font-weight: 500 !important;
-                    border: none !important;
-                    padding: 10px 15px !important;
-                    transition: all 0.3s !important;
-                    box-shadow: 0 2px 5px rgba(0,0,0,0.1) !important;
-                }
-                
-                div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"] button:hover {
-                    transform: translateY(-2px) !important;
-                    box-shadow: 0 4px 8px rgba(0,0,0,0.15) !important;
-                }
-                
-                .divider {
-                    margin: 20px 0;
-                    border-top: 1px solid rgba(128, 128, 128, 0.2);
-                }
-                </style>
-                
                 <div class="sidebar-header">
                     <div class="gradient-text">MNIST App</div>
                     <div class="sidebar-subheader">Digit Classification AI</div>
                 </div>
                 """, unsafe_allow_html=True)
+                
+                # Navigation buttons with container
+                st.markdown('<div class="nav-buttons-container">', unsafe_allow_html=True)
                 
                 # Home button
                 if st.button("🏠 Home", key="nav_home_btn", use_container_width=True, type="primary"):
@@ -99,20 +57,22 @@ class Sidebar:
                     NavigationState.set_active_view("settings")
                     st.rerun()
                 
+                st.markdown('</div>', unsafe_allow_html=True)
+                
                 # Add a visual divider
                 st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
                 
-                # Theme toggle (BB8 Toggle)
+                # Theme toggle section with centering container
+
                 theme_manager = ThemeManager()
                 bb8_toggle = BB8Toggle(theme_manager, on_change=None)
                 bb8_toggle.render()
                 
                 # Add another visual divider
-                st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
                 
                 # Footer info in sidebar
                 st.markdown("""
-                <div style="text-align: center; font-size: 0.8rem; opacity: 0.7; margin-top: 30px;">
+                <div class="sidebar-footer">
                     <p>Version 1.0.0</p>
                     <p>© 2025 MNIST Classifier</p>
                 </div>
