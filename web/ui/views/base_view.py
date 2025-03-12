@@ -7,7 +7,7 @@
 import streamlit as st
 from abc import ABC, abstractmethod
 import logging
-from typing import Dict, Any, Optional, List, Union
+from typing import Dict, Any, Optional
 
 from core.app_state.session_state import SessionState
 from core.errors.ui_errors import UIError
@@ -225,39 +225,57 @@ class BaseView(ABC):
     def apply_common_layout(self):
         """Apply common layout styling to ensure consistency across views."""
         try:
-            # Import and apply view styling utility if available
+            # Apply view styling first
             try:
+                logger.info("Applying view styling")
                 from utils.ui.view_utils import apply_view_styling
+                logger.info("View styling utility found")
                 apply_view_styling()
             except ImportError: 
-                # Fallback to direct CSS injection if utility isn't available
-                st.markdown("""
-                <style>
-                /* Fix content alignment */
-                .block-container {
-                    max-width: 100% !important;
-                    padding-top: 1rem !important;
-                    padding-left: 1rem !important;
-                    padding-right: 1rem !important;
-                }
+                logger.warning("View styling utility not found")
                 
-                /* Make headers look better */
-                h1, h2, h3 {
-                    margin-bottom: 1rem !important;
-                    margin-top: 0.5rem !important;
-                    font-family: var(--font-primary, 'Poppins', sans-serif) !important;
-                }
-                
-                /* Add space around elements */
-                .stMarkdown {
-                    margin-bottom: 0.5rem !important;
-                }
-                
-                /* Remove empty columns */
-                .stColumn:empty {
-                    display: none !important;
-                }
-                </style>
-                """, unsafe_allow_html=True)
+            # Now apply component-specific CSS
+            self._apply_css()
+            
         except Exception as e:
-            self.logger.error(f"Error applying common layout: {str(e)}") 
+            self.logger.error(f"Error applying common layout: {str(e)}")
+
+    def _apply_css(self, css_modules=None):
+        """Apply CSS for view components.
+        
+        Args:
+            css_modules: List of CSS module names to apply, defaults to button_css and card_css
+        """
+        if css_modules is None:
+            css_modules = ["button_css", "card_css"]
+            
+        self.logger.debug(f"Applying CSS modules: {css_modules}")
+        
+        for css_module in css_modules:
+            try:
+                # First try relative import (from current module)
+                module = __import__(f"utils.css.{css_module}", fromlist=[""])
+                loader_func = getattr(module, f"load_{css_module}")
+                loader_func()
+                self.logger.debug(f"Applied CSS module: {css_module}")
+                
+            except (ImportError, AttributeError, ValueError) as e:
+                self.logger.debug(f"First import attempt failed for {css_module}: {str(e)}")
+                try:
+                    # Try alternate import path
+                    if css_module == "button_css":
+                        from utils.css.button_css import load_button_css
+                        load_button_css()
+                    elif css_module == "card_css":
+                        from utils.css.card_css import load_card_css
+                        load_card_css()
+                    else:
+                        # Dynamic import for other modules
+                        module_name = f"utils.css.{css_module}"
+                        module = __import__(module_name, fromlist=[""])
+                        getattr(module, f"load_{css_module}")()
+                        
+                    self.logger.debug(f"Applied CSS module: {css_module}")
+                    
+                except (ImportError, AttributeError) as e:
+                    self.logger.warning(f"Could not load CSS module '{css_module}': {str(e)}") 
