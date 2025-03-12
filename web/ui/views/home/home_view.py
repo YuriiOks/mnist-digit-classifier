@@ -57,7 +57,7 @@ class HomeView(BaseView):
 
             for col, card_data in zip(cols, feature_cards):
                 with col:
-                    print(card_data)
+
                     card = Card(
                         title=card_data["title"],
                         content=card_data["content"],
