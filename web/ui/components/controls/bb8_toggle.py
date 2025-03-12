@@ -63,8 +63,23 @@ class BB8Toggle:
             html_code = template.replace('type="checkbox"', 
                                         f'type="checkbox" {"checked" if is_dark_mode else ""}')
             
+            # Add a centered container around the toggle
+            html_code = f'<div class="bb8-toggle-container">{html_code}</div>'
+            
             # Combine HTML and CSS, and use st.markdown to render
             st.markdown(f"<style>{css_code}</style>{html_code}", unsafe_allow_html=True)
+            
+            # Additional centering CSS
+            st.markdown("""
+            <style>
+            .bb8-toggle-container {
+                display: flex;
+                justify-content: center;
+                margin: 0 auto;
+                width: 100%;
+            }
+            </style>
+            """, unsafe_allow_html=True)
             
             # Handle checkbox change (using JavaScript)
             st.markdown(
