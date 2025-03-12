@@ -233,3 +233,27 @@
     transform: translateY(-5px);
     box-shadow: var(--shadow-lg);
 }
+
+/* CTA Section Alignment */
+.cta-section .stHorizontalBlock {
+  align-items: center !important;
+}
+
+.cta-section h2 {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.cta-section .stButton {
+  margin-top: 0 !important;
+  display: flex;
+  justify-content: center;
+}
+
+/* Ensure button has consistent height and is vertically centered */
+.cta-section .stButton button {
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
