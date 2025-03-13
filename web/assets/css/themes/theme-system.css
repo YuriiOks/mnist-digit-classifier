@@ -5,6 +5,18 @@
  * Created: 2024-05-03
  */
 
+/* Base variable mappings for both themes */
+:root {
+  /* Input variables */
+  --input-bg-color: var(--color-card);
+  --toggle-bg-color: var(--color-background-alt);
+  --toggle-thumb-color: var(--color-primary);
+  --canvas-bg-color: white;
+  --icon-color: currentColor;
+  --icon-stroke-color: currentColor;
+  --focus-outline-color: var(--color-primary);
+}
+
 /* Theme switching is controlled by a data-theme attribute on the html element */
 [data-theme="dark"] {
   /* === Color System === */
@@ -62,15 +74,14 @@
   --nav-draw-gradient: linear-gradient(90deg, #f0c84c, #ee4347);
   --nav-history-gradient: linear-gradient(90deg, #5e81f4, #ee4347);
   --nav-settings-gradient: linear-gradient(90deg, #c55ce0, #5e81f4);
+
+  /* Dark theme specific aliases */
+  --color-bg-secondary-dark: var(--color-background-alt);
+  --color-border-dark: var(--color-border);
+  --color-text-secondary-dark: var(--color-text-light);
 }
 
-/* Light theme navigation button gradients */
-:root {
-  --nav-home-gradient: linear-gradient(90deg, #4361ee, #3a0ca3);
-  --nav-draw-gradient: linear-gradient(90deg, #4cc9f0, #4361ee);
-  --nav-history-gradient: linear-gradient(90deg, #7209b7, #4361ee);
-  --nav-settings-gradient: linear-gradient(90deg, #f72585, #7209b7);
-}
+/* Light theme navigation gradients now defined only in variables.css */
 
 /* 
  * Transition for theme changes
@@ -96,4 +107,4 @@ html, html * {
 .bb8-toggle .bb8__head::after,
 .bb8-toggle .bb8__body {
   transition: var(--transition);
-} 
+}
