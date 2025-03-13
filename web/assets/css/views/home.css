@@ -168,14 +168,9 @@
     box-shadow: var(--shadow-md);
 }
 
-/* Animation for card loading */
+/* Animation for card loading - using the one defined in animations.css */
 .welcome-card, .feature-card {
     animation: fadeIn 0.5s ease-in-out;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
 }
 
 /* Theme-specific text colors */
