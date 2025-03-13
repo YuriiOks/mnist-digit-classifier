@@ -1,63 +1,226 @@
 /* MNIST Digit Classifier
  * Copyright (c) 2025
  * File: assets/css/global/variables.css
- * Description: Global CSS variables for the MNIST Digit Classifier
- * Created: 2024-05-01
+ * Description: Global CSS variables for the application
+ * Created: 2024-05-03
  */
 
-/* Default theme variables (light) */
 :root {
-  /* Theme specific colors */
+  /* === Color System === */
+  /* Base colors */
+  --color-primary: #4361ee;
+  --color-primary-rgb: 67, 97, 238;
+  --color-secondary: #4cc9f0;
+  --color-secondary-rgb: 76, 201, 240;
+  --color-accent: #4895ef;
+  --color-accent-rgb: 72, 149, 239;
+  
+  /* Background colors */
   --color-background: #f8f9fa;
-  --color-background-alt: #ffffff;
+  --color-background-alt: #f1f3f5;
   --color-card: #ffffff;
-  --color-card-alt: #f7f9fc;
+  --color-card-alt: #f1f3f5;
   
   /* Text colors */
   --color-text: #212529;
-  --color-text-light: #495057;
-  --color-text-muted: #6c757d;
+  --color-text-light: #6c757d;
+  --color-text-muted: #adb5bd;
   
-  /* UI colors */
-  --color-border: #e2e8f0;
-  --color-shadow: rgba(0, 0, 0, 0.08);
+  /* Text on colored backgrounds */
+  --color-text-on-primary: #ffffff;
+  --color-text-on-secondary: #212529;
+  --color-text-on-accent: #ffffff;
   
-  /* Brand colors */
-  --color-primary: #5B5BF9;
-  --color-primary-dark: #4040e4;
-  --color-primary-light: #7d7dff;
-  --color-secondary: #38b6ff;
-  --color-accent: #FF7F50;
+  /* Border and shadow */
+  --color-border: #dee2e6;
+  --color-shadow: rgba(0, 0, 0, 0.1);
+  --color-highlight: rgba(67, 97, 238, 0.1);
   
-  /* Status colors */
-  --color-success: #10b981;
-  --color-warning: #f59e0b;
-  --color-error: #ef4444;
-  --color-info: #3b82f6;
+  /* Semantic colors */
+  --color-success: #4cc9f0;
+  --color-success-rgb: 76, 201, 240;
+  --color-warning: #fbbf24;
+  --color-warning-rgb: 251, 191, 36;
+  --color-error: #f87171;
+  --color-error-rgb: 248, 113, 113;
+  --color-info: #60a5fa;
+  --color-info-rgb: 96, 165, 250;
   
-  /* UI elements */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  /* State colors */
+  --color-focus: #4361ee;
+  --color-hover-overlay: rgba(0, 0, 0, 0.05);
+  --color-active-overlay: rgba(0, 0, 0, 0.1);
+  --color-disabled: #e9ecef;
+  --color-disabled-text: #adb5bd;
+  
+  /* === Typography === */
+  /* Font families */
+  --font-primary: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  --font-heading: var(--font-primary);
+  --font-code: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  
+  /* Font sizes */
+  --font-size-xs: 0.75rem;   /* 12px */
+  --font-size-sm: 0.875rem;  /* 14px */
+  --font-size-md: 1rem;      /* 16px */
+  --font-size-lg: 1.125rem;  /* 18px */
+  --font-size-xl: 1.25rem;   /* 20px */
+  --font-size-2xl: 1.5rem;   /* 24px */
+  --font-size-3xl: 1.875rem; /* 30px */
+  --font-size-4xl: 2.25rem;  /* 36px */
+  --font-size-5xl: 3rem;     /* 48px */
+  --font-size-6xl: 3.75rem;  /* 60px */
+  
+  /* Font weights */
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  
+  /* Line heights */
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+  --line-height-loose: 2;
+  
+  /* Letter spacing */
+  --letter-spacing-tight: -0.025em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.025em;
+  --letter-spacing-wider: 0.05em;
+  
+  /* === Spacing === */
+  --spacing-xs: 0.25rem;   /* 4px */
+  --spacing-sm: 0.5rem;    /* 8px */
+  --spacing-md: 1rem;      /* 16px */
+  --spacing-lg: 1.5rem;    /* 24px */
+  --spacing-xl: 2rem;      /* 32px */
+  --spacing-2xl: 3rem;     /* 48px */
+  --spacing-3xl: 4rem;     /* 64px */
+  --spacing-4xl: 6rem;     /* 96px */
+  
+  /* === Layout === */
+  --max-width: 1200px;
+  --container-padding: var(--spacing-md);
+  --header-height: 60px;
+  --footer-height: 50px;
+  --sidebar-width: 250px;
+  
+  /* === Borders === */
+  --border-width-thin: 1px;
+  --border-width-thick: 2px;
+  --border-width-thicker: 4px;
+  
+  --border-radius-sm: 0.25rem;  /* 4px */
+  --border-radius-md: 0.5rem;   /* 8px */
+  --border-radius-lg: 0.75rem;  /* 12px */
+  --border-radius-xl: 1rem;     /* 16px */
+  --border-radius-full: 9999px;
+  
+  /* === Effects === */
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
   
-  /* Spacing */
-  --spacing-xs: 0.25rem;
-  --spacing-sm: 0.5rem;
-  --spacing-md: 1rem;
-  --spacing-lg: 1.5rem;
-  --spacing-xl: 2rem;
-  
-  /* Border radius */
-  --border-radius-sm: 0.25rem;
-  --border-radius-md: 0.5rem;
-  --border-radius-lg: 0.75rem;
-  --border-radius-circle: 50%;
+  /* Focus ring */
+  --focus-ring-color: rgba(67, 97, 238, 0.4);
+  --focus-ring-width: 3px;
   
   /* Transitions */
-  --transition-speed-fast: 0.2s;
-  --transition-speed-normal: 0.3s;
-  --transition-speed-slow: 0.5s;
-  --transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-timing: ease-in-out;
+  --transition-speed-fast: 150ms;
+  --transition-speed-normal: 300ms;
+  --transition-speed-slow: 500ms;
+  
+  /* Animations */
+  --animation-duration-fast: 150ms;
+  --animation-duration-normal: 300ms;
+  --animation-duration-slow: 500ms;
+  
+  /* === Z-index === */
+  --z-index-hide: -1;
+  --z-index-base: 0;
+  --z-index-dropdown: 10;
+  --z-index-sticky: 20;
+  --z-index-fixed: 30;
+  --z-index-overlay: 40;
+  --z-index-modal: 50;
+  --z-index-popover: 60;
+  --z-index-toast: 70;
+  --z-index-tooltip: 80;
+  --z-index-header: 90;
+  --z-index-sidebar: 100;
+  
+  /* === Component Variables === */
+  /* Cards */
+  --card-transition: 
+    transform var(--transition-speed-normal) var(--transition-timing),
+    box-shadow var(--transition-speed-normal) var(--transition-timing),
+    border-color var(--transition-speed-normal) var(--transition-timing);
+  --card-hover-transform: translateY(-5px);
+  --card-padding: var(--spacing-lg);
+  
+  /* Buttons */
+  --button-padding-x: var(--spacing-md);
+  --button-padding-y: var(--spacing-sm);
+  --button-border-width: var(--border-width-thin);
+  --button-line-height: 1.2;
+  --button-font-weight: var(--font-weight-medium);
+  --button-transition: all var(--transition-speed-fast) var(--transition-timing);
+  --button-hover-transform: translateY(-2px);
+  
+  /* Forms */
+  --input-height: 2.5rem;
+  --input-padding-x: var(--spacing-sm);
+  --input-padding-y: var(--spacing-xs);
+  --input-border-width: var(--border-width-thin);
+  --input-border-radius: var(--border-radius-md);
+  --input-focus-ring-width: 3px;
+  
+  /* Navigation */
+  --nav-item-padding-x: var(--spacing-md);
+  --nav-item-padding-y: var(--spacing-sm);
+  --nav-item-height: 2.2rem;
+  --nav-item-font-size: var(--font-size-sm);
+  
+  /* === Responsive Breakpoints === */
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+  
+  /* === Navigation Button Gradients === */
+  --nav-home-gradient: linear-gradient(90deg, #4361ee, #3a0ca3);
+  --nav-draw-gradient: linear-gradient(90deg, #4cc9f0, #4361ee);
+  --nav-history-gradient: linear-gradient(90deg, #7209b7, #4361ee);
+  --nav-settings-gradient: linear-gradient(90deg, #f72585, #7209b7);
+  
+  /* Colors should follow --color-{category}-{variant} pattern */
+  --color-primary-light: rgba(var(--color-primary-rgb), 0.7);
+  --color-primary-lighter: rgba(var(--color-primary-rgb), 0.3);
+  --color-primary-dark: #3046c0;  /* Darker version of primary blue */
+  
+  /* Aliases for backward compatibility */
+  --primary-color: var(--color-primary);
+  --secondary-color: var(--color-secondary);
+  --accent-color: var(--color-accent);
+  --text-color-primary: var(--color-text);
+  --text-color-secondary: var(--color-text-light);
+  --text-on-primary-color: var(--color-text-on-primary);
+  --text-on-secondary-color: var(--color-text-on-secondary);
+  --color-bg-secondary: var(--color-background-alt);
+  --border-color: var(--color-border);
+  --canvas-bg-color: var(--color-card);
+  --input-bg-color: var(--color-card);
+  --toggle-bg-color: var(--color-text-muted);
+  --toggle-thumb-color: white;
+  --icon-color: var(--color-text);
+  --icon-stroke-color: var(--color-text);
+  --focus-outline-color: var(--color-primary);
 }
 
 /* Add a special class to match the design specification */
@@ -116,40 +279,3 @@
 .animate-pulse {
   animation: pulse 2s infinite;
 }
-
-/* Layout variables */
---container-max-width: 1200px;
---sidebar-width: 300px;
---header-height: 60px;
---footer-height: 60px;
-
-/* Border radius */
---border-radius-sm: 4px;
---border-radius-md: 8px;
---border-radius-lg: 12px;
---border-radius-xl: 16px;
---border-radius-circle: 50%;
-
-/* Shadow variables */
---shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
---shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
---shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
---shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1);
-
-/* Z-index variables */
---z-index-background: -1;
---z-index-default: 1;
---z-index-header: 100;
---z-index-dropdown: 200;
---z-index-modal: 300;
---z-index-toast: 400;
-
-/* Animation variables */
---transition-speed-fast: 150ms;
---transition-speed-normal: 300ms;
---transition-speed-slow: 500ms;
---transition-timing: ease-in-out;
-
-/* Spacing variables */
---spacing-xxs: 0.125rem;   /* 2px */
---spacing-xxl: 3rem;       /* 48px */
