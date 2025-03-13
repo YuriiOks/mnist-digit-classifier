@@ -78,6 +78,8 @@ class ThemeState:
         "border_radius": "4px"
     }
 
+    _logger = logging.getLogger(f"{__name__}.ThemeState")
+
     @classmethod
     @AspectUtils.catch_errors
     @AspectUtils.log_method
