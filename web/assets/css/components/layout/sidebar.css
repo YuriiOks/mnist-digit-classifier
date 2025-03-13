@@ -1,265 +1,104 @@
 /* MNIST Digit Classifier
  * Copyright (c) 2025
  * File: assets/css/components/layout/sidebar.css
- * Description: Styles for the application sidebar
- * Created: 2024-05-01
+ * Description: Sidebar component styles
+ * Created: 2024-05-03
  */
 
-/* Sidebar base styles */
-.app-sidebar {
-  background-color: var(--color-card);
-  width: var(--sidebar-width);
-  height: calc(100vh - var(--header-height) - var(--footer-height));
-  position: fixed;
-  top: var(--header-height);
-  left: 0;
-  z-index: var(--z-index-header);
-  border-right: 1px solid var(--color-border);
-  overflow-y: auto;
+/* Sidebar styling */
+[data-testid="stSidebar"] {
+  background-color: var(--color-card) !important;
+  border-right: var(--border-width-thin) solid var(--color-border);
+  width: var(--sidebar-width) !important;
+  box-shadow: var(--shadow-md);
 }
 
-/* Sidebar layout and components */
-.sidebar-container {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-/* Sidebar header styles */
+/* Sidebar header */
 .sidebar-header {
   text-align: center;
-  margin-bottom: 20px;
-  padding: var(--spacing-md);
-  border-bottom: 1px solid var(--color-border);
-  font-weight: 700;
-  color: var(--color-text);
+  padding: var(--spacing-lg) var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
 }
 
-/* Gradient text effect for app title */
 .gradient-text {
-  background: linear-gradient(90deg, #4361ee, #4cc9f0);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  font-weight: 700;
-  font-size: 2.2rem;
-  line-height: 1.2;
-  margin-bottom: 0.2rem;
+  margin-bottom: var(--spacing-xs);
 }
 
-/* Subtitle style */
 .sidebar-subheader {
-  opacity: 0.8;
-  font-size: 0.9rem;
-  margin-bottom: 15px;
-  text-align: center;
-}
-
-/* Navigation section */
-.sidebar-nav {
-  flex: 1;
-  padding: var(--spacing-md) 0;
-}
-
-.nav-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.nav-list li {
-  margin: 0;
-  padding: 0;
-}
-
-.nav-list a {
-  display: flex;
-  align-items: center;
-  padding: var(--spacing-md) var(--spacing-lg);
-  color: var(--color-text);
-  text-decoration: none;
-  transition: all var(--transition-speed-fast) var(--transition-timing);
-  border-left: 3px solid transparent;
-}
-
-.nav-list a:hover {
-  background-color: var(--color-highlight);
-  border-left-color: var(--color-primary);
-}
-
-.nav-list a.active {
-  background-color: var(--color-highlight);
-  border-left-color: var(--color-primary);
-  color: var(--color-primary);
-  font-weight: 600;
-}
-
-.nav-list .nav-icon {
-  margin-right: var(--spacing-md);
-  width: 20px;
-  text-align: center;
-}
-
-/* Custom button styling - now smaller */
-div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"] button {
-  width: 100% !important;
-  border-radius: 6px !important;
-  margin-bottom: 5px !important;
-  font-weight: 500 !important;
-  border: none !important;
-  padding: 6px 10px !important;
-  font-size: 0.9rem !important;
-  transition: all 0.3s !important;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
-}
-
-div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"] button:hover {
-  transform: translateY(-1px) !important;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.15) !important;
-}
-
-/* BB8 Toggle centering container */
-.toggle-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 10px 0;
-  width: 100%;
-}
-
-/* Make sure the toggle itself is centered */
-.bb8-toggle {
-  margin: 0 auto !important;
-  display: block !important;
-}
-
-/* Divider element */
-.divider {
-  margin: 20px 0;
-  border-top: 1px solid rgba(128, 128, 128, 0.2);
-}
-
-/* Sidebar footer section */
-.sidebar-footer {
-  padding: var(--spacing-md);
-  border-top: 1px solid var(--color-border);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   color: var(--color-text-light);
-  text-align: center;
-  font-size: 0.8rem; 
-  opacity: 0.7; 
-  margin-top: 30px;
 }
 
-/* For when sidebar is collapsed */
-.app-sidebar.collapsed {
-  width: 60px;
-}
-
-.app-sidebar.collapsed .sidebar-header,
-.app-sidebar.collapsed .nav-list span:not(.nav-icon),
-.app-sidebar.collapsed .sidebar-footer {
-  display: none;
-}
-
-.app-sidebar.collapsed .nav-list a {
-  justify-content: center;
-  padding: var(--spacing-md);
-}
-
-.app-sidebar.collapsed .nav-list .nav-icon {
-  margin-right: 0;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .app-sidebar {
-    transform: translateX(-100%);
-    transition: transform var(--transition-speed-normal) var(--transition-timing);
-  }
-  
-  .app-sidebar.open {
-    transform: translateX(0);
-  }
-  
-  /* When sidebar is open, add overlay */
-  .sidebar-overlay {
-    display: none;
-    position: fixed;
-    top: var(--header-height);
-    left: 0;
-    width: 100%;
-    height: calc(100vh - var(--header-height) - var(--footer-height));
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: calc(var(--z-index-header) - 1);
-  }
-  
-  .sidebar-overlay.visible {
-    display: block;
-  }
-}
-
-/* Individual navigation button styles by specific ID */
-button[key="nav_home_btn"] {
-  background: linear-gradient(90deg, #4361ee, #3a0ca3) !important;
-  font-size: 0.85rem !important;
-  height: 2.2rem !important;
-}
-
-button[key="nav_draw_btn"] {
-  background: linear-gradient(90deg, #4cc9f0, #4361ee) !important;
-  font-size: 0.85rem !important;
-  height: 2.2rem !important;
-}
-
-button[key="nav_history_btn"] {
-  background: linear-gradient(90deg, #7209b7, #4361ee) !important;
-  font-size: 0.85rem !important;
-  height: 2.2rem !important;
-}
-
-button[key="nav_settings_btn"] {
-  background: linear-gradient(90deg, #f72585, #7209b7) !important;
-  font-size: 0.85rem !important;
-  height: 2.2rem !important;
-}
-
-/* Alternative selectors using data-testid which includes the key */
-div[data-testid="stButton"][data-baseweb-key="nav_home_btn"] button {
-  background: linear-gradient(90deg, #4361ee, #3a0ca3) !important;
-  font-size: 0.85rem !important;
-  height: 2.2rem !important;
-}
-
-div[data-testid="stButton"][data-baseweb-key="nav_draw_btn"] button {
-  background: linear-gradient(90deg, #4cc9f0, #4361ee) !important;
-  font-size: 0.85rem !important;
-  height: 2.2rem !important;
-}
-
-div[data-testid="stButton"][data-baseweb-key="nav_history_btn"] button {
-  background: linear-gradient(90deg, #7209b7, #4361ee) !important;
-  font-size: 0.85rem !important;
-  height: 2.2rem !important;
-}
-
-div[data-testid="stButton"][data-baseweb-key="nav_settings_btn"] button {
-  background: linear-gradient(90deg, #f72585, #7209b7) !important;
-  font-size: 0.85rem !important;
-  height: 2.2rem !important;
-}
-
-/* Smaller spacing between buttons */
-div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"] {
-  gap: 3px !important;
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-/* Custom navigation container */
+/* Navigation container */
 .nav-buttons-container {
   display: flex;
   flex-direction: column;
-  gap: 5px;
-  margin-top: 5px;
-  margin-bottom: 10px;
-} 
+  gap: var(--spacing-sm);
+  padding: 0 var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+/* Toggle container */
+.toggle-container {
+  display: flex;
+  justify-content: center;
+  margin: var(--spacing-lg) 0;
+}
+
+/* Divider */
+.divider {
+  height: 1px;
+  background-color: var(--color-border);
+  margin: var(--spacing-md) var(--spacing-lg);
+}
+
+/* Sidebar footer */
+.sidebar-footer {
+  text-align: center;
+  padding: var(--spacing-md);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  margin-top: auto;
+}
+
+/* Fix sidebar width and scrolling */
+section[data-testid="stSidebar"] > div {
+  background-color: var(--color-card);
+  width: var(--sidebar-width);
+}
+
+section[data-testid="stSidebar"] {
+  width: var(--sidebar-width) !important;
+  flex-shrink: 0 !important;
+}
+
+/* Hide sidebar collapse button */
+button[kind="header"] {
+  display: none !important;
+}
+
+/* Navigation button hover effects */
+.nav-buttons-container button:hover {
+  transform: var(--button-hover-transform);
+  box-shadow: var(--shadow-md);
+}
+
+/* Mobile sidebar */
+@media (max-width: var(--breakpoint-md)) {
+  section[data-testid="stSidebar"] > div {
+    width: 100%;
+  }
+  
+  .sidebar-header {
+    padding: var(--spacing-md) var(--spacing-sm);
+  }
+  
+  .nav-buttons-container {
+    padding: 0 var(--spacing-sm);
+  }
+}
