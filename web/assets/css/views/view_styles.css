@@ -39,9 +39,9 @@
   /* ===== Typography ===== */
   /* Make headers look better */
   h1, h2, h3 {
-    margin-bottom: 1rem !important;
-    margin-top: 0.5rem !important;
-    font-family: var(--font-primary, 'Comfortaa', sans-serif) !important;
+    margin-bottom: var(--spacing-md) !important;
+    margin-top: var(--spacing-sm) !important;
+    font-family: var(--font-heading) !important;
   }
   
   /* View title styling */
@@ -103,7 +103,7 @@
   }
   
   /* ===== Responsive Adjustments ===== */
-  @media (max-width: 768px) {
+  @media (max-width: var(--breakpoint-md)) {
     .two-column-grid {
       grid-template-columns: 1fr;
     }
