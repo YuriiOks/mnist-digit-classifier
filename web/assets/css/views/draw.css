@@ -205,12 +205,7 @@
   background-color: var(--color-primary, #6366F1);
 }
 
-/* Animation for predictions */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
+/* Animation for predictions - using the one defined in animations.css */
 .prediction-result {
   animation: fadeIn 0.3s ease-out;
 }
@@ -219,4 +214,4 @@
 .drawing-controls button:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
-} 
+}
