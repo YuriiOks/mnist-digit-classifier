@@ -32,10 +32,16 @@ class NavigationState:
         {"id": "settings", "label": "Settings", "icon": "⚙️"}
     ]
 
+    _logger = logging.getLogger(f"{__name__}.NavigationState")
+
     @classmethod
     @AspectUtils.catch_errors
     @AspectUtils.log_method
     def initialize(cls) -> None:
+
+        cls._logger = logging.getLogger(f"{__name__}.{cls.__class__.__name__}")
+        cls._logger.debug(f"Initializing {cls.__class__.__name__} instance")
+
         """Initialize navigation state with defaults if not already present."""
         # Set default active view if not set
         if not SessionState.has_key(cls.ACTIVE_VIEW_KEY):
