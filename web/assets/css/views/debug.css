@@ -1,0 +1,175 @@
+/* MNIST Digit Classifier
+ * Copyright (c) 2025
+ * File: assets/css/views/debug.css
+ * Description: Debug view specific styles
+ * Created: 2024-05-03
+ */
+
+/* Debug container */
+.debug-container {
+  padding: var(--spacing-lg);
+}
+
+/* Debug header */
+.debug-header {
+  margin-bottom: var(--spacing-xl);
+}
+
+.debug-title {
+  font-size: var(--font-size-3xl);
+  margin-bottom: var(--spacing-sm);
+}
+
+.debug-description {
+  color: var(--color-text-light);
+  max-width: 800px;
+}
+
+/* Debug sections */
+.debug-section {
+  background-color: var(--color-card);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border);
+}
+
+.debug-section-header {
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px solid var(--color-border);
+  font-size: var(--font-size-xl);
+}
+
+/* CSS Debug section */
+.css-debug-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.color-sample {
+  height: 60px;
+  border-radius: var(--border-radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  margin-bottom: var(--spacing-xs);
+}
+
+.color-value {
+  font-family: var(--font-code);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-light);
+}
+
+/* Typography samples */
+.typography-samples {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.font-sample {
+  padding: var(--spacing-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+}
+
+.font-sample-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-sm);
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: var(--spacing-xs);
+}
+
+.font-sample-name {
+  font-weight: 600;
+}
+
+.font-sample-value {
+  font-family: var(--font-code);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-light);
+}
+
+/* Component previews */
+.component-previews {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.component-preview {
+  padding: var(--spacing-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+}
+
+.component-preview-header {
+  font-weight: 600;
+  margin-bottom: var(--spacing-sm);
+  padding-bottom: var(--spacing-xs);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.component-preview-content {
+  padding: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  align-items: center;
+}
+
+/* Session state debug */
+.session-state-debug {
+  font-family: var(--font-code);
+  font-size: var(--font-size-sm);
+  background-color: var(--color-card-alt, #f5f5f5);
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius-sm);
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.state-key {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.state-value {
+  color: var(--color-text);
+}
+
+.state-item {
+  margin-bottom: var(--spacing-xs);
+  padding-bottom: var(--spacing-xs);
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* Font tester */
+.font-tester {
+  margin-top: var(--spacing-lg);
+}
+
+.font-test-input {
+  margin-bottom: var(--spacing-md);
+}
+
+.font-test-output {
+  padding: var(--spacing-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  margin-top: var(--spacing-md);
+}
+
+/* Responsive adjustments */
+@media (max-width: var(--breakpoint-md)) {
+  .component-previews {
+    grid-template-columns: 1fr;
+  }
+} 
