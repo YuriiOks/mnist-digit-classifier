@@ -11,7 +11,7 @@ from core.errors.error_handler import ErrorHandler
 
 logger = logging.getLogger(__name__)
 
-class UIError(Exception):
+class BaseUIError(Exception):
     """Base class for UI-related errors."""
     
     def __init__(self, message, component_type=None, component_name=None, severity="error"):
@@ -22,24 +22,7 @@ class UIError(Exception):
         super().__init__(self.message)
 
 
-class TemplateError(UIError):
-    """Exception raised for errors in template processing."""
-    
-    def __init__(self, message, template_file=None, original_exception=None):
-        super().__init__(message, severity="error")
-        self.template_file = template_file
-        self.original_exception = original_exception
-
-
-class ComponentError(UIError):
-    """Exception raised for errors in component rendering."""
-    
-    def __init__(self, message, component_type=None, component_name=None, original_exception=None):
-        super().__init__(message, component_type, component_name, severity="error")
-        self.original_exception = original_exception
-
-
-class UIError(Exception):
+class UIError(BaseUIError):
     """Base exception for UI-related errors."""
     
     def __init__(
@@ -244,3 +227,21 @@ class ComponentError(UIError):
         component_type = self.details.get("component_type", "Unknown")
         component_name = self.details.get("component_name", "component")
         return f"Failed to render {component_type} {component_name}" 
+    
+
+
+class TemplateError(UIError):
+    """Exception raised for errors in template processing."""
+    
+    def __init__(self, message, template_file=None, original_exception=None):
+        super().__init__(message, severity="error")
+        self.template_file = template_file
+        self.original_exception = original_exception
+
+
+class ComponentError(UIError):
+    """Exception raised for errors in component rendering."""
+    
+    def __init__(self, message, component_type=None, component_name=None, original_exception=None):
+        super().__init__(message, component_type, component_name, severity="error")
+        self.original_exception = original_exception
