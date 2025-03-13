@@ -21,6 +21,8 @@ class SessionState:
     the application.
     """
 
+    _logger = logging.getLogger(f"{__name__}.SessionState")
+
     @classmethod
     @AspectUtils.catch_errors
     @AspectUtils.log_method
