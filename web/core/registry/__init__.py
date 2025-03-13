@@ -5,3 +5,9 @@
 # Created: 2024-05-01
 
 # Make registry a proper Python package 
+from core.registry.view_registry import ViewRegistry
+
+
+__all__ = [
+    "ViewRegistry"
+]
