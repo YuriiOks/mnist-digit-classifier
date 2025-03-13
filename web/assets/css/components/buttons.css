@@ -1,0 +1,113 @@
+/* MNIST Digit Classifier
+ * Copyright (c) 2025
+ * File: assets/css/components/buttons.css
+ * Description: Global button styles
+ * Created: 2024-05-03
+ */
+
+/* Base button styles */
+button, .stButton button {
+  border-radius: var(--border-radius-md);
+  font-family: var(--font-primary);
+  font-weight: var(--font-weight-medium);
+  transition: var(--button-transition);
+  cursor: pointer;
+  line-height: var(--button-line-height);
+  padding: var(--button-padding-y) var(--button-padding-x);
+}
+
+/* Primary button style */
+button[data-testid="baseButton-primary"] {
+  background: linear-gradient(90deg, var(--color-primary), var(--color-secondary)) !important;
+  color: var(--color-text-on-primary) !important;
+  border: none !important;
+}
+
+button[data-testid="baseButton-primary"]:hover {
+  box-shadow: var(--shadow-md) !important;
+  transform: var(--button-hover-transform) !important;
+}
+
+/* Navigation button styles using theme variables */
+div[data-testid="stButton"][data-baseweb-key="nav_home_btn"] button {
+  background: var(--nav-home-gradient) !important;
+  font-size: var(--nav-item-font-size) !important;
+  height: var(--nav-item-height) !important;
+}
+
+div[data-testid="stButton"][data-baseweb-key="nav_draw_btn"] button {
+  background: var(--nav-draw-gradient) !important;
+  font-size: var(--nav-item-font-size) !important;
+  height: var(--nav-item-height) !important;
+}
+
+div[data-testid="stButton"][data-baseweb-key="nav_history_btn"] button {
+  background: var(--nav-history-gradient) !important;
+  font-size: var(--nav-item-font-size) !important;
+  height: var(--nav-item-height) !important;
+}
+
+div[data-testid="stButton"][data-baseweb-key="nav_settings_btn"] button {
+  background: var(--nav-settings-gradient) !important;
+  font-size: var(--nav-item-font-size) !important;
+  height: var(--nav-item-height) !important;
+}
+
+/* Secondary button style */
+button[data-testid="baseButton-secondary"] {
+  background-color: transparent !important;
+  color: var(--color-primary) !important;
+  border: var(--button-border-width) solid var(--color-primary) !important;
+}
+
+button[data-testid="baseButton-secondary"]:hover {
+  background-color: rgba(var(--color-primary-rgb), 0.1) !important;
+}
+
+/* Button sizes */
+.button-small {
+  font-size: var(--font-size-sm) !important;
+  padding: var(--spacing-xs) var(--spacing-sm) !important;
+}
+
+.button-large {
+  font-size: var(--font-size-lg) !important;
+  padding: var(--spacing-sm) var(--spacing-lg) !important;
+}
+
+/* Outline buttons */
+.button-outline {
+  background-color: transparent !important;
+  border: var(--button-border-width) solid currentColor !important;
+}
+
+.button-outline-primary {
+  color: var(--color-primary) !important;
+  border-color: var(--color-primary) !important;
+}
+
+.button-outline-secondary {
+  color: var(--color-secondary) !important;
+  border-color: var(--color-secondary) !important;
+}
+
+/* Icon buttons */
+.button-icon {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: var(--spacing-sm) !important;
+  border-radius: var(--border-radius-full) !important;
+}
+
+/* Button groups */
+.button-group {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.button-group-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+} 
