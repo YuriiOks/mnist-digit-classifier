@@ -1,0 +1,99 @@
+/* MNIST Digit Classifier
+ * Copyright (c) 2025
+ * File: assets/css/themes/theme-system.css
+ * Description: Theme system core for light/dark mode switching
+ * Created: 2024-05-03
+ */
+
+/* Theme switching is controlled by a data-theme attribute on the html element */
+[data-theme="dark"] {
+  /* === Color System === */
+  /* Base colors */
+  --color-primary: #ee4347;
+  --color-primary-rgb: 238, 67, 71;
+  --color-secondary: #f0c84c;
+  --color-secondary-rgb: 240, 200, 76;
+  --color-accent: #5e81f4;
+  --color-accent-rgb: 94, 129, 244;
+  
+  /* Background colors */
+  --color-background: #121212;
+  --color-background-alt: #1a1a1a;
+  --color-card: #1e1e1e;
+  --color-card-alt: #252525;
+  
+  /* Text colors */
+  --color-text: #f8f9fa;
+  --color-text-light: #d1d5db;
+  --color-text-muted: #9ca3af;
+  
+  /* Border and shadow */
+  --color-border: #383838;
+  --color-shadow: rgba(0, 0, 0, 0.3);
+  --color-highlight: rgba(238, 67, 71, 0.15);
+  
+  /* Semantic colors */
+  --color-success: #34d399;
+  --color-success-rgb: 52, 211, 153;
+  --color-warning: #fbbf24;
+  --color-warning-rgb: 251, 191, 36;
+  --color-error: #f87171;
+  --color-error-rgb: 248, 113, 113;
+  --color-info: #60a5fa;
+  --color-info-rgb: 96, 165, 250;
+  
+  /* State colors */
+  --color-focus: #ee4347;
+  --color-hover-overlay: rgba(255, 255, 255, 0.05);
+  --color-active-overlay: rgba(255, 255, 255, 0.1);
+  
+  /* === Effects === */
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
+  
+  /* Focus ring */
+  --focus-ring-color: rgba(238, 67, 71, 0.4);
+  
+  /* Navigation button gradients */
+  --nav-home-gradient: linear-gradient(90deg, #ee4347, #d42c64);
+  --nav-draw-gradient: linear-gradient(90deg, #f0c84c, #ee4347);
+  --nav-history-gradient: linear-gradient(90deg, #5e81f4, #ee4347);
+  --nav-settings-gradient: linear-gradient(90deg, #c55ce0, #5e81f4);
+}
+
+/* Light theme navigation button gradients */
+:root {
+  --nav-home-gradient: linear-gradient(90deg, #4361ee, #3a0ca3);
+  --nav-draw-gradient: linear-gradient(90deg, #4cc9f0, #4361ee);
+  --nav-history-gradient: linear-gradient(90deg, #7209b7, #4361ee);
+  --nav-settings-gradient: linear-gradient(90deg, #f72585, #7209b7);
+}
+
+/* 
+ * Transition for theme changes
+ * Apply to the whole document but exclude the BB8 toggle to 
+ * prevent transition interference with its animation
+ */
+html, html * {
+  transition: background-color var(--transition-speed-normal),
+              color var(--transition-speed-normal),
+              border-color var(--transition-speed-normal),
+              box-shadow var(--transition-speed-normal);
+}
+
+/* Don't apply transitions to BB8 toggle parts */
+.bb8-toggle, .bb8-toggle * {
+  transition: none;
+}
+
+/* Reapply specific BB8 toggle transitions from its CSS */
+.bb8-toggle .bb8-toggle__container,
+.bb8-toggle .bb8__head-container,
+.bb8-toggle .bb8__head::before,
+.bb8-toggle .bb8__head::after,
+.bb8-toggle .bb8__body {
+  transition: var(--transition);
+} 
