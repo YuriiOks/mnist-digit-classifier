@@ -1,4 +1,5 @@
 {
+  "name": "default",
   "fonts": {
     "heading": "system-ui, sans-serif",
     "body": "system-ui, sans-serif",
@@ -11,14 +12,26 @@
   },
   "colors": {
     "primary": "#4361ee",
-    "secondary": "#3f37c9",
+    "secondary": "#4cc9f0",
     "accent": "#4895ef",
     "background": "#f8f9fa",
     "card": "#ffffff",
+    "card-alt": "#f1f3f5",
     "text": "#212529",
+    "text-light": "#6c757d",
+    "text-muted": "#adb5bd",
     "border": "#dee2e6",
+    "shadow": "rgba(0, 0, 0, 0.1)",
+    "highlight": "rgba(67, 97, 238, 0.1)",
     "success": "#4cc9f0",
     "warning": "#f72585",
-    "error": "#e63946"
+    "error": "#e63946",
+    "info": "#4895ef"
+  },
+  "gradients": {
+    "nav_home": "linear-gradient(90deg, #4361ee, #3a0ca3)",
+    "nav_draw": "linear-gradient(90deg, #4cc9f0, #4361ee)",
+    "nav_history": "linear-gradient(90deg, #7209b7, #4361ee)",
+    "nav_settings": "linear-gradient(90deg, #f72585, #7209b7)"
   }
 } 
