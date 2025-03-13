@@ -1,20 +1,109 @@
 /* MNIST Digit Classifier
  * Copyright (c) 2025
  * File: assets/css/views/home.css
- * Description: Home view styling
- * Created: 2024-05-01
+ * Description: Home view specific styles
+ * Created: 2024-05-03
  */
+
+/* Hero section */
+.home-hero {
+  text-align: center;
+  margin-bottom: var(--spacing-2xl);
+  padding: var(--spacing-2xl) 0;
+}
+
+.home-title {
+  font-size: var(--font-size-4xl);
+  margin-bottom: var(--spacing-md);
+}
+
+.home-subtitle {
+  font-size: var(--font-size-xl);
+  color: var(--color-text-light);
+  max-width: 600px;
+  margin: 0 auto var(--spacing-lg) auto;
+}
+
+/* Feature cards section */
+.feature-cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-2xl);
+}
+
+.welcome-card-container {
+  margin-bottom: var(--spacing-2xl);
+}
+
+/* How it works section */
+.how-it-works {
+  margin-bottom: var(--spacing-2xl);
+}
+
+.how-it-works h2 {
+  margin-bottom: var(--spacing-lg);
+}
+
+.steps-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.step-number {
+  font-size: var(--font-size-3xl);
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+/* Call to action section */
+.cta-section {
+  text-align: center;
+  padding: var(--spacing-2xl) 0;
+  background-color: var(--color-card);
+  border-radius: var(--border-radius-lg);
+  margin-bottom: var(--spacing-2xl);
+}
+
+.cta-title {
+  font-size: var(--font-size-3xl);
+  margin-bottom: var(--spacing-lg);
+}
+
+.cta-buttons {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-md);
+}
+
+/* Responsive adjustments */
+@media (max-width: var(--breakpoint-md)) {
+  .home-title {
+    font-size: var(--font-size-3xl);
+  }
+  
+  .home-subtitle {
+    font-size: var(--font-size-lg);
+  }
+  
+  .cta-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+}
 
 /* Welcome section styling */
 .welcome-card {
-    margin-bottom: 2rem;
+    margin-bottom: var(--spacing-2xl);
     width: 100%;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border-radius: var(--border-radius, 8px);
+    transition: var(--card-transition);
+    border-radius: var(--border-radius-md);
 }
 
 .welcome-card:hover {
-    transform: translateY(-5px);
+    transform: var(--card-hover-transform);
     box-shadow: var(--shadow-lg);
 }
 
@@ -27,7 +116,7 @@
 }
 
 .feature-card:hover {
-    transform: translateY(-5px);
+    transform: var(--card-hover-transform);
     box-shadow: var(--shadow-lg);
 }
 
@@ -75,45 +164,8 @@
 }
 
 .step-card:hover {
-    transform: translateY(-2px);
+    transform: var(--card-hover-transform);
     box-shadow: var(--shadow-md);
-}
-
-.step-number {
-    background-color: var(--primary-color);
-    color: var(--text-on-primary-color);
-    width: 2rem;
-    height: 2rem;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    margin-bottom: 0.5rem;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .home-section {
-        margin-bottom: 2rem;
-    }
-    
-    .step-card {
-        margin-bottom: 1rem;
-    }
-    
-    /* Stack features in a single column on mobile */
-    .features-grid {
-        display: flex;
-        flex-direction: column;
-    }
-    
-    /* Adjust how-it-works cards for smaller screens */
-    .how-it-works-container .streamlit-column {
-        width: 100% !important;
-        flex: 0 0 100% !important;
-        margin-bottom: 1rem;
-    }
 }
 
 /* Animation for card loading */
@@ -157,7 +209,7 @@
 
 .cta-button:hover {
     opacity: 0.9;
-    transform: translateY(-2px);
+    transform: var(--card-hover-transform);
     box-shadow: var(--shadow-md);
 } 
 
@@ -230,7 +282,7 @@
     border-radius: var(--border-radius-md);
 }
 .feature-card:hover {
-    transform: translateY(-5px);
+    transform: var(--card-hover-transform);
     box-shadow: var(--shadow-lg);
 }
 
