@@ -1,0 +1,105 @@
+/* MNIST Digit Classifier
+ * Copyright (c) 2025
+ * File: assets/css/components/cards.css
+ * Description: Global card component styles
+ * Created: 2024-05-03
+ */
+
+/* Base card styles */
+.card, 
+.feature-card, 
+.content-card, 
+.welcome-card {
+  background-color: var(--color-card);
+  border-radius: var(--border-radius-md);
+  border: var(--border-width-thin) solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: var(--card-transition);
+  height: 100%;
+}
+
+/* Card hover effects */
+.card:hover, 
+.feature-card:hover, 
+.content-card:hover {
+  transform: var(--card-hover-transform);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--color-primary);
+}
+
+/* Card title */
+.card-title {
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-xl);
+  margin-bottom: var(--spacing-sm);
+  color: var(--color-text) !important;
+}
+
+/* Card content */
+.card-content {
+  padding: var(--card-padding);
+}
+
+.card-body p {
+  color: var(--color-text-light) !important;
+}
+
+/* Card sizes */
+.card.small, 
+.feature-card.small, 
+.content-card.small {
+  max-width: 300px;
+}
+
+.card.medium, 
+.feature-card.medium, 
+.content-card.medium {
+  max-width: 500px;
+}
+
+.card.large, 
+.feature-card.large, 
+.content-card.large {
+  max-width: 800px;
+}
+
+/* Card layout variations */
+.card-horizontal {
+  display: flex;
+  flex-direction: row;
+}
+
+.card-horizontal .card-image {
+  width: 33%;
+  min-width: 120px;
+}
+
+.card-horizontal .card-content {
+  flex: 1;
+}
+
+/* Card grid layouts */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+/* Card hover color transitions */
+.feature-card.small:hover .card-title,
+.feature-card.secondary-card:hover .card-title,
+.content-card.small:hover .card-title {
+  color: var(--color-primary) !important;
+  transition: none !important; /* Ensure immediate color change */
+}
+
+/* Make sure the card title icon also changes immediately */
+.feature-card.small:hover .card-icon,
+.feature-card.secondary-card:hover .card-icon,
+.content-card.small:hover .card-icon {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary)) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  transition: none !important; /* Ensure immediate color change */
+} 
