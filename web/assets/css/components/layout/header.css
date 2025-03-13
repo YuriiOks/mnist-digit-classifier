@@ -1,34 +1,54 @@
 /* MNIST Digit Classifier
  * Copyright (c) 2025
  * File: assets/css/components/layout/header.css
- * Description: Styles for the application header
- * Created: 2024-05-01
+ * Description: Header component styles
+ * Created: 2024-05-03
  */
 
 .app-header {
+  background-color: var(--color-card);
+  height: var(--header-height);
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: var(--z-index-header);
+  border-bottom: 1px solid var(--color-border);
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 100%;
-  padding: 1rem 2rem;
-  background: linear-gradient(
-    90deg,
-    var(--color-primary-light, #6366F1),
-    var(--color-secondary, #06B6D4)
-  );
-  color: white;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 0 var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
 }
 
-.header-title {
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin: 0;
-  color: white;
-  text-align: center;
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+
+.app-title {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.app-logo {
+  height: 30px;
+  margin-right: var(--spacing-sm);
+}
+
+.header-logo-title {
+  display: flex;
+  align-items: center;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
 }
 
 /* Shine effect */
@@ -81,14 +101,7 @@
   transform: translateY(-50%) scale(1.1);
 }
 
-/* Actions container (theme toggle, etc.) */
-.header-actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-}
-
-/* Only show the appropriate icon based on theme */
+/* Replace class-based theme selectors with attribute selectors */
 .light-icon {
   display: block;
 }
@@ -97,22 +110,26 @@
   display: none;
 }
 
-/* In dark mode, hide light icon and show dark icon */
-.dark .light-icon {
+/* Replace .dark class with data-theme attribute selector */
+[data-theme="dark"] .light-icon {
   display: none;
 }
 
-.dark .dark-icon {
+[data-theme="dark"] .dark-icon {
   display: block;
 }
 
 /* Responsive adjustments */
-@media (max-width: 768px) {
-  .header-container {
+@media (max-width: var(--breakpoint-md)) {
+  .app-header {
     padding: 0 var(--spacing-md);
   }
   
-  .header-title h1 {
-    font-size: 1.25rem;
+  .app-title {
+    font-size: var(--font-size-lg);
+  }
+  
+  .header-actions {
+    gap: var(--spacing-sm);
   }
 } 
