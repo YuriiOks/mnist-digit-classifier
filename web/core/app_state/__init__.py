@@ -1,76 +1,32 @@
 # MNIST Digit Classifier
 # Copyright (c) 2025
 # File: core/app_state/__init__.py
-# Description: App state management package
-# Created: 2024-05-01
+# Description: App state package initialization
+# Created: 2024-05-05
 
-"""State management for the MNIST Digit Classifier application."""
+"""Application state management for the MNIST Digit Classifier."""
 
-import logging
 from typing import Dict, Any
+from core.app_state.session_state import SessionState
+from core.app_state.theme_state import ThemeState
+from core.app_state.navigation_state import NavigationState
+from core.app_state.canvas_state import CanvasState
+from core.app_state.history_state import HistoryState
+from core.app_state.settings_state import SettingsState
+# from core.app_state.home_state import HomeState
+import logging
 
 logger = logging.getLogger(__name__)
 
-# Import for easier access
-from core.app_state.session_state import SessionState
-
-# Check if these modules exist before importing them
-try:
-    from core.app_state.canvas_state import CanvasState
-except ImportError:
-    # Define a placeholder to avoid errors
-    class CanvasState:
-        """Placeholder for CanvasState"""
-        @classmethod
-        def initialize(cls): pass
-
-try:
-    from core.app_state.history_state import HistoryState
-except ImportError:
-    # Define a placeholder to avoid errors
-    class HistoryState:
-        """Placeholder for HistoryState"""
-        @classmethod
-        def initialize(cls): pass
-
-try:
-    from core.app_state.settings_state import SettingsState
-except ImportError:
-    # Define a placeholder to avoid errors
-    class SettingsState:
-        """Placeholder for SettingsState"""
-        @classmethod
-        def initialize(cls): pass
-        
-        @classmethod
-        def get_setting(cls, category, key, default=None):
-            return default
-
-try:
-    from core.app_state.theme_state import ThemeState
-except ImportError:
-    # Define a placeholder to avoid errors
-    class ThemeState:
-        """Placeholder for ThemeState"""
-        @classmethod
-        def initialize(cls): pass
-
-try:
-    from core.app_state.navigation_state import NavigationState
-except ImportError:
-    # Define a placeholder to avoid errors
-    class NavigationState:
-        """Placeholder for NavigationState"""
-        @classmethod
-        def initialize(cls): pass
 
 __all__ = [
-    'SessionState',
-    'CanvasState',
-    'HistoryState',
-    'SettingsState',
-    'ThemeState',
-    'NavigationState',
+    "SessionState",
+    "ThemeState",
+    "NavigationState",
+    "CanvasState",
+    "HistoryState",
+    "SettingsState",
+    # "HomeState"
 ]
 
 def initialize_app_state():
