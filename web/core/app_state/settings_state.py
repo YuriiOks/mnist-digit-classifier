@@ -18,6 +18,8 @@ class SettingsState:
 
     SETTINGS_KEY = "app_settings"
 
+    _logger = logging.getLogger(f"{__name__}.SettingsState")
+
     @classmethod
     @AspectUtils.catch_errors
     @AspectUtils.log_method
