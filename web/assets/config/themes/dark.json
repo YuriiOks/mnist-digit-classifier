@@ -1,21 +1,41 @@
 {
   "name": "dark",
+  "displayName": "Dark Mode",
   "colors": {
     "primary": "#ee4347",
     "secondary": "#f0c84c",
     "accent": "#5e81f4",
     "background": "#121212",
+    "backgroundAlt": "#1a1a1a",
     "card": "#1e1e1e",
-    "card-alt": "#252525",
+    "cardAlt": "#252525",
     "text": "#f8f9fa",
-    "text-light": "#d1d5db",
-    "text-muted": "#9ca3af",
+    "textLight": "#d1d5db",
+    "textMuted": "#9ca3af",
     "border": "#383838",
     "shadow": "rgba(0, 0, 0, 0.3)",
+    "highlight": "rgba(238, 67, 71, 0.15)",
     
     "success": "#34d399",
     "warning": "#fbbf24",
     "error": "#f87171",
     "info": "#60a5fa"
+  },
+  "fonts": {
+    "primary": "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    "heading": "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    "code": "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace"
+  },
+  "settings": {
+    "borderRadius": "0.5rem",
+    "shadowStrength": "1.4",
+    "buttonStyle": "rounded",
+    "inputStyle": "filled"
+  },
+  "gradients": {
+    "navHome": "linear-gradient(90deg, #ee4347, #d42c64)",
+    "navDraw": "linear-gradient(90deg, #f0c84c, #ee4347)",
+    "navHistory": "linear-gradient(90deg, #5e81f4, #ee4347)",
+    "navSettings": "linear-gradient(90deg, #c55ce0, #5e81f4)"
   }
 }
