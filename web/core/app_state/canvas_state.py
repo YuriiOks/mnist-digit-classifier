@@ -30,6 +30,8 @@ class CanvasState:
     UPLOAD_INPUT = "upload"
     URL_INPUT = "url"
 
+    _logger = logging.getLogger(f"{__name__}.CanvasState")
+
     @classmethod
     @AspectUtils.catch_errors
     @AspectUtils.log_method
