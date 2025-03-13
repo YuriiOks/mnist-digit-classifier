@@ -10,6 +10,7 @@ body {
   color: var(--color-text);
   background-color: var(--color-background);
   line-height: 1.6;
+  padding-bottom: var(--footer-height);
 }
 
 /* Typography */
@@ -78,24 +79,7 @@ a:hover {
   background: var(--color-text-light);
 }
 
-/* Animations */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideIn {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.5s ease-in-out;
-}
-
-.animate-slide-in {
-  animation: slideIn 0.5s ease-in-out;
-}
+/* Animations moved to animations.css */
 
 /* Utility classes */
 .text-center {
@@ -148,4 +132,4 @@ a:hover {
   padding-bottom: 0 !important;
   padding-left: 0 !important;
   padding-right: 0 !important;
-} 
+}
