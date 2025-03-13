@@ -1,0 +1,210 @@
+/* MNIST Digit Classifier
+ * Copyright (c) 2025
+ * File: assets/css/views/history.css
+ * Description: History view specific styles
+ * Created: 2024-05-03
+ */
+
+/* History container */
+.history-container {
+  padding: var(--spacing-lg);
+}
+
+/* History header */
+.history-header {
+  margin-bottom: var(--spacing-xl);
+}
+
+.history-title {
+  font-size: var(--font-size-3xl);
+  margin-bottom: var(--spacing-sm);
+}
+
+.history-description {
+  color: var(--color-text-light);
+  max-width: 800px;
+}
+
+/* History filters */
+.history-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+  background-color: var(--color-card);
+  padding: var(--spacing-lg);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+/* History entries grid */
+.history-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+/* History entry card */
+.history-entry {
+  background-color: var(--color-card);
+  border-radius: var(--border-radius-md);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.history-entry:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-md);
+}
+
+.history-entry-header {
+  padding: var(--spacing-md);
+  border-bottom: 1px solid var(--color-border);
+  background-color: var(--color-background);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.history-entry-time {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-light);
+}
+
+.history-entry-content {
+  padding: var(--spacing-md);
+  flex-grow: 1;
+  display: flex;
+  gap: var(--spacing-md);
+}
+
+.history-entry-image {
+  width: 80px;
+  height: 80px;
+  background-color: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+}
+
+.history-entry-details {
+  flex-grow: 1;
+}
+
+.history-entry-prediction {
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  margin-bottom: var(--spacing-xs);
+  color: var(--color-primary);
+}
+
+.history-entry-confidence {
+  margin-bottom: var(--spacing-xs);
+  font-size: var(--font-size-sm);
+}
+
+.confidence-bar {
+  height: 6px;
+  background-color: var(--color-highlight);
+  border-radius: var(--border-radius-full);
+  overflow: hidden;
+  margin-top: var(--spacing-xs);
+}
+
+.confidence-value {
+  height: 100%;
+  background-color: var(--color-primary);
+}
+
+.history-entry-footer {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  justify-content: space-between;
+  background-color: var(--color-background);
+}
+
+.history-entry-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+/* Empty state */
+.history-empty {
+  text-align: center;
+  padding: var(--spacing-2xl);
+  background-color: var(--color-card);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.history-empty-icon {
+  font-size: var(--font-size-4xl);
+  margin-bottom: var(--spacing-md);
+  opacity: 0.5;
+}
+
+.history-empty-title {
+  font-size: var(--font-size-xl);
+  margin-bottom: var(--spacing-sm);
+}
+
+.history-empty-description {
+  color: var(--color-text-light);
+  margin-bottom: var(--spacing-lg);
+}
+
+/* Pagination */
+.history-pagination {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-xl);
+}
+
+.pagination-button {
+  background-color: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.pagination-button:hover {
+  background-color: var(--color-highlight);
+}
+
+.pagination-button.active {
+  background-color: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+/* Responsive adjustments */
+@media (max-width: var(--breakpoint-md)) {
+  .history-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .history-entry-content {
+    flex-direction: column;
+  }
+  
+  .history-entry-image {
+    width: 100%;
+    height: 100px;
+  }
+}
