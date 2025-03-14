@@ -1,25 +1,17 @@
 {
   "name": "default",
-  "fonts": {
-    "heading": "system-ui, sans-serif",
-    "body": "system-ui, sans-serif",
-    "code": "monospace"
-  },
-  "settings": {
-    "animations_enabled": true,
-    "transitions_speed": "normal",
-    "border_radius": "4px"
-  },
+  "displayName": "Default Theme",
   "colors": {
     "primary": "#4361ee",
     "secondary": "#4cc9f0",
     "accent": "#4895ef",
     "background": "#f8f9fa",
+    "backgroundAlt": "#f1f3f5",
     "card": "#ffffff",
-    "card-alt": "#f1f3f5",
+    "cardAlt": "#f1f3f5",
     "text": "#212529",
-    "text-light": "#6c757d",
-    "text-muted": "#adb5bd",
+    "textLight": "#6c757d",
+    "textMuted": "#adb5bd",
     "border": "#dee2e6",
     "shadow": "rgba(0, 0, 0, 0.1)",
     "highlight": "rgba(67, 97, 238, 0.1)",
@@ -28,10 +20,23 @@
     "error": "#e63946",
     "info": "#4895ef"
   },
+  "fonts": {
+    "primary": "system-ui, sans-serif",
+    "heading": "system-ui, sans-serif",
+    "code": "monospace"
+  },
+  "settings": {
+    "animationsEnabled": true,
+    "transitionSpeed": "normal",
+    "borderRadius": "4px",
+    "shadowStrength": "1.0",
+    "buttonStyle": "default",
+    "inputStyle": "outline"
+  },
   "gradients": {
-    "nav_home": "linear-gradient(90deg, #4361ee, #3a0ca3)",
-    "nav_draw": "linear-gradient(90deg, #4cc9f0, #4361ee)",
-    "nav_history": "linear-gradient(90deg, #7209b7, #4361ee)",
-    "nav_settings": "linear-gradient(90deg, #f72585, #7209b7)"
+    "navHome": "linear-gradient(90deg, #4361ee, #3a0ca3)",
+    "navDraw": "linear-gradient(90deg, #4cc9f0, #4361ee)",
+    "navHistory": "linear-gradient(90deg, #7209b7, #4361ee)",
+    "navSettings": "linear-gradient(90deg, #f72585, #7209b7)"
   }
-} 
+}
