@@ -210,18 +210,20 @@ section[data-testid="stSidebar"] > div {
 .sidebar-footer::after {
   content: '';
   position: absolute;
-  bottom: -100%;
+  top: -200%;
   left: -100%;
   width: 300%;
-  height: 200%;
+  height: 300%;
   background: linear-gradient(
     45deg,
     rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.07) 40%,
     rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0.07) 60%,
     rgba(255, 255, 255, 0) 100%
   );
   transform: rotate(25deg);
-  animation: footerShineEffect 6s infinite ease-in-out;
+  animation: footerShineEffect 8s infinite cubic-bezier(0.4, 0.0, 0.2, 1);
   pointer-events: none;
   z-index: -1;
 }
@@ -229,20 +231,20 @@ section[data-testid="stSidebar"] > div {
 /* Animation for the shine effect */
 @keyframes footerShineEffect {
   0% {
-    transform: rotate(25deg) translateY(0%);
+    transform: rotate(25deg) translateY(-10%);
     opacity: 0;
   }
-  30% {
-    opacity: 0;
+  20% {
+    opacity: 0.1;
+  }
+  35% {
+    opacity: 0.5;
   }
   50% {
-    opacity: 0.7;
-  }
-  70% {
-    opacity: 0;
+    opacity: 0.1;
   }
   100% {
-    transform: rotate(25deg) translateY(-100%);
+    transform: rotate(25deg) translateY(120%);
     opacity: 0;
   }
 }
