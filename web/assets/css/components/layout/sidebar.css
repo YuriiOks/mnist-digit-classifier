@@ -1,37 +1,96 @@
 /* MNIST Digit Classifier
  * Copyright (c) 2025
  * File: assets/css/components/layout/sidebar.css
- * Description: Sidebar component styles
+ * Description: Sidebar component styles with enhanced visuals
  * Created: 2024-05-03
+ * Updated: 2024-03-15
  */
 
-/* Sidebar styling */
+/* Sidebar styling with gradient overlay */
 [data-testid="stSidebar"] {
   background-color: var(--color-card) !important;
+  background-image: linear-gradient(
+    135deg,
+    rgba(var(--color-primary-rgb), 0.05) 0%,
+    rgba(var(--color-secondary-rgb), 0.05) 100%
+  ) !important;
   border-right: var(--border-width-thin) solid var(--color-border);
   width: var(--sidebar-width) !important;
   box-shadow: var(--shadow-md);
+  position: relative !important; /* Enable positioning context */
+  min-height: 100vh !important; /* Ensure full height */
 }
 
-/* Sidebar header */
+section[data-testid="stSidebar"] > div {
+  background-color: var(--color-card);
+  width: var(--sidebar-width);
+  background-image: inherit;
+  padding-bottom: 90px !important; /* Make space for the footer */
+  min-height: 100vh !important;
+}
+
+/* Enhanced sidebar header with gradient background card */
 .sidebar-header {
   text-align: center;
   padding: var(--spacing-lg) var(--spacing-md);
+  margin: var(--spacing-md);
   margin-bottom: var(--spacing-lg);
+  border-radius: var(--border-radius-md);
+  position: relative;
+  overflow: hidden;
+  background: rgba(var(--color-card-rgb, 255, 255, 255), 0.7);
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(var(--color-border-rgb, 222, 226, 230), 0.3);
 }
 
+/* Add subtle gradient effect to sidebar header */
+.sidebar-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(var(--color-primary-rgb), 0.15) 0%,
+    rgba(var(--color-secondary-rgb), 0.15) 100%
+  );
+  z-index: -1;
+}
+
+/* Enhanced gradient text effect */
 .gradient-text {
   font-size: var(--font-size-2xl);
   font-weight: var(--font-weight-bold);
   background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   margin-bottom: var(--spacing-xs);
+  text-shadow: 0 2px 10px rgba(var(--color-primary-rgb), 0.2);
+  letter-spacing: 0.5px;
+  position: relative;
+}
+
+/* Add subtle animation to the gradient text */
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.gradient-text {
+  background-size: 200% auto;
+  animation: gradientShift 6s ease infinite;
 }
 
 .sidebar-subheader {
   font-size: var(--font-size-sm);
   color: var(--color-text-light);
+  max-width: 85%;
+  margin: 0 auto;
 }
 
 /* Navigation container */
@@ -43,33 +102,160 @@
   margin-bottom: var(--spacing-lg);
 }
 
-/* Toggle container */
+/* Toggle container with subtle background */
 .toggle-container {
   display: flex;
   justify-content: center;
   margin: var(--spacing-lg) 0;
+  padding: var(--spacing-md) 0;
+  position: relative;
+}
+
+/* Add subtle background to toggle area */
+.toggle-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 10%;
+  right: 10%;
+  bottom: 0;
+  background: linear-gradient(
+    to right,
+    rgba(var(--color-primary-rgb), 0.05),
+    rgba(var(--color-secondary-rgb), 0.05),
+    rgba(var(--color-primary-rgb), 0.05)
+  );
+  border-radius: var(--border-radius-full);
+  z-index: -1;
 }
 
 /* Divider */
 .divider {
   height: 1px;
-  background-color: var(--color-border);
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--color-border),
+    transparent
+  );
   margin: var(--spacing-md) var(--spacing-lg);
 }
 
-/* Sidebar footer */
+/* Sidebar footer - positioned fixed at the bottom */
+/* Sidebar footer - positioned fixed at the bottom */
 .sidebar-footer {
   text-align: center;
   padding: var(--spacing-md);
   font-size: var(--font-size-xs);
   color: var(--color-text-muted);
-  margin-top: auto;
+  
+  /* Enhanced gradient background with better shine effect */
+  background: linear-gradient(
+    to bottom,
+    rgba(var(--color-background-rgb, 248, 249, 250), 0.0),
+    rgba(var(--color-background-rgb, 248, 249, 250), 0.7)
+  );
+  background-size: 100% 200%; /* Make gradient larger than the element */
+  background-position: 0 -30px; /* Position to show the most visible part */
+  
+  padding-top: var(--spacing-lg);
+  
+  /* Fixed positioning at the bottom of the sidebar */
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  border-top: 1px solid var(--color-border);
+  z-index: 10 !important;
+  
+  /* Add subtle box shadow for additional depth */
+  box-shadow: 0 -4px 6px -6px rgba(0, 0, 0, 0.1);
 }
 
-/* Fix sidebar width and scrolling */
-section[data-testid="stSidebar"] > div {
-  background-color: var(--color-card);
-  width: var(--sidebar-width);
+/* Add subtle shine effect to footer */
+/* Sidebar footer - positioned fixed at the bottom with enhanced gradient */
+/* Sidebar footer - positioned fixed at the bottom with animated shine effect */
+.sidebar-footer {
+  text-align: center;
+  padding: var(--spacing-md);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  border-top: 1px solid var(--color-border);
+  z-index: 10 !important;
+  padding-top: var(--spacing-lg);
+  box-shadow: 0 -4px 15px -10px rgba(var(--color-shadow-rgb, 0, 0, 0), 0.1);
+  overflow: hidden;
+  
+  background: 
+  linear-gradient(
+    to bottom,
+    transparent -10%,
+    rgba(var(--color-primary-rgb, 18, 18, 18), 0.25) 100%
+  ),
+  linear-gradient(
+    to right,
+    rgba(var(--color-primary-rgb), 0.01) 0%,
+    rgba(var(--color-secondary-rgb), 0.15) 50%,
+    rgba(var(--color-primary-rgb), 0.01) 100%
+  );
+}
+
+/* Add shine effect with pseudo-element */
+.sidebar-footer::after {
+  content: '';
+  position: absolute;
+  bottom: -100%;
+  left: -100%;
+  width: 300%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: rotate(25deg);
+  animation: footerShineEffect 6s infinite ease-in-out;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Animation for the shine effect */
+@keyframes footerShineEffect {
+  0% {
+    transform: rotate(25deg) translateY(0%);
+    opacity: 0;
+  }
+  30% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  70% {
+    opacity: 0;
+  }
+  100% {
+    transform: rotate(25deg) translateY(-100%);
+    opacity: 0;
+  }
+}
+
+
+/* Dark theme adjustments for footer shine */
+[data-theme="dark"] .sidebar-footer::after {
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(255, 255, 255, 0.05),
+    transparent
+  );
 }
 
 section[data-testid="stSidebar"] {
@@ -96,9 +282,35 @@ button[kind="header"] {
   
   .sidebar-header {
     padding: var(--spacing-md) var(--spacing-sm);
+    margin: var(--spacing-sm);
   }
   
   .nav-buttons-container {
     padding: 0 var(--spacing-sm);
   }
+}
+
+/* Dark theme adjustments */
+[data-theme="dark"] .sidebar-header {
+  background: rgba(var(--color-card-rgb, 30, 30, 30), 0.7);
+}
+
+[data-theme="dark"] .toggle-container::before {
+  opacity: 0.15;
+}
+
+/* Dark theme adjustments for footer */
+[data-theme="dark"] .sidebar-footer {
+  background: 
+  linear-gradient(
+    to bottom,
+    transparent -10%,
+    rgba(var(--color-primary-rgb, 18, 18, 18), 0.25) 100%
+  ),
+  linear-gradient(
+    to right,
+    rgba(var(--color-primary-rgb), 0.01) 0%,
+    rgba(var(--color-secondary-rgb), 0.015) 50%,
+    rgba(var(--color-primary-rgb), 0.01) 100%
+  );
 }
