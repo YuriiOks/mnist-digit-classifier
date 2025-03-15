@@ -52,6 +52,11 @@
   --color-active-overlay: rgba(0, 0, 0, 0.1);
   --color-disabled: #e9ecef;
   --color-disabled-text: #adb5bd;
+
+  /* Light theme RGB values */
+--color-primary-rgb: 67, 97, 238;
+--color-secondary-rgb: 76, 201, 240;
+--color-accent-rgb: 72, 149, 239;
   
   /* === Typography === */
   /* Font families */
@@ -170,7 +175,7 @@
   --button-line-height: 1.2;
   --button-font-weight: var(--font-weight-medium);
   --button-transition: all var(--transition-speed-fast) var(--transition-timing);
-  --button-hover-transform: translateY(-2px);
+  --button-hover-transform: translateY(-2px) translateX(2px);
   
   /* Forms */
   --input-height: 2.5rem;
@@ -199,6 +204,12 @@
   --nav-history-gradient: linear-gradient(90deg, #7209b7, #4361ee);
   --nav-settings-gradient: linear-gradient(90deg, #f72585, #7209b7);
   
+  /* === Navigation Button Styles === */
+  --nav-icon-size: 1.2em;
+  --nav-text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+  --nav-border-highlight: var(--border-width-thick) solid rgba(255, 255, 255, 0.8);
+  
+
   /* Colors should follow --color-{category}-{variant} pattern */
   --color-primary-light: rgba(var(--color-primary-rgb), 0.7);
   --color-primary-lighter: rgba(var(--color-primary-rgb), 0.3);
@@ -221,6 +232,30 @@
   --icon-color: var(--color-text);
   --icon-stroke-color: var(--color-text);
   --focus-outline-color: var(--color-primary);
+
+  /* Text shadows */
+  --text-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.1);
+  --text-shadow-md: 0 0 10px rgba(255, 255, 255, 0.4);
+  --text-shadow-lg: 0 2px 4px rgba(0, 0, 0, 0.2);
+
+  /* Shimmer effect gradients */
+  --shimmer-gradient: linear-gradient(
+  to right,
+  rgba(255, 255, 255, 0) 0%,
+  rgba(255, 255, 255, 0.3) 50%,
+  rgba(255, 255, 255, 0) 100%
+);
+--shimmer-gradient-subtle: linear-gradient(
+  to right,
+  rgba(255, 255, 255, 0) 0%,
+  rgba(255, 255, 255, 0.2) 50%,
+  rgba(255, 255, 255, 0) 100%
+);
+
+  /* Animation durations */
+
+  --button-shine-duration: 1.5s;
+  --nav-shine-duration: 1.8s;
 }
 
 /* Add a special class to match the design specification */
