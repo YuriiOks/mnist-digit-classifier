@@ -90,139 +90,157 @@ class BB8Toggle(Component[Dict[str, Any]]):
         self.__theme_manager = theme_manager_instance or theme_manager
         self.__on_change = on_change
         self.__key = key
-    
+        
     @AspectUtils.catch_errors
     @AspectUtils.log_method
     def _load_bb8_toggle_css(self) -> None:
         """Load the BB8 toggle CSS."""
-        css_content = resource_manager.load_css("components/controls/bb8-toggle.css")
-        if css_content:
-            resource_manager.inject_css(css_content)
-            self._logger.debug("Loaded BB8 toggle CSS")
-        else:
-            self._logger.warning("Could not load BB8 toggle CSS")
+        # Try multiple potential paths for the CSS
+        potential_paths = [
+            "components/controls/bb8-toggle.css",
+            "components/controls/bb8_toggle.css",
+            "controls/bb8-toggle.css",
+            "controls/bb8_toggle.css"
+        ]
+        
+        css_loaded = False
+        for css_path in potential_paths:
+            css_content = resource_manager.load_css(css_path)
+            if css_content:
+                resource_manager.inject_css(css_content)
+                self._logger.debug(f"Successfully loaded BB8 toggle CSS from {css_path}")
+                css_loaded = True
+                break
+        
+        if not css_loaded:
+            # If no CSS was loaded, inject the minimum CSS needed
+            self._logger.warning("Could not load BB8 toggle CSS from files, using inline minimum CSS")
+            min_css = """
+            .bb8-toggle {
+                display: inline-block;
+                cursor: pointer;
+            }
+            .bb8-toggle__container {
+                width: 170px;
+                height: 90px;
+                background: linear-gradient(#2c4770, #070e2b 35%, #628cac 50% 70%, #a6c5d4);
+                border-radius: 99em;
+                position: relative;
+                transition: 0.4s;
+            }
+            .bb8-toggle__checkbox {
+                display: none;
+            }
+            .bb8 {
+                position: absolute;
+                left: 15px;
+                top: 15px;
+                transition: 0.4s;
+            }
+            .bb8__body {
+                width: 60px;
+                height: 60px;
+                background: white;
+                border-radius: 50%;
+            }
+            .bb8__head {
+                width: 40px;
+                height: 25px;
+                background: white;
+                border-radius: 25px 25px 0 0;
+                margin-bottom: -3px;
+            }
+            .bb8-toggle__checkbox:checked + .bb8-toggle__container .bb8 {
+                left: calc(100% - 75px);
+            }
+            """
+            resource_manager.inject_css(min_css)
 
     @AspectUtils.catch_errors
     @AspectUtils.log_method
     def render(self) -> str:
-        """
-        Render BB8 toggle component to HTML with embedded JS.
+        """Render the BB8 toggle component.
         
         Returns:
             HTML representation of the BB8 toggle.
         """
         # First try to load the template
-        template_content = None
-        for template_path in [
-            "components/controls/bb8-toggle.html",
-            "controls/bb8-toggle.html"
-        ]:
-            template_content = self.load_template(template_path)
-            if template_content:
-                self._logger.debug(f"Loaded BB8 template from: {template_path}")
-                break
+        template_content = self.load_template("components/controls/bb8-toggle.html")
         
-        # If no template was found, use the embedded fallback
-        if not template_content:
-            self._logger.debug("Using embedded BB8 HTML template")
-            template_content = BB8_HTML
+        if template_content:
+            # Set the checked state based on current theme
+            is_dark = self.__theme_manager.is_dark_mode()
+            if is_dark:
+                template_content = template_content.replace('<input class="bb8-toggle__checkbox" type="checkbox">', 
+                                                        '<input class="bb8-toggle__checkbox" type="checkbox" checked>')
+            
+            return template_content
         
-        # Set checked state based on current theme
-        is_dark_mode = self.__theme_manager.is_dark_mode()
-        html = template_content.replace(
-            'type="checkbox"',
-            f'type="checkbox" {"checked" if is_dark_mode else ""}'
-        )
+        # Fallback to the default BB8 HTML
+        html = BB8_HTML
+        
+        # Set the checked state based on current theme
+        is_dark = self.__theme_manager.is_dark_mode()
+        if is_dark:
+            html = html.replace('<input class="bb8-toggle__checkbox" type="checkbox">', 
+                            '<input class="bb8-toggle__checkbox" type="checkbox" checked>')
+        
+        return html
 
-        # Add JavaScript for theme toggling
-        js_code = self.__get_toggle_js()
-        
-        # Combine HTML and JS in a container
-        combined_html = f"<div class='bb8-toggle-container'>{html}{js_code}</div>"
-        
-        return combined_html
-
-    def __get_toggle_js(self) -> str:
-        """
-        JavaScript code to handle theme toggling.
+    @AspectUtils.catch_errors
+    @AspectUtils.log_method
+    def display(self) -> Dict[str, Any]:
+        """Display the BB8 toggle component and handle theme changes.
         
         Returns:
-            JavaScript as a string.
+            Dict containing theme information.
         """
-        return """
+        # Make sure the CSS is loaded
+        self._load_bb8_toggle_css()
+        
+        # Render the HTML
+        html = self.render()
+        
+        # Add JavaScript for handling the toggle change
+        js_code = """
         <script>
         (function() {
             const checkbox = document.querySelector('.bb8-toggle__checkbox');
             if (!checkbox) return;
-
+            
             checkbox.addEventListener('change', function() {
                 const theme = this.checked ? 'dark' : 'light';
-                document.documentElement.setAttribute('data-theme', theme);
+                
+                // Tell Streamlit about the change
                 window.parent.postMessage({
                     type: 'streamlit:setComponentValue',
-                    value: {
-                        theme,
-                        bb8_toggle_checkbox: this.checked
-                    }
+                    value: { theme: theme }
                 }, '*');
             });
         })();
         </script>
         """
-
-    @AspectUtils.catch_errors
-    @AspectUtils.log_method
-    def display(self) -> Dict[str, Any]:
-        """
-        Display BB8 toggle in Streamlit and handle theme changes.
         
-        Returns:
-            Dict containing theme status information.
-        """
-        # Load the CSS first
-        self._load_bb8_toggle_css()
+        # Combine HTML and JavaScript
+        combined_html = f"{html}{js_code}"
         
-        # Render the component
-        html = self.render()
+        # Display the component
+        st.markdown(combined_html, unsafe_allow_html=True)
         
-        # Create a placeholder for returning values
-        return_value = {}
-        
-        # Use components.v1.html for isolated rendering
-        st.components.v1.html(html, height=120, key=f"{self.__key}_html")
-        
-        # Process theme change if present in session state
-        if f"{self.__key}_html" in st.session_state:
-            component_value = st.session_state[f"{self.__key}_html"]
-            if isinstance(component_value, dict) and "theme" in component_value:
-                # Get the new theme
-                new_theme = component_value["theme"]
-                is_checked = component_value.get("bb8_toggle_checkbox", new_theme == "dark")
-                
-                # Update return value
-                return_value = {
-                    "theme": new_theme,
-                    "is_dark": new_theme == "dark",
-                    "changed": True
-                }
-                
-                # Apply theme change if different
-                current_theme = self.__theme_manager.get_current_theme()
-                if new_theme != current_theme:
-                    self._logger.debug(f"Applying theme: {new_theme}")
-                    self.__theme_manager.apply_theme(new_theme)
-                    
-                    # Call on_change callback if provided
-                    if self.__on_change:
-                        self.__on_change(new_theme)
-            
-        # If we have no theme change data yet, return current state
-        if not return_value:
+        # Handle theme changes
+        if "theme" in st.session_state:
             current_theme = self.__theme_manager.get_current_theme()
-            return_value = {
-                "theme": current_theme,
-                "is_dark": current_theme == "dark",
-                "changed": False
-            }
+            requested_theme = st.session_state["theme"]
+            
+            if current_theme != requested_theme:
+                self.__theme_manager.apply_theme(requested_theme)
+                
+                # Call on_change callback if provided
+                if self.__on_change:
+                    self.__on_change(requested_theme)
         
-        return return_value
+        # Return theme information
+        return {
+            "theme": self.__theme_manager.get_current_theme(),
+            "is_dark": self.__theme_manager.is_dark_mode()
+        }
