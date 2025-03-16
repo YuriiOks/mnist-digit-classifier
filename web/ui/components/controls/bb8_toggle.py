@@ -16,8 +16,8 @@ from utils.aspects import AspectUtils
 # Default BB8 toggle HTML as fallback
 BB8_HTML = """
 <label class="bb8-toggle">
-    <input class="bb8-toggle__checkbox" type="checkbox">
-    <div class="bb8-toggle__container">
+    <input class="bb8-toggle__checkbox" type="checkbox" data-name="bb8-checkbox">
+    <div class="bb8-toggle__container" data-name="bb8-container">
       <div class="bb8-toggle__scenery">
         <div class="bb8-toggle__star"></div>
         <div class="bb8-toggle__star"></div>
@@ -203,85 +203,11 @@ class BB8Toggle(Component[Dict[str, Any]]):
         
         # Add JavaScript for handling the toggle change with a unique ID to avoid conflicts
         # Generate a unique ID for this toggle instance
-        toggle_id = f"bb8_toggle_{self.__key}"
-        
-        js_code = f"""
-        <script>
-        (function() {{
-            // Find the checkbox using its class, ensure we get the right one
-            const checkbox = document.querySelector('.bb8-toggle__checkbox');
-            if (!checkbox) {{
-                console.error('BB8 checkbox not found');
-                return;
-            }}
-            
-            // Set a unique ID to make it easier to reference
-            checkbox.id = "{toggle_id}";
-            
-            // Create a function to handle the theme change
-            function handleThemeChange(event) {{
-                const newTheme = event.target.checked ? 'dark' : 'light';
-                console.log('BB8 toggle clicked, new theme:', newTheme);
-                
-                // Apply theme visually immediately for better UX
-                document.documentElement.setAttribute('data-theme', newTheme);
-                
-                // Send the state to Streamlit
-                window.parent.postMessage({{
-                    type: 'streamlit:setComponentValue',
-                    value: {{ 
-                        theme: newTheme,
-                        key: "{self.__key}",
-                        toggled: event.target.checked
-                    }}
-                }}, '*');
-            }}
-            
-            // Remove any existing listeners to avoid duplicates
-            checkbox.removeEventListener('change', handleThemeChange);
-            
-            // Add the event listener
-            checkbox.addEventListener('change', handleThemeChange);
-            
-            console.log('BB8 toggle initialized with ID: {toggle_id}');
-        }})();
-        </script>
-        """
         
         # Combine HTML and JavaScript
-        combined_html = f"{html}{js_code}"
+        combined_html = f"{html}"
         
         # Display the component
         st.markdown(combined_html, unsafe_allow_html=True)
         
-        # Create a container for the toggle state if it doesn't exist
-        if f"bb8_state_{self.__key}" not in st.session_state:
-            st.session_state[f"bb8_state_{self.__key}"] = {
-                "theme": self.__theme_manager.get_current_theme(),
-                "toggled": self.__theme_manager.is_dark_mode()
-            }
         
-        # Check for theme state changes in session_state
-        # This happens after the user clicks the toggle
-        for key in st.session_state:
-            if key == "theme" and st.session_state[key] != self.__theme_manager.get_current_theme():
-                self._logger.debug(f"Theme changed in session_state: {st.session_state[key]}")
-                self.__theme_manager.apply_theme(st.session_state[key])
-                
-                # Update our state tracker
-                st.session_state[f"bb8_state_{self.__key}"]["theme"] = st.session_state[key]
-                st.session_state[f"bb8_state_{self.__key}"]["toggled"] = (st.session_state[key] == "dark")
-                
-                # Call on_change callback if provided
-                if self.__on_change:
-                    self.__on_change(st.session_state[key])
-                    
-                # Force a page rerun to update all components
-                st.rerun()
-        
-        # Return current state
-        return {
-            "theme": self.__theme_manager.get_current_theme(),
-            "is_dark": self.__theme_manager.is_dark_mode(),
-            "key": self.__key
-        }
