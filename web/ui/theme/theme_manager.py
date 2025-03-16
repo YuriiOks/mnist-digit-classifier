@@ -223,7 +223,7 @@ class ThemeManager:
         self._logger.info(f"Theme toggled from {current_theme} to {new_theme}")
         
         return new_theme
-    
+
     @AspectUtils.catch_errors
     @AspectUtils.log_method
     def apply_theme(self, theme_mode: str) -> None:
@@ -236,6 +236,9 @@ class ThemeManager:
         # Make sure we're using a valid theme mode
         if theme_mode not in [self.LIGHT_THEME, self.DARK_THEME]:
             theme_mode = self.DEFAULT_THEME
+        
+        # Log theme change
+        self._logger.debug(f"Applying theme: {theme_mode}")
         
         # Set the current theme in session state
         st.session_state[self.CURRENT_THEME_KEY] = theme_mode
@@ -255,8 +258,6 @@ class ThemeManager:
         
         # Apply CSS variables
         self._apply_css_variables(theme_data)
-        
-        self._logger.debug(f"Applied theme: {theme_mode}")
     
     @AspectUtils.catch_errors
     @AspectUtils.log_method
