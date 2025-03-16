@@ -35,13 +35,29 @@ from ui.components.cards.card import Card, FeatureCard, WelcomeCard
 
 def load_core_css():
     """Load core CSS files."""
-    resource_manager.load_and_inject_css([
+    # Direct CSS paths that should match the project structure
+    css_files = [
         "global/variables.css",
         "global/reset.css",
-        "global/base.css",
+        "global/base.css", 
         "global/animations.css",
         "themes/theme-system.css"
-    ])
+    ]
+    
+    # Try to load each file
+    loaded_css = ""
+    for css_file in css_files:
+        css_content = resource_manager.load_css(css_file)
+        if css_content:
+            loaded_css += f"\n/* {css_file} */\n{css_content}"
+        else:
+            logger.warning(f"Could not load core CSS: {css_file}")
+    
+    # Inject the combined CSS
+    if loaded_css:
+        resource_manager.inject_css(loaded_css)
+    else:
+        logger.warning("No core CSS was loaded")
 
 
 def load_view_css(view_name):
@@ -259,3 +275,4 @@ if __name__ == "__main__":
         logger.critical(f"Application failed to start: {str(e)}", exc_info=True)
         st.error("The application encountered a critical error. Please check the logs for details.")
         st.code(str(e))
+
