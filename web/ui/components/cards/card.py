@@ -96,11 +96,18 @@ class Card(Component[None]):
         Returns:
             HTML representation of the card.
         """
-        # Try to render using template
+        # Try to render using template - use class name to determine template
+        card_class_name = self.__class__.__name__.lower()
+
+        if card_class_name == "featurecard":
+            card_class_name = "feature_card"
+        elif card_class_name == "welcomecard":
+            card_class_name = "welcome_card"
+        
+        # Try a sequence of template paths
         template_paths = [
-            "components/cards/card.html",
-            "cards/card.html",
-            "components/card.html"
+            f"components/cards/{card_class_name}.html",   # Try specific class template first
+            f"components/cards/card.html",   # Try specific class template first
         ]
         
         # Try each template path
@@ -108,24 +115,13 @@ class Card(Component[None]):
             template_content = self.load_template(template_path)
             if template_content:
                 context = {
-                    "TITLE": self.__title,
-                    "CONTENT": self.__content,
-                    "ICON": self.__icon
+                    "TITLE": self.title,
+                    "CONTENT": self.content,
+                    "ICON": self.icon
                 }
                 rendered = self.render_template(template_path, context)
                 if rendered:
                     return rendered
-        
-        # Fallback to direct HTML generation if template loading fails
-        class_list = " ".join(self.classes)
-        return f"""
-        <div class="card {class_list}" id="{self.component_id}">
-            <div class="card-title">
-                <span class="card-icon">{self.__icon}</span> {self.__title}
-            </div>
-            <div class="card-content">{self.__content}</div>
-        </div>
-        """
 
     @AspectUtils.catch_errors
     def display(self) -> None:
@@ -141,6 +137,30 @@ class Card(Component[None]):
         st.markdown(html, unsafe_allow_html=True)
         self._logger.debug(f"Displayed Card: {self.__title}")
 
+    def _load_component_css(self) -> None:
+        """Load CSS specific to this component."""
+        # Updated paths that match the actual file structure
+        css_paths = [
+            "components/cards/cards.css",      # Main cards styling
+            "components/theme_aware.css",      # Theme-related styling 
+        ]
+        
+        loaded = False
+        for css_path in css_paths:
+            css = resource_manager.load_css(css_path)
+            if css:
+                resource_manager.inject_css(css)
+                loaded = True
+                self._logger.debug(f"Loaded CSS: {css_path}")
+        
+        if not loaded:
+            self._logger.warning("Could not load any card CSS")
+
+    def __str__(self):
+        return super().__str__() + f"({self.title})" + f"({self.content})"
+    
+    def __repr__(self):
+        return super().__repr__() + f"({self.title})"
 
 class FeatureCard(Card):
     """Feature card with specialized styling for feature highlights."""
