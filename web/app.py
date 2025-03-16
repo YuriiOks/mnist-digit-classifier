@@ -37,11 +37,34 @@ def load_core_css():
     """Load core CSS files."""
     # Paths relative to assets/css
     css_files = [
+        "themes/theme-system.css",
         "global/variables.css",
-        "global/reset.css",
-        "global/base.css", 
         "global/animations.css",
-        "themes/theme-system.css"
+        "global/base.css", 
+        "global/reset.css",
+        "views/view_styles.css",
+        "views/home.css",
+        "views/draw.css",
+        "views/history.css",
+        "views/settings.css",
+        "components/cards/card.css",
+        "components/cards/history-entry.css",
+        "components/cards/settings-section.css",
+        "components/cards/tips-cards.css",
+        "components/controls/button.css",
+        "components/controls/bb8-button.css",
+        "components/controls/pagination.css",
+        "components/feedback/confidence-bar.css",
+        "components/feedback/prediction-result.css",
+        "components/forms/color-swatch.css",
+        "components/forms/font-preview.css",
+        "components/forms/setting-item.css",
+        "components/inputs/canvas.css",
+        "components/inputs/file-upload.css",
+        "layout/footer.css",
+        "layout/header.css",
+        "layout/sidebar.css",
+        "ui/settings-toggle.css"
     ]
     
     # Try to load each file
@@ -82,16 +105,13 @@ def render_home_view():
     # Load welcome card data from JSON
     welcome_data = resource_manager.load_json_resource("home/welcome_card.json")
 
-    print(f"welcome_data: {welcome_data}")
 
-    if welcome_data:
-        welcome_card = WelcomeCard(
-            title=welcome_data.get("title", "MNIST Digit Classifier"),
-            content=welcome_data.get("content", "Welcome to the MNIST Digit Classifier."),
-            icon=welcome_data.get("icon", "👋")
-        )
-        print(f"It must show the welcome card\n{welcome_card}")
-        welcome_card.display()
+    welcome_card = WelcomeCard(
+        title=welcome_data.get("title", "MNIST Digit Classifier"),
+        content=welcome_data.get("content", "Welcome to the MNIST Digit Classifier."),
+        icon=welcome_data.get("icon", "👋")
+    )
+    welcome_card.display()
     
     # Display "How It Works" section
     st.markdown("<h2 id='how-it-works'>How It Works</h2>", unsafe_allow_html=True)
@@ -99,21 +119,17 @@ def render_home_view():
     # Load feature cards data from JSON
     feature_cards = resource_manager.load_json_resource("home/feature_cards.json")
 
-    print(f"feature_cards: {feature_cards}")
-
-    if feature_cards:
-        # Create columns for feature cards
-        cols = st.columns(len(feature_cards))
-        
-        # Display feature cards
-        for i, card_data in enumerate(feature_cards):
-            with cols[i]:
-                feature_card = FeatureCard(
-                    title=card_data.get("title", f"Feature {i+1}"),
-                    content=card_data.get("content", ""),
-                    icon=card_data.get("icon", "")
-                )
-                feature_card.display()
+    cols = st.columns(len(feature_cards))
+    
+    # Display feature cards
+    for i, card_data in enumerate(feature_cards):
+        with cols[i]:
+            feature_card = FeatureCard(
+                title=card_data.get("title", f"Feature {i+1}"),
+                content=card_data.get("content", ""),
+                icon=card_data.get("icon", "")
+            )
+            feature_card.display()
     
     # CTA section
     st.markdown("<hr style='margin: 2rem 0;'>", unsafe_allow_html=True)
@@ -125,6 +141,8 @@ def render_home_view():
         st.markdown("<h2 id='ready-to-try-it-out' style='margin: 0;'>Ready to try it out?</h2>", unsafe_allow_html=True)
     
     with cta_col2:
+        ## Add custom CSS for the button
+
         if st.button("Start Drawing", type="primary"):
             NavigationState.set_active_view("draw")
             st.rerun()
