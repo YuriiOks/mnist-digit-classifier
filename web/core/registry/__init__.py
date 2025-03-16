@@ -1,13 +1,21 @@
 # MNIST Digit Classifier
 # Copyright (c) 2025
-# File: core/registry/__init__.py
-# Description: Registry package initialization
-# Created: 2024-05-01
+# File: core/__init__.py
+# Description: Core package initialization
+# Created: 2025-03-16
 
-# Make registry a proper Python package 
-from core.registry.view_registry import ViewRegistry
+"""Core functionality for the MNIST Digit Classifier."""
 
+from core.app_state import SessionState, ThemeState, NavigationState, initialize_app_state
+from core.errors import ErrorHandler, UIError, TemplateError, ComponentError
 
 __all__ = [
-    "ViewRegistry"
+    "SessionState",
+    "ThemeState",
+    "NavigationState",
+    "initialize_app_state",
+    "ErrorHandler",
+    "UIError",
+    "TemplateError",
+    "ComponentError"
 ]
