@@ -197,7 +197,9 @@ class Component(ABC, Generic[T]):
             for key, value in full_context.items():
                 key = key.lower()
                 key = "{" + key + "}"
-                print(f"key: {key}, value: {value}")
+                # if class name is "Sidebar" 
+                if self.__component_name == "sidebar":
+                    print(f"key: {key}, value: {value}")
                 rendered = rendered.replace(key, str(value))   # double curly braces
                 rendered = rendered.replace(f"${{{key.upper()}}}", str(value))
                 
