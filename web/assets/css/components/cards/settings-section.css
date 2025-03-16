@@ -1,0 +1,18 @@
+/* Settings section card styling */
+.settings-section {
+    background-color: var(--color-card);
+    border-radius: var(--border-radius-md);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--color-border);
+  }
+  
+  .settings-section-title {
+    font-size: var(--font-size-xl);
+    margin-bottom: var(--spacing-xs);
+  }
+  
+  .settings-section-description {
+    color: var(--color-text-light);
+    font-size: var(--font-size-sm);
+  }
