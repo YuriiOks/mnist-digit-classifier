@@ -2,8 +2,15 @@
 # Copyright (c) 2025
 # File: ui/layout/__init__.py
 # Description: Layout components package initialization
-# Created: 2024-05-01
+# Created: 2025-03-16
 
-from ui.layout.header import Header
-from ui.layout.footer import Footer
-from ui.layout.sidebar import Sidebar 
+"""Layout components for the MNIST Digit Classifier."""
+
+from ui.layout.layout_components import Layout, Header, Footer, Sidebar
+
+__all__ = [
+    "Layout",
+    "Header",
+    "Footer",
+    "Sidebar"
+]
