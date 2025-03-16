@@ -1,184 +1,192 @@
 # MNIST Digit Classifier
 # Copyright (c) 2025
 # File: ui/components/controls/buttons.py
-# Description: Custom button components
-# Created: 2024-05-01
+# Description: Button components
+# Created: 2025-03-16
 
 import streamlit as st
 import logging
-from typing import Dict, Any, Callable, Optional, List, Union
+from typing import Dict, Any, Callable, Optional, Tuple
 
+from utils.aspects import AspectUtils
 from ui.components.base.component import Component
 
 logger = logging.getLogger(__name__)
 
-class Button:
+
+class Button(Component[bool]):
     """Base button component."""
-    
+
     def __init__(
         self,
         label: str,
+        *,
         key: Optional[str] = None,
         on_click: Optional[Callable] = None,
-        args: tuple = (),
+        args: Tuple = (),
         kwargs: Optional[Dict[str, Any]] = None,
         disabled: bool = False,
         help: Optional[str] = None,
-        type: str = "default"
+        type: str = "default",
+        id: Optional[str] = None,
+        classes: Optional[list] = None,
+        attributes: Optional[Dict[str, str]] = None,
+        **extra_kwargs
     ):
-        """Initialize a button.
-        
-        Args:
-            label: Button text
-            key: Unique key for the button
-            on_click: Function to call when button is clicked
-            args: Arguments to pass to on_click
-            kwargs: Keyword arguments to pass to on_click
-            disabled: Whether the button is disabled
-            help: Tooltip text
-            type: Button type (default, primary, secondary, etc.)
         """
-        self.label = label
-        self.key = key
-        self.on_click = on_click
-        self.args = args
-        self.kwargs = kwargs or {}
-        self.disabled = disabled
-        self.help = help
-        self.type = type
+        Initialize a button.
+
+        Args:
+            label: Button text.
+            key: Streamlit unique key.
+            on_click: Callback function for click event.
+            args: Arguments for callback.
+            kwargs: Keyword arguments for callback.
+            disabled: Disable state of button.
+            help: Tooltip text.
+            type: Button style (default, primary, secondary).
+            id: HTML ID for the component.
+            classes: List of CSS classes to apply.
+            attributes: Dictionary of HTML attributes.
+            **extra_kwargs: Additional keyword arguments.
+        """
+        super().__init__(
+            component_type="controls",
+            component_name="button",
+            id=id,
+            classes=classes or [],
+            attributes=attributes or {},
+            key=key,
+            **extra_kwargs
+        )
+        
+        self.__label = label
+        self.__key = key or f"button_{id}"
+        self.__on_click = on_click
+        self.__args = args
+        self.__kwargs = kwargs or {}
+        self.__disabled = disabled
+        self.__help = help
+        self.__type = type
+
+    @property
+    def label(self) -> str:
+        """Get the button label."""
+        return self.__label
     
-    def render(self) -> bool:
-        """Render the button.
+    @property
+    def type(self) -> str:
+        """Get the button type."""
+        return self.__type
+    
+    @property
+    def disabled(self) -> bool:
+        """Get the button disabled state."""
+        return self.__disabled
+    
+    @disabled.setter
+    def disabled(self, value: bool) -> None:
+        """Set the button disabled state."""
+        self.__disabled = value
+    
+    @AspectUtils.catch_errors
+    def render(self) -> str:
+        """
+        Render the button as HTML.
         
         Returns:
-            True if the button was clicked, False otherwise
+            HTML representation of the button.
         """
-        try:
-            return st.button(
-                label=self.label,
-                key=self.key,
-                on_click=self.on_click,
-                args=self.args,
-                kwargs=self.kwargs,
-                disabled=self.disabled,
-                help=self.help,
-                type=self.type
-            )
-        except Exception as e:
-            logger.error(f"Error rendering button '{self.label}': {str(e)}")
-            # Fallback to basic button
-            return st.button(self.label, key=self.key, disabled=True, 
-                            help="Error: Could not render button properly")
+        # The button is primarily rendered by Streamlit, not as HTML
+        return f"<button class='{' '.join(self.classes)}' data-testid='baseButton-{self.__type}'>{self.__label}</button>"
+
+    @AspectUtils.catch_errors
+    def display(self) -> bool:
+        """
+        Render the button using Streamlit.
+        
+        Returns:
+            True if the button was clicked, False otherwise.
+        """
+        return st.button(
+            label=self.__label,
+            key=self.__key,
+            on_click=self.__on_click,
+            args=self.__args,
+            kwargs=self.__kwargs,
+            disabled=self.__disabled,
+            help=self.__help,
+            type=self.__type
+        )
 
 
 class PrimaryButton(Button):
-    """Primary action button with prominent styling."""
-    
-    def __init__(
-        self,
-        label: str,
-        key: Optional[str] = None,
-        on_click: Optional[Callable] = None,
-        args: tuple = (),
-        kwargs: Optional[Dict[str, Any]] = None,
-        disabled: bool = False,
-        help: Optional[str] = None
-    ):
-        """Initialize a primary button."""
-        super().__init__(
-            label=label,
-            key=key,
-            on_click=on_click,
-            args=args,
-            kwargs=kwargs,
-            disabled=disabled,
-            help=help,
-            type="primary"
-        )
+    """Primary button with prominent styling."""
+
+    def __init__(self, label: str, **kwargs):
+        """
+        Initialize a primary button.
+        
+        Args:
+            label: Button text
+            **kwargs: Additional button parameters
+        """
+        super().__init__(label, type="primary", **kwargs)
 
 
 class SecondaryButton(Button):
-    """Secondary action button with less prominent styling."""
-    
-    def __init__(
-        self,
-        label: str,
-        key: Optional[str] = None,
-        on_click: Optional[Callable] = None,
-        args: tuple = (),
-        kwargs: Optional[Dict[str, Any]] = None,
-        disabled: bool = False,
-        help: Optional[str] = None
-    ):
-        """Initialize a secondary button."""
-        super().__init__(
-            label=label,
-            key=key,
-            on_click=on_click,
-            args=args,
-            kwargs=kwargs,
-            disabled=disabled,
-            help=help,
-            type="secondary"
-        )
+    """Secondary button with less prominent styling."""
+
+    def __init__(self, label: str, **kwargs):
+        """
+        Initialize a secondary button.
+        
+        Args:
+            label: Button text
+            **kwargs: Additional button parameters
+        """
+        super().__init__(label, type="secondary", **kwargs)
 
 
-class IconButton:
+class IconButton(Button):
     """Button represented by an icon."""
-    
+
     def __init__(
         self,
         icon: str,
+        *,
         key: Optional[str] = None,
         on_click: Optional[Callable] = None,
-        args: tuple = (),
+        args: Tuple = (),
         kwargs: Optional[Dict[str, Any]] = None,
         disabled: bool = False,
         help: Optional[str] = None,
-        label: Optional[str] = None
+        label: Optional[str] = None,
+        **extra_kwargs
     ):
-        """Initialize an icon button.
-        
+        """
+        Initialize an icon button.
+
         Args:
-            icon: Icon to display (emoji or icon class)
-            key: Unique key for the button
-            on_click: Function to call when button is clicked
-            args: Arguments to pass to on_click
-            kwargs: Keyword arguments to pass to on_click
-            disabled: Whether the button is disabled
-            help: Tooltip text
-            label: Optional text label to display alongside the icon
+            icon: Icon (emoji or HTML).
+            key: Streamlit unique key.
+            on_click: Callback function for click event.
+            args: Arguments for callback.
+            kwargs: Keyword arguments for callback.
+            disabled: Disable state of button.
+            help: Tooltip text.
+            label: Optional text label.
+            **extra_kwargs: Additional keyword arguments.
         """
-        self.icon = icon
-        self.key = key
-        self.on_click = on_click
-        self.args = args
-        self.kwargs = kwargs or {}
-        self.disabled = disabled
-        self.help = help
-        self.label = label
-    
-    def render(self) -> bool:
-        """Render the icon button.
+        display_label = f"{icon} {label}" if label else icon
         
-        Returns:
-            True if the button was clicked, False otherwise
-        """
-        try:
-            # If we have a label, use it with the icon
-            display_label = f"{self.icon} {self.label}" if self.label else self.icon
-            
-            return st.button(
-                label=display_label,
-                key=self.key,
-                on_click=self.on_click,
-                args=self.args,
-                kwargs=self.kwargs,
-                disabled=self.disabled,
-                help=self.help
-            )
-        except Exception as e:
-            logger.error(f"Error rendering icon button '{self.icon}': {str(e)}")
-            # Fallback to basic button
-            return st.button("⚠️", key=self.key, disabled=True, 
-                            help="Error: Could not render button properly")
+        super().__init__(
+            label=display_label,
+            key=key,
+            on_click=on_click,
+            args=args,
+            kwargs=kwargs or {},
+            disabled=disabled,
+            help=help,
+            **extra_kwargs
+        )
