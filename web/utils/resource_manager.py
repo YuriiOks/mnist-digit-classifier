@@ -39,9 +39,38 @@ class ResourceManager:
         # Skip initialization if already done (singleton pattern)
         if self._initialized:
             return
-            
+                
         self._logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         self._project_root = project_root or self._detect_project_root()
+        
+        # Print debugging info if DEBUG_RESOURCES is set
+        if os.environ.get("DEBUG_RESOURCES") == "true":
+            self._logger.info(f"ResourceManager initialized with root: {self._project_root}")
+            self._logger.info(f"Checking for assets directory: {self._project_root / 'assets'}")
+            
+            # List CSS directories
+            css_dir = self._project_root / "assets" / "css"
+            if css_dir.exists():
+                self._logger.info(f"CSS directory exists: {css_dir}")
+                for subdir in ["components", "global", "themes", "views"]:
+                    path = css_dir / subdir
+                    if path.exists():
+                        self._logger.info(f"  - {subdir}/ ✓")
+                        # If components, check component directories
+                        if subdir == "components":
+                            for comp_dir in ["cards", "controls", "layout"]:
+                                comp_path = path / comp_dir
+                                if comp_path.exists():
+                                    self._logger.info(f"    - {comp_dir}/ ✓")
+                                    # List CSS files in each directory
+                                    for css_file in comp_path.glob("*.css"):
+                                        self._logger.info(f"      * {css_file.name}")
+                                else:
+                                    self._logger.warning(f"    - {comp_dir}/ ✗ MISSING")
+                    else:
+                        self._logger.warning(f"  - {subdir}/ ✗ MISSING")
+            else:
+                self._logger.warning(f"CSS directory NOT FOUND: {css_dir}")
         
 
         # Base directories for different resource types - relative to project root
@@ -80,16 +109,10 @@ class ResourceManager:
         return cwd
         
     def get_resource_path(self, resource_type: ResourceType, resource_path: str) -> Optional[Path]:
-        """
-        Get the full path to a resource.
+        """Get the full path to a resource with improved path resolution."""
+        # Log requested path for debugging
+        self._logger.debug(f"Resolving path for {resource_type.value}: {resource_path}")
         
-        Args:
-            resource_type: Type of resource (CSS, JS, etc.)
-            resource_path: Relative path to the resource
-            
-        Returns:
-            Full path to the resource, or None if not found
-        """
         # Handle absolute paths
         if Path(resource_path).is_absolute():
             return Path(resource_path) if Path(resource_path).exists() else None
@@ -97,27 +120,29 @@ class ResourceManager:
         # Strip leading slash if present
         resource_path = resource_path.lstrip("/")
         
-        # Paths to check (direct and with components/ prefix)
-        paths_to_check = [resource_path]
+        # Base directories to check based on resource type
+        base_dirs = self._BASE_DIRS[resource_type]
         
-        # Add a components/ prefix if not already there
-        if not resource_path.startswith("components/"):
-            paths_to_check.append(f"components/{resource_path}")
-        
-        # Check each base directory with each path variant
-        checked_paths = []
-        for base_dir in self._BASE_DIRS[resource_type]:
-            for path in paths_to_check:
-                full_path = self._project_root / base_dir / path
-                checked_paths.append(str(full_path))
+        # Iterate through base directories
+        for base_dir in base_dirs:
+            full_path = self._project_root / base_dir / resource_path
+            if full_path.exists():
+                return full_path
                 
-                if full_path.exists():
-                    self._logger.debug(f"Found resource at: {full_path}")
-                    return full_path
+            # If resource_type is CONFIG, also check DATA directories
+            if resource_type == ResourceType.CONFIG:
+                for data_dir in self._BASE_DIRS[ResourceType.DATA]:
+                    data_path = self._project_root / data_dir / resource_path
+                    if data_path.exists():
+                        return data_path
         
-        # If resource not found, log what was checked
-        self._logger.warning(f"Resource not found for {resource_type.value}: {resource_path}")
-        self._logger.debug(f"Checked paths: {checked_paths}")
+        # Check the direct path under project root as a last resort
+        direct_path = self._project_root / resource_path
+        if direct_path.exists():
+            return direct_path
+            
+        # Log the failure
+        self._logger.debug(f"Resource not found: {resource_type.value}/{resource_path}")
         return None
 
     def load_text_resource(self, resource_type: ResourceType, resource_path: str) -> Optional[str]:
@@ -138,58 +163,67 @@ class ResourceManager:
             return None
     
     def load_json_resource(self, resource_path: str) -> Optional[Any]:
-        """Load a JSON resource."""
-        # Handle theme files
-        if resource_path in ["light.json", "dark.json", "default.json"]:
-            resource_path = f"themes/{resource_path}"
+        """Load a JSON resource with improved path resolution."""
+        # Check if it's in config first
+        config_content = self.load_text_resource(ResourceType.CONFIG, resource_path)
         
-        # Try to load from CONFIG for theme files
-        content = self.load_text_resource(ResourceType.CONFIG, resource_path)
+        # If not found in config, try data directory
+        if config_content is None:
+            data_content = self.load_text_resource(ResourceType.DATA, resource_path)
+            if data_content:
+                try:
+                    return json.loads(data_content)
+                except json.JSONDecodeError as e:
+                    self._logger.error(f"Invalid JSON in data/{resource_path}: {str(e)}")
+                    return None
+        else:
+            try:
+                return json.loads(config_content)
+            except json.JSONDecodeError as e:
+                self._logger.error(f"Invalid JSON in config/{resource_path}: {str(e)}")
+                return None
+                
+        # If still not found, try with home/ prefix
+        if not resource_path.startswith("home/"):
+            home_path = f"home/{resource_path}"
+            return self.load_json_resource(home_path)
         
-        # If not found and it's not a theme file, try DATA
-        if content is None and "themes/" not in resource_path:
-            content = self.load_text_resource(ResourceType.DATA, resource_path)
-            
-        if content is None:
-            return None
-            
-        try:
-            # Parse JSON
-            data = json.loads(content)
-            return data
-        except json.JSONDecodeError as e:
-            self._logger.error(f"Invalid JSON in {resource_path}: {str(e)}")
-            return None
+        # Log failure and return None
+        self._logger.warning(f"JSON resource not found: {resource_path}")
+        return None
 
     def load_css(self, css_path: str) -> Optional[str]:
-        """Load a CSS file."""
-        # First try direct path
+        """Load a CSS file with robust path resolution for singular/plural variants."""
+        # Log requested path
+        self._logger.debug(f"Attempting to load CSS: {css_path}")
+        
+        # Try the original path first
         content = self.load_text_resource(ResourceType.CSS, css_path)
         if content:
             return content
         
-        # Try with plural/singular form correction (common issue in logs)
-        if css_path.endswith('s.css'):
-            alt_path = css_path[:-5] + '.css'  # cards.css -> card.css
-        elif css_path.endswith('.css') and not css_path.endswith('s.css'):
-            alt_path = css_path[:-4] + 's.css'  # card.css -> cards.css
-        else:
-            alt_path = None
-
-        if alt_path:
-            content = self.load_text_resource(ResourceType.CSS, alt_path)
-            if content:
-                return content
-
-        # Try in components directory if not already there
-        if not css_path.startswith("components/"):
-            components_path = f"components/{css_path}"
-            content = self.load_text_resource(ResourceType.CSS, components_path)
-            if content:
-                return content
+        # Try plural/singular variants
+        if css_path.endswith('.css'):
+            base_path = css_path[:-4]  # Remove .css extension
             
-        # Log what we tried with full paths
-        self._logger.warning(f"Failed to load CSS file: {css_path} (checked alternatives)")
+            # Try adding/removing 's' at the end
+            if base_path.endswith('s'):
+                # Try singular form
+                singular_path = f"{base_path[:-1]}.css"
+                content = self.load_text_resource(ResourceType.CSS, singular_path)
+                if content:
+                    self._logger.info(f"Found CSS using singular form: {singular_path}")
+                    return content
+            else:
+                # Try plural form
+                plural_path = f"{base_path}s.css"
+                content = self.load_text_resource(ResourceType.CSS, plural_path)
+                if content:
+                    self._logger.info(f"Found CSS using plural form: {plural_path}")
+                    return content
+        
+        # Log what we tried
+        self._logger.warning(f"Failed to load CSS file: {css_path} (tried singular/plural forms)")
         return None
 
     def load_template(self, template_path: str) -> Optional[str]:
@@ -291,5 +325,49 @@ class ResourceManager:
         except Exception as e:
             self._logger.error(f"Error loading theme file {exact_path}: {str(e)}")
             return None
+
+    def load_data_json(self, json_path: str) -> Optional[Dict[str, Any]]:
+        """Load a JSON file from the data directory with path variants."""
+        # First try as config file
+        data = self.load_json_resource(json_path)
+        if data:
+            self._logger.info(f"✅ Successfully loaded JSON from config: {json_path}")
+            return data
         
+        # Try data directory with "data/" prefix
+        if not json_path.startswith("data/"):
+            data_path = f"data/{json_path}"
+            data = self.load_json_resource(data_path)
+            if data:
+                self._logger.info(f"✅ Successfully loaded JSON from data: {data_path}")
+                return data
+        
+        # List available JSON files to help troubleshooting
+        data_dir = self._project_root / "assets/data"
+        if data_dir.exists():
+            self._logger.info("Available JSON files in data directory:")
+            for dirpath, _, filenames in os.walk(data_dir):
+                for filename in filenames:
+                    if filename.endswith('.json'):
+                        rel_path = os.path.relpath(os.path.join(dirpath, filename), data_dir)
+                        self._logger.info(f"  - {rel_path}")
+        
+        # If all attempts fail, create an empty fallback
+        self._logger.warning(f"Unable to load JSON: {json_path} - using fallback")
+        if "welcome_card" in json_path:
+            return {
+                "title": "MNIST Digit Classifier",
+                "icon": "👋",
+                "content": "Welcome to the MNIST Digit Classifier. Draw or upload a digit to get started."
+            }
+        elif "feature_cards" in json_path:
+            return [
+                {"title": "Draw", "icon": "✏️", "content": "Draw a digit from 0-9"},
+                {"title": "Upload", "icon": "📤", "content": "Upload an image"},
+                {"title": "Predict", "icon": "🔮", "content": "Get AI predictions"}
+            ]
+        
+        return {}
+
+
 resource_manager = ResourceManager()
