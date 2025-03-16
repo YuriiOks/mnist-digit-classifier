@@ -219,6 +219,9 @@ class ThemeManager:
         # Apply the new theme
         self.apply_theme(new_theme)
         
+        # Log the change
+        self._logger.info(f"Theme toggled from {current_theme} to {new_theme}")
+        
         return new_theme
     
     @AspectUtils.catch_errors
