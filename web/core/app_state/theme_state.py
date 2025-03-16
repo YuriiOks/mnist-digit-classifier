@@ -91,25 +91,26 @@ class ThemeState:
         }
 
         try:
-            # Load default config (fonts and settings)
-            default_config = resource_manager.load_json_resource("config/themes/default.json")
-
+            # Use the specific theme loading method that knows exactly where to look
+            default_config = resource_manager.load_theme_json("default.json")
+            light_config = resource_manager.load_theme_json("light.json")
+            dark_config = resource_manager.load_theme_json("dark.json")
+            
+            cls._logger.debug("Attempted to load theme files from assets/config/themes/")
+            
             if default_config:
+                cls._logger.debug("Successfully loaded default.json theme")
                 if "fonts" in default_config:
                     theme_config["fonts"].update(default_config["fonts"])
                 if "settings" in default_config:
                     theme_config["settings"].update(default_config["settings"])
 
-            # Load light theme colors
-            light_config = resource_manager.load_json_resource("config/themes/light.json")
-
             if light_config and "colors" in light_config:
+                cls._logger.debug("Successfully loaded light.json theme")
                 theme_config["colors"][cls.THEME_LIGHT] = light_config["colors"]
 
-            # Load dark theme colors
-            dark_config = resource_manager.load_json_resource("config/themes/dark.json")
-
             if dark_config and "colors" in dark_config:
+                cls._logger.debug("Successfully loaded dark.json theme")
                 theme_config["colors"][cls.THEME_DARK] = dark_config["colors"]
         except Exception as e:
             cls._logger.error(f"Error loading theme config: {e}")
@@ -121,6 +122,7 @@ class ThemeState:
             theme_config["colors"][cls.THEME_DARK] = cls.DEFAULT_COLORS[cls.THEME_DARK]
 
         return theme_config
+
 
     @classmethod
     @AspectUtils.catch_errors
