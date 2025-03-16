@@ -37,11 +37,11 @@ class ResourceManager:
     
     # Base directories for different resource types
     _BASE_DIRS = {
-        ResourceType.CSS: ["assets/css", "css", "assets/styles"],
-        ResourceType.JS: ["assets/js", "js", "assets/javascript"],
-        ResourceType.TEMPLATE: ["assets/templates", "templates", "views"],
+        ResourceType.CSS: ["assets/css", "css"],
+        ResourceType.JS: ["assets/js", "js"],
+        ResourceType.TEMPLATE: ["assets/templates", "templates"],
         ResourceType.DATA: ["assets/data", "data"],
-        ResourceType.IMAGE: ["assets/images", "images", "assets/img"],
+        ResourceType.IMAGE: ["assets/images", "images"],
         ResourceType.CONFIG: ["assets/config", "config"],
     }
     
