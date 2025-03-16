@@ -426,26 +426,137 @@ def render_draw_view():
                         st.success(f"Thank you! Recorded the correct digit as {i}.")
                         st.session_state.show_correction = False
 
+# def render_sidebar():
+#     """
+#     Render a unified sidebar with navigation and theme toggle.
+#     """
+#     from ui.theme.theme_manager import theme_manager
+#     from core.app_state.navigation_state import NavigationState
+#     import datetime
+    
+#     # Add at the beginning of render_sidebar()
+#     print("===== RENDERING SIDEBAR =====")
+#     # print(f"Theme Manager initialized: {theme_manager._initialized}")
+#     print(f"Current Theme: {theme_manager.get_current_theme()}")
+
+#     # # Add for BB8 toggle debugging
+#     print("===== BB8 TOGGLE DEBUG =====")
+#     from pathlib import Path
+#     bb8_css_path = Path("assets/css/components/controls/bb8-toggle.css")
+#     bb8_template_path = Path("assets/templates/components/controls/bb8-toggle.html")
+#     print(f"BB8 CSS Path exists: {bb8_css_path.exists()}")
+#     print(f"BB8 Template Path exists: {bb8_template_path.exists()}")
+
+#     # Render header
+#     st.sidebar.markdown(
+#         """
+#         <div class="sidebar-header">
+#             <div class="gradient-text">MNIST App</div>
+#             <div class="sidebar-subheader">Digit Classification AI</div>
+#         </div>
+#         """,
+#         unsafe_allow_html=True
+#     )
+    
+#     # Navigation items with proper styling
+#     nav_items = [
+#         {"id": "home", "label": "Home", "icon": "🏠"},
+#         {"id": "draw", "label": "Draw", "icon": "✏️"},
+#         {"id": "history", "label": "History", "icon": "📊"},
+#         {"id": "settings", "label": "Settings", "icon": "⚙️"}
+#     ]
+    
+#     # Get current view
+#     active_view = NavigationState.get_active_view()
+    
+#     # Add some spacing
+#     st.sidebar.markdown("<div style='height: 8px'></div>", unsafe_allow_html=True)
+    
+#     # Create navigation buttons with consistent styling
+#     for item in nav_items:
+#         if st.sidebar.button(
+#             f"{item['icon']} {item['label']}",
+#             key=f"nav_{item['id']}",
+#             type="primary" if active_view == item['id'] else "secondary",
+#             use_container_width=True
+#         ):
+#             NavigationState.set_active_view(item['id'])
+#             st.rerun()
+    
+#     # Add divider
+#     st.sidebar.markdown('<div class="divider"></div>', unsafe_allow_html=True)
+    
+#     # BB8 Toggle Container
+#     from ui.components.controls.bb8_toggle import BB8Toggle
+    
+#     # Use container with custom height to make room for BB8
+#     with st.sidebar.container():
+#         st.markdown("<div style='height: 14px'></div>", unsafe_allow_html=True)
+        
+#         # Centered container for BB8
+#         st.markdown('<div style="display: flex; justify-content: center;">', unsafe_allow_html=True)
+        
+#         # Create and display the BB8 toggle
+#         bb8_key = "sidebar_bb8_toggle"
+#         bb8_toggle = BB8Toggle(
+#             theme_manager_instance=theme_manager, 
+#             on_change=lambda theme: st.rerun(),
+#             key=bb8_key
+#         )
+#         toggle_result = bb8_toggle.display()
+
+#         print(f"BB8 Toggle Result: {toggle_result}")
+
+#         current_theme = theme_manager.get_current_theme()
+
+#         # Use the theme value from result
+        
+#         st.markdown('</div>', unsafe_allow_html=True)
+            
+#     # Add divider
+#     st.sidebar.markdown('<div class="divider"></div>', unsafe_allow_html=True)
+    
+#     # Add version in footer
+#     current_year = datetime.datetime.now().year
+#     version = "1.0.0"  # Can be fetched from a config
+    
+#     st.sidebar.markdown(
+#         f"""
+#         <div class="sidebar-footer">
+#             <p>Version {version}</p>
+#             <p>© {current_year} MNIST Classifier</p>
+#         </div>
+#         """,
+#         unsafe_allow_html=True
+#     )
+
+try:
+    from st_click_detector import click_detector
+except Exception as e:
+    st.error(f"Error importing st_click_detector: {e}")
+    # Fallback function if import fails
+    def click_detector(html):
+        st.markdown(html, unsafe_allow_html=True)
+        return None
+
 def render_sidebar():
-    """
-    Render a unified sidebar with navigation and theme toggle.
-    """
+    """Render the sidebar with BB8 toggle using click detector."""
     from ui.theme.theme_manager import theme_manager
-    from core.app_state.navigation_state import NavigationState
     import datetime
     
-    # Add at the beginning of render_sidebar()
+    # Import the click detector - handle import errors gracefully
+    try:
+        from st_click_detector import click_detector
+    except Exception as e:
+        print(f"Error importing click_detector: {e}")
+        # Fallback function if import fails
+        def click_detector(html):
+            st.markdown(html, unsafe_allow_html=True)
+            return None
+    
+    # Debug information
     print("===== RENDERING SIDEBAR =====")
-    # print(f"Theme Manager initialized: {theme_manager._initialized}")
     print(f"Current Theme: {theme_manager.get_current_theme()}")
-
-    # # Add for BB8 toggle debugging
-    print("===== BB8 TOGGLE DEBUG =====")
-    from pathlib import Path
-    bb8_css_path = Path("assets/css/components/controls/bb8-toggle.css")
-    bb8_template_path = Path("assets/templates/components/controls/bb8-toggle.html")
-    print(f"BB8 CSS Path exists: {bb8_css_path.exists()}")
-    print(f"BB8 Template Path exists: {bb8_template_path.exists()}")
 
     # Render header
     st.sidebar.markdown(
@@ -458,7 +569,7 @@ def render_sidebar():
         unsafe_allow_html=True
     )
     
-    # Navigation items with proper styling
+    # Navigation items
     nav_items = [
         {"id": "home", "label": "Home", "icon": "🏠"},
         {"id": "draw", "label": "Draw", "icon": "✏️"},
@@ -466,13 +577,10 @@ def render_sidebar():
         {"id": "settings", "label": "Settings", "icon": "⚙️"}
     ]
     
-    # Get current view
+    # Get current view and add navigation buttons
     active_view = NavigationState.get_active_view()
-    
-    # Add some spacing
     st.sidebar.markdown("<div style='height: 8px'></div>", unsafe_allow_html=True)
     
-    # Create navigation buttons with consistent styling
     for item in nav_items:
         if st.sidebar.button(
             f"{item['icon']} {item['label']}",
@@ -486,77 +594,92 @@ def render_sidebar():
     # Add divider
     st.sidebar.markdown('<div class="divider"></div>', unsafe_allow_html=True)
     
-    # BB8 Toggle Container
-    st.sidebar.markdown("<div style='padding: 0 1rem;'>", unsafe_allow_html=True)
+    # Load BB8 Toggle CSS first
+    bb8_css = resource_manager.load_css("components/controls/bb8-toggle.css")
+    if bb8_css:
+        st.markdown(f"<style>{bb8_css}</style>", unsafe_allow_html=True)
+    
+    # BB8 Toggle container
+    with st.sidebar.container():
+        st.markdown("<div style='height: 14px'></div>", unsafe_allow_html=True)
+        
+        # Prepare BB8 toggle HTML with data-name attributes
+        is_dark = theme_manager.is_dark_mode()
+        checkbox_state = "checked" if is_dark else ""
 
-    # Try to use the BB8 toggle with fallback to simple toggle
-    try:
         from ui.components.controls.bb8_toggle import BB8Toggle
         
-        # Load BB8 CSS explicitly first
-        bb8_css = resource_manager.load_css("components/controls/bb8-toggle.css")
-        if bb8_css:
-            resource_manager.inject_css(bb8_css)
-        
-        # Use container with custom height to make room for BB8
-        with st.sidebar.container():
-            st.markdown("<div style='height: 14px'></div>", unsafe_allow_html=True)
-            
-            # Centered container for BB8
-            st.markdown('<div style="display: flex; justify-content: center;">', unsafe_allow_html=True)
-            
-            # Create and display the BB8 toggle
-            bb8_key = "sidebar_bb8_toggle"
-            bb8_toggle = BB8Toggle(
-                theme_manager_instance=theme_manager, 
-                on_change=lambda theme: st.rerun(),
-                key=bb8_key
-            )
-            toggle_result = bb8_toggle.display()
-            
-            st.markdown('</div>', unsafe_allow_html=True)
-            
-            # Show current theme below toggle
-            current_theme = theme_manager.get_current_theme()
-            st.markdown(
-                f'<div style="text-align: center; font-size: 0.8rem; margin-top: 4px;">{current_theme.capitalize()} Mode</div>',
-                unsafe_allow_html=True
-            )
-            
-            # Debug info
-            if st.session_state.get("debug_mode", False):
-                st.write(f"Toggle result: {toggle_result}")
-                st.write(f"Session state: {dict([(k, v) for k, v in st.session_state.items() if 'bb8' in str(k) or 'theme' in str(k)])}")
+        # The key here is adding data-name attributes to clickable elements
+        # Create and display the BB8 toggle
+        bb8_key = "sidebar_bb8_toggle"
+        bb8_toggle = BB8Toggle(
+            theme_manager_instance=theme_manager, 
+            on_change=lambda theme: st.rerun(),
+            key=bb8_key
+        )
 
-    except Exception as e:
-        # Fallback to simple toggle if BB8 fails
-        st.sidebar.error(f"Could not load BB8 toggle: {str(e)}")
-        st.sidebar.markdown("<div style='height: 10px'></div>", unsafe_allow_html=True)
+        bb8_toggle.display()
         
-        # Simple theme toggle - horizontally centered
-        col1, col2, col3 = st.sidebar.columns([1, 3, 1])
-        with col2:
-            current_theme = theme_manager.get_current_theme()
-            if st.toggle(
-                f"{'☀️' if current_theme == 'light' else '🔆'} Light / Dark {'🌙' if current_theme == 'dark' else '🌑'}", 
-                value=(current_theme == "dark"),
-                key="theme_toggle_fallback"
-            ):
-                theme_manager.apply_theme("dark")
-            else:
-                theme_manager.apply_theme("light")
-            
-            # Add theme change rerun logic
-            if st.session_state.get("prev_theme") != current_theme:
-                st.session_state["prev_theme"] = current_theme
+        bb8_html = f"""
+        <div style="display: flex; justify-content: center;">
+            <label class="bb8-toggle">
+                <input class="bb8-toggle__checkbox" type="checkbox" {checkbox_state} data-name="bb8-checkbox">
+                <div class="bb8-toggle__container" data-name="bb8-container">
+                  <div class="bb8-toggle__scenery">
+                    <div class="bb8-toggle__star"></div>
+                    <div class="bb8-toggle__star"></div>
+                    <div class="bb8-toggle__star"></div>
+                    <div class="bb8-toggle__star"></div>
+                    <div class="bb8-toggle__star"></div>
+                    <div class="bb8-toggle__star"></div>
+                    <div class="bb8-toggle__star"></div>
+                    <div class="tatto-1"></div>
+                    <div class="tatto-2"></div>
+                    <div class="gomrassen"></div>
+                    <div class="hermes"></div>
+                    <div class="chenini"></div>
+                    <div class="bb8-toggle__cloud"></div>
+                    <div class="bb8-toggle__cloud"></div>
+                    <div class="bb8-toggle__cloud"></div>
+                  </div>
+                  <div class="bb8">
+                    <div class="bb8__head-container">
+                      <div class="bb8__antenna"></div>
+                      <div class="bb8__antenna"></div>
+                      <div class="bb8__head"></div>
+                    </div>
+                    <div class="bb8__body"></div>
+                  </div>
+                  <div class="artificial__hidden">
+                    <div class="bb8__shadow"></div>
+                  </div>
+                </div>
+            </label>
+        </div>
+        """
+        
+        # Use click detector with the BB8 toggle HTML
+        try:
+            clicked = click_detector(bb8_html, key="bb8_click_detector")
+            print(clicked)
+            # Check if the toggle was clicked
+            if clicked == "bb8-toggle-input":
+                print(f"BB8 toggle clicked! Current theme: {theme_manager.get_current_theme()}")
+                # Toggle the theme
+                new_theme = "light" if is_dark else "dark"
+                theme_manager.apply_theme(new_theme)
                 st.rerun()
-
+        except Exception as e:
+            print(f"Error with click detector: {e}")
+            # Fallback to just showing the BB8 toggle without click functionality
+            st.markdown(bb8_html, unsafe_allow_html=True)
+            
     # Add divider
     st.sidebar.markdown('<div class="divider"></div>', unsafe_allow_html=True)
     
-    # Add version in footer
+    # Footer
     current_year = datetime.datetime.now().year
-    version = "1.0.0"  # Can be fetched from a config
+    version = "1.0.0"
     
     st.sidebar.markdown(
         f"""
@@ -567,6 +690,7 @@ def render_sidebar():
         """,
         unsafe_allow_html=True
     )
+
 
 def find_files(base_dir, extension):
     """Find all files with given extension."""
@@ -710,21 +834,6 @@ def render_settings_view():
                 </div>
             </div>
             """, unsafe_allow_html=True)
-        
-        # Animation settings
-        st.markdown("<h4>UI Effects</h4>", unsafe_allow_html=True)
-        
-        animations_enabled = SettingsState.get_setting("theme", "enable_animations", True)
-        if st.toggle("Enable animations", value=animations_enabled, key="animations_toggle"):
-            if not animations_enabled:  # Only update if changed
-                SettingsState.set_setting("theme", "enable_animations", True)
-                # Apply animation CSS
-                st.markdown("<style>.animate-fade-in{animation:fadeIn 0.5s ease-out}</style>", unsafe_allow_html=True)
-        else:
-            if animations_enabled:  # Only update if changed
-                SettingsState.set_setting("theme", "enable_animations", False)
-                # Disable animations
-                st.markdown("<style>.animate-fade-in{animation:none}</style>", unsafe_allow_html=True)
         
         # Font settings
         st.markdown("<h4>Typography</h4>", unsafe_allow_html=True)
