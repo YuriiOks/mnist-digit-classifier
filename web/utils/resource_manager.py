@@ -43,6 +43,7 @@ class ResourceManager:
         self._logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         self._project_root = project_root or self._detect_project_root()
         
+
         # Base directories for different resource types - relative to project root
         self._BASE_DIRS = {
             ResourceType.CSS: ["assets/css"],
@@ -75,6 +76,7 @@ class ResourceManager:
         # Otherwise use current directory
         cwd = Path.cwd()
         self._logger.debug(f"Using current directory as root: {cwd}")
+
         return cwd
         
     def get_resource_path(self, resource_type: ResourceType, resource_path: str) -> Optional[Path]:
@@ -95,22 +97,26 @@ class ResourceManager:
         # Strip leading slash if present
         resource_path = resource_path.lstrip("/")
         
-        self._logger.debug(f"Looking for {resource_type.value} resource: {resource_path}")
+        # Paths to check (direct and with components/ prefix)
+        paths_to_check = [resource_path]
         
-        # Try each base directory for this resource type
+        # Add a components/ prefix if not already there
+        if not resource_path.startswith("components/"):
+            paths_to_check.append(f"components/{resource_path}")
+        
+        # Check each base directory with each path variant
         checked_paths = []
         for base_dir in self._BASE_DIRS[resource_type]:
-            # Try direct path
-            full_path = self._project_root / base_dir / resource_path
-            checked_paths.append(str(full_path))
-            self._logger.debug(f"Checking path: {full_path}")
-            
-            if full_path.exists():
-                self._logger.debug(f"Found resource at: {full_path}")
-                return full_path
+            for path in paths_to_check:
+                full_path = self._project_root / base_dir / path
+                checked_paths.append(str(full_path))
+                
+                if full_path.exists():
+                    self._logger.debug(f"Found resource at: {full_path}")
+                    return full_path
         
-        # If resource not found, log all the paths we checked
-        self._logger.warning(f"Resource not found: {resource_type.value}/{resource_path}")
+        # If resource not found, log what was checked
+        self._logger.warning(f"Resource not found for {resource_type.value}: {resource_path}")
         self._logger.debug(f"Checked paths: {checked_paths}")
         return None
 
@@ -154,67 +160,62 @@ class ResourceManager:
         except json.JSONDecodeError as e:
             self._logger.error(f"Invalid JSON in {resource_path}: {str(e)}")
             return None
-    
+
     def load_css(self, css_path: str) -> Optional[str]:
         """Load a CSS file."""
         # First try direct path
         content = self.load_text_resource(ResourceType.CSS, css_path)
-        self._logger.debug(f"Attempting to load CSS: {css_path}")
-
         if content:
             return content
-            
-        # Try in components directory
+        
+        # Try with plural/singular form correction (common issue in logs)
+        if css_path.endswith('s.css'):
+            alt_path = css_path[:-5] + '.css'  # cards.css -> card.css
+        elif css_path.endswith('.css') and not css_path.endswith('s.css'):
+            alt_path = css_path[:-4] + 's.css'  # card.css -> cards.css
+        else:
+            alt_path = None
+
+        if alt_path:
+            content = self.load_text_resource(ResourceType.CSS, alt_path)
+            if content:
+                return content
+
+        # Try in components directory if not already there
         if not css_path.startswith("components/"):
-            component_path = f"components/{css_path}"
-            content = self.load_text_resource(ResourceType.CSS, component_path)
+            components_path = f"components/{css_path}"
+            content = self.load_text_resource(ResourceType.CSS, components_path)
             if content:
                 return content
-        
-        # Try in global directory
-        if not css_path.startswith("global/"):
-            global_path = f"global/{css_path}"
-            content = self.load_text_resource(ResourceType.CSS, global_path)
-            if content:
-                return content
-        
-        # Try in themes directory
-        if not css_path.startswith("themes/"):
-            themes_path = f"themes/{css_path}"
-            content = self.load_text_resource(ResourceType.CSS, themes_path)
-            if content:
-                return content
-                
-        # Try in views directory
-        if not css_path.startswith("views/"):
-            views_path = f"views/{css_path}"
-            content = self.load_text_resource(ResourceType.CSS, views_path)
-            if content:
-                return content
-        
+            
+        # Log what we tried with full paths
+        self._logger.warning(f"Failed to load CSS file: {css_path} (checked alternatives)")
         return None
-    
+
     def load_template(self, template_path: str) -> Optional[str]:
         """Load a template file."""
         # First try direct path
         content = self.load_text_resource(ResourceType.TEMPLATE, template_path)
         if content:
             return content
-            
-        # Try in components directory
+        
+        # Try with components prefix if not already there
         if not template_path.startswith("components/"):
-            component_path = f"components/{template_path}"
-            content = self.load_text_resource(ResourceType.TEMPLATE, component_path)
+            components_path = f"components/{template_path}"
+            content = self.load_text_resource(ResourceType.TEMPLATE, components_path)
             if content:
                 return content
         
-        # Try in home directory
-        if not template_path.startswith("home/"):
-            home_path = f"home/{template_path}"
-            content = self.load_text_resource(ResourceType.TEMPLATE, home_path)
-            if content:
-                return content
-        
+        # Try with alternate card names based on context
+        if "card.html" in template_path:
+            # Try specific card templates
+            for card_type in ["feature_card.html", "welcome_card.html"]:
+                alt_path = template_path.replace("card.html", card_type)
+                content = self.load_text_resource(ResourceType.TEMPLATE, alt_path)
+                if content:
+                    return content
+
+        self._logger.warning(f"Failed to load template: {template_path} (checked alternatives)")
         return None
 
     def render_template(self, template_path: str, context: Dict[str, Any]) -> Optional[str]:
