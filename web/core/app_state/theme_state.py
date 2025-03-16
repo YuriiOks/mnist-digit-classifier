@@ -2,21 +2,21 @@
 # Copyright (c) 2025
 # File: core/app_state/theme_state.py
 # Description: Theme-specific state management
-# Created: 2024-05-01
+# Created: 2025-03-16
 
 import logging
 from typing import Dict, Any, Literal, Optional
 
 from core.app_state.session_state import SessionState
-from core.app_state.settings_state import SettingsState
-from utils.file.file_loader import load_json_file, FileLoadError
 from utils.aspects import AspectUtils
+from utils.resource_manager import resource_manager
 
 logger = logging.getLogger(__name__)
 
 
 class ThemeState:
-    """Theme-specific state management.
+    """
+    Theme-specific state management.
 
     This class provides themed state management for the application,
     handling theme switching, color schemes, and related settings.
@@ -33,18 +33,12 @@ class ThemeState:
     THEME_LIGHT = "light"
     THEME_DARK = "dark"
 
-    # Theme configuration paths
-    CONFIG_PATH = "assets/config/themes"
-    DEFAULT_CONFIG_FILE = f"{CONFIG_PATH}/default.json"
-    LIGHT_CONFIG_FILE = f"{CONFIG_PATH}/light.json"
-    DARK_CONFIG_FILE = f"{CONFIG_PATH}/dark.json"
-
-    # Default theme settings (fallbacks if config files not available)
+    # Default theme settings
     DEFAULT_THEME = THEME_LIGHT
     DEFAULT_COLORS = {
         THEME_LIGHT: {
-            "primary": "#5B5BF9",
-            "secondary": "#2AB7CA",
+            "primary": "#4361ee",
+            "secondary": "#4cc9f0",
             "background": "#FFFFFF",
             "surface": "#F5F5F5",
             "text": "#333333",
@@ -84,7 +78,8 @@ class ThemeState:
     @AspectUtils.catch_errors
     @AspectUtils.log_method
     def _load_theme_config(cls) -> Dict[str, Any]:
-        """Load theme configurations from JSON files.
+        """
+        Load theme configurations from JSON files.
 
         Returns:
             Dict containing the theme configurations.
@@ -97,43 +92,32 @@ class ThemeState:
 
         try:
             # Load default config (fonts and settings)
-            default_config = load_json_file(cls.DEFAULT_CONFIG_FILE)
-            if "fonts" in default_config:
-                theme_config["fonts"].update(default_config["fonts"])
-            if "settings" in default_config:
-                theme_config["settings"].update(default_config["settings"])
+            default_config = resource_manager.load_json_resource("themes/default.json")
+            if default_config:
+                if "fonts" in default_config:
+                    theme_config["fonts"].update(default_config["fonts"])
+                if "settings" in default_config:
+                    theme_config["settings"].update(default_config["settings"])
 
             # Load light theme colors
-            light_config = load_json_file(cls.LIGHT_CONFIG_FILE)
-            if "colors" in light_config:
+            light_config = resource_manager.load_json_resource("themes/light.json")
+            if light_config and "colors" in light_config:
                 theme_config["colors"][cls.THEME_LIGHT] = light_config["colors"]
 
             # Load dark theme colors
-            dark_config = load_json_file(cls.DARK_CONFIG_FILE)
-            if "colors" in dark_config:
+            dark_config = resource_manager.load_json_resource("themes/dark.json")
+            if dark_config and "colors" in dark_config:
                 theme_config["colors"][cls.THEME_DARK] = dark_config["colors"]
-        except FileLoadError:
-            # Ensure we have fallback values for colors
-            if cls.THEME_LIGHT not in theme_config["colors"]:
-                theme_config["colors"][cls.THEME_LIGHT] = \
-                    cls.DEFAULT_COLORS[cls.THEME_LIGHT]
-            if cls.THEME_DARK not in theme_config["colors"]:
-                theme_config["colors"][cls.THEME_DARK] = \
-                    cls.DEFAULT_COLORS[cls.THEME_DARK]
+        except Exception as e:
+            cls._logger.error(f"Error loading theme config: {e}")
+            
+        # Ensure we have fallback values for colors
+        if cls.THEME_LIGHT not in theme_config["colors"]:
+            theme_config["colors"][cls.THEME_LIGHT] = cls.DEFAULT_COLORS[cls.THEME_LIGHT]
+        if cls.THEME_DARK not in theme_config["colors"]:
+            theme_config["colors"][cls.THEME_DARK] = cls.DEFAULT_COLORS[cls.THEME_DARK]
 
         return theme_config
-
-    @classmethod
-    @AspectUtils.catch_errors
-    @AspectUtils.log_method
-    def reload_theme_config(cls) -> None:
-        """Reload theme configurations from JSON files."""
-        config = cls._load_theme_config()
-
-        # Update session state with new configurations
-        SessionState.set(cls.THEME_COLORS_KEY, config["colors"])
-        SessionState.set(cls.THEME_FONTS_KEY, config["fonts"])
-        SessionState.set(cls.THEME_SETTINGS_KEY, config["settings"])
 
     @classmethod
     @AspectUtils.catch_errors
@@ -162,7 +146,8 @@ class ThemeState:
             if not SessionState.has_key(cls.THEME_SETTINGS_KEY):
                 settings = theme_config.get("settings", cls.DEFAULT_SETTINGS)
                 SessionState.set(cls.THEME_SETTINGS_KEY, settings)
-        except Exception:
+        except Exception as e:
+            cls._logger.error(f"Error initializing theme state: {e}")
             # Fallback defaults
             if not SessionState.has_key(cls.CURRENT_THEME_KEY):
                 SessionState.set(cls.CURRENT_THEME_KEY, cls.DEFAULT_THEME)
@@ -177,56 +162,54 @@ class ThemeState:
     @AspectUtils.catch_errors
     @AspectUtils.log_method
     def get_current_theme(cls) -> str:
-        """Get the current theme.
+        """
+        Get the current theme.
 
         Returns:
             str: The current theme (e.g., "light", "dark").
         """
+        cls.initialize()
         return SessionState.get(cls.CURRENT_THEME_KEY, cls.DEFAULT_THEME)
 
     @classmethod
     @AspectUtils.catch_errors
     @AspectUtils.log_method
     def set_theme(cls, theme: str) -> None:
-        """Set the current theme.
+        """
+        Set the current theme.
 
         Args:
             theme: The theme to set (e.g., "light", "dark").
         """
-        try:
-            cls.initialize()
+        cls.initialize()
 
-            # Validate theme
-            if theme not in [cls.THEME_LIGHT, cls.THEME_DARK]:
-                theme = cls.DEFAULT_THEME
+        # Validate theme
+        if theme not in [cls.THEME_LIGHT, cls.THEME_DARK]:
+            theme = cls.DEFAULT_THEME
 
-            SessionState.set(cls.CURRENT_THEME_KEY, theme)
-        except Exception:
-            raise
+        SessionState.set(cls.CURRENT_THEME_KEY, theme)
 
     @classmethod
     @AspectUtils.catch_errors
     @AspectUtils.log_method
     def toggle_theme(cls) -> str:
-        """Toggle between light and dark themes.
+        """
+        Toggle between light and dark themes.
 
         Returns:
             str: The new theme after toggling.
         """
-        try:
-            current = cls.get_current_theme()
-            new_theme = cls.THEME_DARK if current == cls.THEME_LIGHT else \
-                cls.THEME_LIGHT
-            cls.set_theme(new_theme)
-            return new_theme
-        except Exception:
-            return cls.get_current_theme()  # Return current theme on error
+        current = cls.get_current_theme()
+        new_theme = cls.THEME_DARK if current == cls.THEME_LIGHT else cls.THEME_LIGHT
+        cls.set_theme(new_theme)
+        return new_theme
 
     @classmethod
     @AspectUtils.catch_errors
     @AspectUtils.log_method
     def is_dark_mode(cls) -> bool:
-        """Check if dark mode is active.
+        """
+        Check if dark mode is active.
 
         Returns:
             bool: True if dark mode is active, False otherwise.
@@ -237,7 +220,8 @@ class ThemeState:
     @AspectUtils.catch_errors
     @AspectUtils.log_method
     def get_color(cls, color_name: str) -> str:
-        """Get a color for the current theme.
+        """
+        Get a color for the current theme.
 
         Args:
             color_name: Name of the color to retrieve.
@@ -255,7 +239,8 @@ class ThemeState:
     @AspectUtils.catch_errors
     @AspectUtils.log_method
     def get_all_colors(cls) -> Dict[str, str]:
-        """Get all colors for the current theme.
+        """
+        Get all colors for the current theme.
 
         Returns:
             Dict[str, str]: Dictionary of color names and values.
@@ -267,52 +252,9 @@ class ThemeState:
     @classmethod
     @AspectUtils.catch_errors
     @AspectUtils.log_method
-    def get_font(cls, font_name: str) -> str:
-        """Get a font.
-
-        Args:
-            font_name: Name of the font to retrieve.
-
-        Returns:
-            str: The font value.
-        """
-        fonts = SessionState.get(cls.THEME_FONTS_KEY, cls.DEFAULT_FONTS)
-        return fonts.get(font_name, "system-ui, sans-serif")
-
-    @classmethod
-    @AspectUtils.catch_errors
-    @AspectUtils.log_method
-    def get_theme_setting(cls, setting_name: str) -> Any:
-        """Get a theme setting.
-
-        Args:
-            setting_name: Name of the setting to retrieve.
-
-        Returns:
-            Any: The setting value.
-        """
-        settings = SessionState.get(cls.THEME_SETTINGS_KEY, cls.DEFAULT_SETTINGS)
-        return settings.get(setting_name, None)
-
-    @classmethod
-    @AspectUtils.catch_errors
-    @AspectUtils.log_method
-    def update_theme_setting(cls, setting_name: str, value: Any) -> None:
-        """Update a theme setting.
-
-        Args:
-            setting_name: Name of the setting to update.
-            value: New value for the setting.
-        """
-        settings = SessionState.get(cls.THEME_SETTINGS_KEY, cls.DEFAULT_SETTINGS)
-        settings[setting_name] = value
-        SessionState.set(cls.THEME_SETTINGS_KEY, settings)
-
-    @classmethod
-    @AspectUtils.catch_errors
-    @AspectUtils.log_method
     def get_css_variables(cls) -> str:
-        """Get CSS variables for the current theme.
+        """
+        Get CSS variables for the current theme.
 
         Returns:
             str: CSS variable definitions.
@@ -340,87 +282,3 @@ class ThemeState:
 
         css_vars.append("}")
         return "\n".join(css_vars)
-
-    @classmethod
-    @AspectUtils.catch_errors
-    @AspectUtils.log_method
-    def use_system_preference(cls, preference: str) -> None:
-        """Apply system preference for theme.
-
-        Args:
-            preference: System preference ('light' or 'dark')
-        """
-        # Only apply if it's a valid theme option
-        if preference in ["light", "dark"]:
-            cls.set_theme(preference) 
-
-    @classmethod
-    @AspectUtils.catch_errors
-    @AspectUtils.log_method
-    def get_theme(cls) -> str:
-        """Get the current theme. Alias for get_current_theme().
-
-        Returns:
-            str: The current theme (e.g., "light", "dark").
-        """
-        return cls.get_current_theme()
-
-    @classmethod
-    @AspectUtils.catch_errors
-    @AspectUtils.log_method
-    def is_initialized(cls) -> bool:
-        """Check if the theme state has been initialized.
-
-        Returns:
-            bool: True if the theme state has been initialized, False otherwise.
-        """
-        return SessionState.has_key(cls.CURRENT_THEME_KEY)
-
-    @classmethod
-    @AspectUtils.catch_errors
-    @AspectUtils.log_method
-    def get_theme_mode(cls) -> str:
-        """Get the current theme mode.
-
-        Returns:
-            Current theme mode (light or dark)
-        """
-        cls.initialize()
-        return SessionState.get(cls.CURRENT_THEME_KEY, cls.DEFAULT_THEME)
-
-    @classmethod
-    @AspectUtils.catch_errors
-    @AspectUtils.log_method
-    def set_theme_mode(cls, mode: str) -> None:
-        """Set the theme mode.
-
-        Args:
-            mode: Theme mode to set (light or dark)
-        """
-        # Validate mode
-        if mode not in [cls.THEME_LIGHT, cls.THEME_DARK]:
-            mode = cls.DEFAULT_THEME
-
-        # Set theme mode
-        SessionState.set(cls.CURRENT_THEME_KEY, mode)
-
-        # Update settings if available
-        try:
-            SettingsState.set_setting("theme", "mode", mode)
-        except Exception:
-            pass
-
-    @classmethod
-    @AspectUtils.catch_errors
-    @AspectUtils.log_method
-    def toggle_theme_mode(cls) -> str:
-        """Toggle between light and dark theme modes.
-
-        Returns:
-            New theme mode after toggle
-        """
-        current_mode = cls.get_theme_mode()
-        new_mode = cls.THEME_DARK if current_mode == cls.THEME_LIGHT else \
-            cls.THEME_LIGHT
-        cls.set_theme_mode(new_mode)
-        return new_mode
