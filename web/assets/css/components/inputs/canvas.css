@@ -1,0 +1,8 @@
+/* Canvas component styling */
+.canvas-area {
+    background-color: var(--color-card);
+    border: 2px solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    margin-bottom: var(--spacing-md);
+    box-shadow: var(--shadow-md);
+  }
