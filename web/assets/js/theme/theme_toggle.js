@@ -15,9 +15,15 @@
     // Set data-theme attribute on html element
     document.documentElement.setAttribute('data-theme', theme);
     
-    // Update any theme toggles on the page
-    const toggles = document.querySelectorAll('.theme-toggle input[type="checkbox"]');
-    toggles.forEach(toggle => {
+    // Update standard theme toggles
+    const standardToggles = document.querySelectorAll('.theme-toggle input[type="checkbox"]');
+    standardToggles.forEach(toggle => {
+      toggle.checked = theme === 'dark';
+    });
+    
+    // Update BB8 toggles as well
+    const bb8Toggles = document.querySelectorAll('.bb8-toggle__checkbox');
+    bb8Toggles.forEach(toggle => {
       toggle.checked = theme === 'dark';
     });
     
@@ -60,7 +66,18 @@
    * Initialize theme toggle UI elements
    */
   function initializeThemeToggles() {
-    // Find all theme toggle elements
+    // Initialize standard theme toggles
+    initializeStandardToggles();
+    
+    // Initialize BB8 toggles
+    initializeBB8Toggles();
+  }
+  
+  /**
+   * Initialize standard theme toggle elements
+   */
+  function initializeStandardToggles() {
+    // Find all standard theme toggle elements
     const toggles = document.querySelectorAll('.theme-toggle input[type="checkbox"]');
     
     // Set initial state based on current theme
@@ -73,17 +90,54 @@
         const newTheme = e.target.checked ? 'dark' : 'light';
         
         // This will trigger Streamlit rerun with new theme
-        if (window.Streamlit) {
+        if (window.parent && window.parent.postMessage) {
           // Use Streamlit's communication mechanism
           const toggleData = {
             toggled: newTheme === 'dark',
             theme: newTheme
           };
-          window.Streamlit.setComponentValue(toggleData);
+          window.parent.postMessage({
+            type: 'streamlit:setComponentValue',
+            value: toggleData
+          }, '*');
         }
         
         // Apply theme changes immediately for better UX
         window.applyTheme(newTheme);
+      });
+    });
+  }
+  
+  /**
+   * Initialize BB8 toggle for theme switching
+   */
+  function initializeBB8Toggles() {
+    // Find all BB8 toggle checkboxes
+    const toggles = document.querySelectorAll('.bb8-toggle__checkbox');
+    if (!toggles.length) return;
+    
+    // Set initial state based on current theme
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+    toggles.forEach(toggle => {
+      toggle.checked = currentTheme === 'dark';
+      
+      // Add event listener to each toggle
+      toggle.addEventListener('change', function(e) {
+        const newTheme = e.target.checked ? 'dark' : 'light';
+        
+        // Apply theme changes visually
+        window.applyTheme(newTheme);
+        
+        // Communicate with Streamlit if available
+        if (window.parent && window.parent.postMessage) {
+          window.parent.postMessage({
+            type: 'streamlit:setComponentValue',
+            value: {
+              theme: newTheme,
+              bb8_toggle_checkbox: e.target.checked
+            }
+          }, '*');
+        }
       });
     });
   }
@@ -100,5 +154,12 @@
     window.Streamlit.addEventListener('streamlit:render', function() {
       initializeThemeToggles();
     });
+  } else {
+    // For non-Streamlit environments or before Streamlit is ready
+    window.addEventListener('message', function(e) {
+      if (e.data && e.data.type === 'streamlit:render') {
+        setTimeout(initializeThemeToggles, 100);
+      }
+    });
   }
-})(); 
+})();
