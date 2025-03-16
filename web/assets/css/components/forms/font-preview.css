@@ -1,0 +1,24 @@
+/* Font preview component */
+.font-preview {
+    padding: var(--spacing-md);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-sm);
+    margin-top: var(--spacing-md);
+  }
+  
+  .font-preview-title {
+    font-weight: 600;
+    margin-bottom: var(--spacing-sm);
+  }
+  
+  .font-preview-text {
+    font-size: var(--font-size-lg);
+  }
+  
+  .font-preview-sizes {
+    margin-top: var(--spacing-md);
+  }
+  
+  .font-size-example {
+    margin-bottom: var(--spacing-sm);
+  }
