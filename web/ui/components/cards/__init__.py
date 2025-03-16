@@ -2,8 +2,14 @@
 # Copyright (c) 2025
 # File: ui/components/cards/__init__.py
 # Description: Card components package initialization
-# Created: 2024-05-01
+# Created: 2025-03-16
 
-# Import card components for easier access
-from ui.components.cards.card import Card
+"""Card components for the MNIST Digit Classifier."""
 
+from ui.components.cards.card import Card, FeatureCard, WelcomeCard
+
+__all__ = [
+    "Card",
+    "FeatureCard",
+    "WelcomeCard"
+]
