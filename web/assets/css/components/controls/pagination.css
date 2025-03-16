@@ -1,0 +1,19 @@
+/* Pagination component */
+.pagination-button {
+    background-color: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-sm);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .pagination-button:hover {
+    background-color: var(--color-highlight);
+  }
+  
+  .pagination-button.active {
+    background-color: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+  }
