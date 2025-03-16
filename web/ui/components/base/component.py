@@ -195,10 +195,13 @@ class Component(ABC, Generic[T]):
             
             # Replace variables
             for key, value in full_context.items():
-                # Both modern {{var}} and traditional ${VAR} formats
-                rendered = rendered.replace(f"{{{{{key}}}}}", str(value))
+                key = key.lower()
+                key = "{" + key + "}"
+                print(f"key: {key}, value: {value}")
+                rendered = rendered.replace(key, str(value))   # double curly braces
                 rendered = rendered.replace(f"${{{key.upper()}}}", str(value))
                 
+            print(rendered)
             return rendered
         except Exception as e:
             self._logger.error(f"Template rendering error: {str(e)}")
