@@ -1,7 +1,14 @@
 # MNIST Digit Classifier
 # Copyright (c) 2025
 # File: ui/theme/__init__.py
-# Description: Theme management initialization
-# Created: 2024-05-01
+# Description: Theme components package initialization
+# Created: 2025-03-16
 
-from ui.theme.theme_manager import ThemeManager 
+"""Theme components for the MNIST Digit Classifier."""
+
+from ui.theme.theme_manager import ThemeManager, theme_manager
+
+__all__ = [
+    "ThemeManager",
+    "theme_manager"
+]
