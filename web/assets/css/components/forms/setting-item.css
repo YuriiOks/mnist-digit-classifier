@@ -1,0 +1,33 @@
+/* Individual setting component */
+.setting-item {
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .setting-label {
+    font-weight: 600;
+    margin-bottom: var(--spacing-xs);
+    display: block;
+  }
+  
+  .setting-description {
+    color: var(--color-text-light);
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--spacing-sm);
+  }
+  
+  .setting-control {
+    width: 100%;
+  }
+  
+  /* Setting groups */
+  .setting-group {
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-sm);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .setting-group-title {
+    font-weight: 600;
+    margin-bottom: var(--spacing-sm);
+  }
