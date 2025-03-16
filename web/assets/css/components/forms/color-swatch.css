@@ -1,0 +1,40 @@
+/* Color swatch components */
+.color-swatch {
+    height: 60px;
+    border-radius: var(--border-radius-sm);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: var(--spacing-xs);
+    color: white;
+    font-size: var(--font-size-xs);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  }
+  
+  .primary-swatch {
+    background-color: var(--color-primary);
+  }
+  
+  .secondary-swatch {
+    background-color: var(--color-secondary);
+  }
+  
+  .accent-swatch {
+    background-color: var(--color-accent);
+  }
+  
+  .success-swatch {
+    background-color: var(--color-success);
+  }
+  
+  .warning-swatch {
+    background-color: var(--color-warning);
+  }
+  
+  .error-swatch {
+    background-color: var(--color-error);
+  }
+  
+  .info-swatch {
+    background-color: var(--color-info);
+  }
