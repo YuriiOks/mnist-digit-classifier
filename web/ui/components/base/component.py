@@ -143,7 +143,7 @@ class Component(ABC, Generic[T]):
             Template content as string, or None if loading failed.
         """
         return resource_manager.load_template(template_path)
-    
+
     def render_template(self, template_path: str, context: Optional[Dict[str, Any]] = None) -> Optional[str]:
         """
         Load and render a template with variable substitution.
@@ -161,28 +161,49 @@ class Component(ABC, Generic[T]):
             if context:
                 full_context.update(context)
             
-            rendered = resource_manager.render_template(template_path, full_context)
+            # Try to load the template directly
+            template_content = resource_manager.load_template(template_path)
             
-            if rendered is None:
-                raise TemplateError(
-                    f"Failed to render template: {template_path}",
-                    template_path=template_path,
-                    component=self.component_name
-                )
+            if not template_content:
+                # Try to infer template path variants
+                alt_paths = []
+                
+                # If not already prefixed with components/
+                if not template_path.startswith("components/"):
+                    alt_paths.append(f"components/{template_path}")
+                    
+                # If it might be a component type path
+                parts = template_path.split("/")
+                if len(parts) > 1:
+                    # Try variations
+                    alt_paths.append(f"{parts[0]}/{parts[-1]}")
+                    
+                # Try all alternative paths
+                for alt_path in alt_paths:
+                    template_content = resource_manager.load_template(alt_path)
+                    if template_content:
+                        self._logger.debug(f"Found template at alternative path: {alt_path}")
+                        break
+            
+            if not template_content:
+                # No template found - log warning but don't raise error
+                self._logger.warning(f"Template not found: {template_path}")
+                return None
+                
+            # Process template variables
+            rendered = template_content
+            
+            # Replace variables
+            for key, value in full_context.items():
+                # Both modern {{var}} and traditional ${VAR} formats
+                rendered = rendered.replace(f"{{{{{key}}}}}", str(value))
+                rendered = rendered.replace(f"${{{key.upper()}}}", str(value))
                 
             return rendered
         except Exception as e:
             self._logger.error(f"Template rendering error: {str(e)}")
-            if isinstance(e, TemplateError):
-                raise e
-            else:
-                raise TemplateError(
-                    f"Error rendering template: {str(e)}",
-                    template_path=template_path,
-                    component=self.component_name,
-                    original_exception=e
-                )
-
+            # Don't raise immediately to allow fallback rendering
+            return None
     @abstractmethod
     def render(self) -> str:
         """
