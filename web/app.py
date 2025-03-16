@@ -247,14 +247,16 @@ def main():
     # Load core CSS files
     load_core_css()
     
-    # Set up layout with header and footer
+    # Set up layout
     layout = Layout(title="MNIST Digit Classifier")
-    layout.render()
+    
+    # Render header first
+    layout.render_header()
     
     # Determine which view to render based on navigation state
     current_view = NavigationState.get_active_view()
     
-    # Render the appropriate view
+    # Render the appropriate view content
     if current_view == "home":
         render_home_view()
     elif current_view == "draw":
@@ -266,7 +268,9 @@ def main():
     else:
         # Fallback to home view
         render_home_view()
-
+    
+    # Render footer last
+    layout.render_footer()
 
 if __name__ == "__main__":
     try:
