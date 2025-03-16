@@ -1,8 +1,6 @@
 # MNIST Digit Classifier
-# Copyright (c) 2025
 # File: utils/resource_manager.py
-# Description: Unified resource loading and management
-# Created: 2025-03-16
+# Complete rewrite for path resolution
 
 import json
 import logging
@@ -24,35 +22,10 @@ class ResourceType(Enum):
 
 
 class ResourceManager:
-    """
-    Unified manager for loading various resource types.
-    
-    This class provides centralized access to application resources including
-    CSS files, JavaScript, HTML templates, JSON data, and images. It handles
-    path resolution, caching, and content injection.
-    """
+    """Unified manager for loading various resource types."""
     
     # Singleton instance
     _instance = None
-    
-    # Base directories for different resource types
-    _BASE_DIRS = {
-        ResourceType.CSS: ["assets/css", "css"],
-        ResourceType.JS: ["assets/js", "js"],
-        ResourceType.TEMPLATE: ["assets/templates", "templates"],
-        ResourceType.DATA: ["assets/data", "data"],
-        ResourceType.IMAGE: ["assets/images", "images"],
-        ResourceType.CONFIG: ["assets/config", "config"],
-    }
-    
-    # Cache for loaded resources to prevent repeated disk reads
-    _cache = {
-        ResourceType.CSS: {},
-        ResourceType.JS: {},
-        ResourceType.TEMPLATE: {},
-        ResourceType.DATA: {},
-        ResourceType.CONFIG: {},
-    }
     
     def __new__(cls, *args, **kwargs):
         """Ensure singleton pattern for ResourceManager."""
@@ -60,48 +33,50 @@ class ResourceManager:
             cls._instance = super(ResourceManager, cls).__new__(cls)
             cls._instance._initialized = False
         return cls._instance
-    
+
     def __init__(self, project_root: Optional[Path] = None):
-        """
-        Initialize the resource manager.
-        
-        Args:
-            project_root: Optional path to project root directory.
-                          If None, will be auto-detected.
-        """
+        """Initialize the resource manager."""
         # Skip initialization if already done (singleton pattern)
         if self._initialized:
             return
             
         self._logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         self._project_root = project_root or self._detect_project_root()
+        
+        # Base directories for different resource types - relative to project root
+        self._BASE_DIRS = {
+            ResourceType.CSS: ["assets/css"],
+            ResourceType.JS: ["assets/js"],
+            ResourceType.TEMPLATE: ["assets/templates"],
+            ResourceType.DATA: ["assets/data"],
+            ResourceType.IMAGE: ["assets/images"],
+            ResourceType.CONFIG: ["assets/config"],
+        }
+        
+        # Log the actual paths we'll be checking
+        for res_type, dirs in self._BASE_DIRS.items():
+            paths = [str(self._project_root / d) for d in dirs]
+            self._logger.debug(f"Resource paths for {res_type.value}: {paths}")
+        
+        # Cache for loaded resources
+        self._cache = {res_type: {} for res_type in ResourceType}
+        
         self._initialized = True
         self._logger.info(f"ResourceManager initialized with root: {self._project_root}")
-    
+
     def _detect_project_root(self) -> Path:
-        """
-        Detect the project root directory.
-        
-        Returns:
-            Path to the project root directory.
-        """
-        # Try to find app.py as a marker for project root
-        cwd = Path.cwd()
-        
-        # Check current directory for app.py
-        if (cwd / "app.py").exists():
-            return cwd
+        """Detect the project root directory."""
+        # In Docker, the project root is always /app
+        docker_path = Path("/app")
+        if docker_path.exists():
+            self._logger.debug(f"Docker environment detected, using root: {docker_path}")
+            return docker_path
             
-        # Check for Docker-style paths
-        for docker_path in ["/app", "/usr/src/app"]:
-            path = Path(docker_path)
-            if path.exists() and (path / "app.py").exists():
-                return path
-                
-        # Fall back to current directory with a warning
-        self._logger.warning(f"Could not detect project root, using {cwd}")
+        # Otherwise use current directory
+        cwd = Path.cwd()
+        self._logger.debug(f"Using current directory as root: {cwd}")
         return cwd
-    
+        
     def get_resource_path(self, resource_type: ResourceType, resource_path: str) -> Optional[Path]:
         """
         Get the full path to a resource.
@@ -120,74 +95,27 @@ class ResourceManager:
         # Strip leading slash if present
         resource_path = resource_path.lstrip("/")
         
+        self._logger.debug(f"Looking for {resource_type.value} resource: {resource_path}")
+        
         # Try each base directory for this resource type
+        checked_paths = []
         for base_dir in self._BASE_DIRS[resource_type]:
             # Try direct path
             full_path = self._project_root / base_dir / resource_path
+            checked_paths.append(str(full_path))
+            self._logger.debug(f"Checking path: {full_path}")
+            
             if full_path.exists():
+                self._logger.debug(f"Found resource at: {full_path}")
                 return full_path
-            
-            # If dealing with a component, try different component paths
-            if resource_type in [ResourceType.CSS, ResourceType.TEMPLATE, ResourceType.JS]:
-                # Try with 'components/' prefix if not already present
-                if not resource_path.startswith("components/"):
-                    alt_path = self._project_root / base_dir / "components" / resource_path
-                    if alt_path.exists():
-                        return alt_path
-                
-                # Try without 'components/' prefix if already present
-                if resource_path.startswith("components/"):
-                    alt_path = self._project_root / base_dir / resource_path[11:]
-                    if alt_path.exists():
-                        return alt_path
         
-        # If resource not found, log a warning and return None
+        # If resource not found, log all the paths we checked
         self._logger.warning(f"Resource not found: {resource_type.value}/{resource_path}")
+        self._logger.debug(f"Checked paths: {checked_paths}")
         return None
-    
+
     def load_text_resource(self, resource_type: ResourceType, resource_path: str) -> Optional[str]:
-        """
-        Load a text-based resource.
-        
-        Args:
-            resource_type: Type of resource
-            resource_path: Path to the resource
-            
-        Returns:
-            Content of the resource as string, or None if not found
-        """
-        # Check cache first
-        cache_key = f"{resource_type.value}:{resource_path}"
-        if cache_key in self._cache[resource_type]:
-            return self._cache[resource_type][cache_key]
-        
-        # Get the full path to the resource
-        full_path = self.get_resource_path(resource_type, resource_path)
-        if not full_path:
-            return None
-            
-        try:
-            # Read the file and add to cache
-            with open(full_path, 'r', encoding='utf-8') as f:
-                content = f.read()
-                self._cache[resource_type][cache_key] = content
-                self._logger.debug(f"Loaded {resource_type.value}: {resource_path}")
-                return content
-        except Exception as e:
-            self._logger.error(f"Error loading {resource_type.value} {resource_path}: {str(e)}")
-            return None
-    
-    def load_binary_resource(self, resource_type: ResourceType, resource_path: str) -> Optional[bytes]:
-        """
-        Load a binary resource.
-        
-        Args:
-            resource_type: Type of resource
-            resource_path: Path to the resource
-            
-        Returns:
-            Content of the resource as bytes, or None if not found
-        """
+        """Load a text-based resource."""
         # Get the full path to the resource
         full_path = self.get_resource_path(resource_type, resource_path)
         if not full_path:
@@ -195,103 +123,111 @@ class ResourceManager:
             
         try:
             # Read the file
-            with open(full_path, 'rb') as f:
+            with open(full_path, 'r', encoding='utf-8') as f:
                 content = f.read()
-                self._logger.debug(f"Loaded binary {resource_type.value}: {resource_path}")
+                self._logger.debug(f"Loaded {resource_type.value}: {resource_path}")
                 return content
         except Exception as e:
-            self._logger.error(f"Error loading binary {resource_type.value} {resource_path}: {str(e)}")
+            self._logger.error(f"Error loading {resource_type.value} {resource_path}: {str(e)}")
             return None
     
     def load_json_resource(self, resource_path: str) -> Optional[Any]:
-        """
-        Load a JSON resource.
+        """Load a JSON resource."""
+        # Handle theme files
+        if resource_path in ["light.json", "dark.json", "default.json"]:
+            resource_path = f"themes/{resource_path}"
         
-        Args:
-            resource_path: Path to the JSON resource
+        # Try to load from CONFIG for theme files
+        content = self.load_text_resource(ResourceType.CONFIG, resource_path)
+        
+        # If not found and it's not a theme file, try DATA
+        if content is None and "themes/" not in resource_path:
+            content = self.load_text_resource(ResourceType.DATA, resource_path)
             
-        Returns:
-            Parsed JSON data, or None if loading failed
-        """
-        # Check cache first
-        cache_key = f"json:{resource_path}"
-        if cache_key in self._cache[ResourceType.DATA]:
-            return self._cache[ResourceType.DATA][cache_key]
-        
-        # Load the text content
-        content = self.load_text_resource(ResourceType.DATA, resource_path)
-        if not content:
+        if content is None:
             return None
             
         try:
-            # Parse JSON and cache
+            # Parse JSON
             data = json.loads(content)
-            self._cache[ResourceType.DATA][cache_key] = data
             return data
         except json.JSONDecodeError as e:
             self._logger.error(f"Invalid JSON in {resource_path}: {str(e)}")
             return None
     
     def load_css(self, css_path: str) -> Optional[str]:
-        """
-        Load a CSS file.
-        
-        Args:
-            css_path: Path to the CSS file
+        """Load a CSS file."""
+        # First try direct path
+        content = self.load_text_resource(ResourceType.CSS, css_path)
+        self._logger.debug(f"Attempting to load CSS: {css_path}")
+
+        if content:
+            return content
             
-        Returns:
-            CSS content as string, or None if loading failed
-        """
-        return self.load_text_resource(ResourceType.CSS, css_path)
-    
-    def load_js(self, js_path: str) -> Optional[str]:
-        """
-        Load a JavaScript file.
+        # Try in components directory
+        if not css_path.startswith("components/"):
+            component_path = f"components/{css_path}"
+            content = self.load_text_resource(ResourceType.CSS, component_path)
+            if content:
+                return content
         
-        Args:
-            js_path: Path to the JavaScript file
-            
-        Returns:
-            JavaScript content as string, or None if loading failed
-        """
-        return self.load_text_resource(ResourceType.JS, js_path)
+        # Try in global directory
+        if not css_path.startswith("global/"):
+            global_path = f"global/{css_path}"
+            content = self.load_text_resource(ResourceType.CSS, global_path)
+            if content:
+                return content
+        
+        # Try in themes directory
+        if not css_path.startswith("themes/"):
+            themes_path = f"themes/{css_path}"
+            content = self.load_text_resource(ResourceType.CSS, themes_path)
+            if content:
+                return content
+                
+        # Try in views directory
+        if not css_path.startswith("views/"):
+            views_path = f"views/{css_path}"
+            content = self.load_text_resource(ResourceType.CSS, views_path)
+            if content:
+                return content
+        
+        return None
     
     def load_template(self, template_path: str) -> Optional[str]:
-        """
-        Load a template file.
-        
-        Args:
-            template_path: Path to the template file
+        """Load a template file."""
+        # First try direct path
+        content = self.load_text_resource(ResourceType.TEMPLATE, template_path)
+        if content:
+            return content
             
-        Returns:
-            Template content as string, or None if loading failed
-        """
-        return self.load_text_resource(ResourceType.TEMPLATE, template_path)
-    
+        # Try in components directory
+        if not template_path.startswith("components/"):
+            component_path = f"components/{template_path}"
+            content = self.load_text_resource(ResourceType.TEMPLATE, component_path)
+            if content:
+                return content
+        
+        # Try in home directory
+        if not template_path.startswith("home/"):
+            home_path = f"home/{template_path}"
+            content = self.load_text_resource(ResourceType.TEMPLATE, home_path)
+            if content:
+                return content
+        
+        return None
+
     def render_template(self, template_path: str, context: Dict[str, Any]) -> Optional[str]:
-        """
-        Load and render a template with variable substitution.
-        
-        Args:
-            template_path: Path to the template
-            context: Dictionary of variables to substitute
-            
-        Returns:
-            Rendered template as string, or None if rendering failed
-        """
+        """Load and render a template with variable substitution."""
         template_content = self.load_template(template_path)
         if not template_content:
+            self._logger.warning(f"Template not found: {template_path}")
             return None
             
         rendered = template_content
         
         try:
-            # First try modern {{variable}} syntax
-            for key, value in context.items():
-                placeholder = f"{{{{{key}}}}}"
-                rendered = rendered.replace(placeholder, str(value))
-            
-            # Then try legacy ${VARIABLE} syntax
+            # Replace template variables
             for key, value in context.items():
                 placeholder = f"${{{key.upper()}}}"
                 rendered = rendered.replace(placeholder, str(value))
@@ -302,92 +238,57 @@ class ResourceManager:
             return None
     
     def inject_css(self, css_content: str) -> None:
-        """
-        Inject CSS content into Streamlit.
-        
-        Args:
-            css_content: CSS content to inject
-        """
+        """Inject CSS content into Streamlit."""
         if not css_content:
             return
             
-        # Remove any existing style tags
-        clean_css = css_content
-        if "<style>" in css_content.lower():
-            clean_css = css_content.replace("<style>", "").replace("</style>", "")
-        
         # Inject with proper style tags
-        st.markdown(f"<style>{clean_css}</style>", unsafe_allow_html=True)
-        self._logger.debug("Injected CSS content")
-    
-    def inject_js(self, js_content: str) -> None:
-        """
-        Inject JavaScript content into Streamlit.
-        
-        Args:
-            js_content: JavaScript content to inject
-        """
-        if not js_content:
-            return
-            
-        # Wrap with script tags and inject
-        html = f"""
-        <script type="text/javascript">
-            (function() {{
-                {js_content}
-            }})();
-        </script>
-        """
-        st.components.v1.html(html, height=0)
-        self._logger.debug("Injected JavaScript content")
+        st.markdown(f"<style>{css_content}</style>", unsafe_allow_html=True)
     
     def load_and_inject_css(self, css_paths: List[str]) -> None:
-        """
-        Load and inject multiple CSS files.
-        
-        Args:
-            css_paths: List of paths to CSS files
-        """
+        """Load and inject multiple CSS files."""
         combined_css = ""
         for css_path in css_paths:
             css_content = self.load_css(css_path)
             if css_content:
                 combined_css += f"\n/* {css_path} */\n{css_content}"
+            else:
+                self._logger.warning(f"CSS file not found: {css_path}")
                 
         if combined_css:
             self.inject_css(combined_css)
-    
-    def load_and_inject_js(self, js_paths: List[str]) -> None:
+            
+    def load_theme_json(self, theme_filename: str) -> Optional[Any]:
         """
-        Load and inject multiple JavaScript files.
+        Load a theme JSON file from the correct location.
         
         Args:
-            js_paths: List of paths to JavaScript files
-        """
-        combined_js = ""
-        for js_path in js_paths:
-            js_content = self.load_js(js_path)
-            if js_content:
-                combined_js += f"\n// {js_path}\n{js_content}\n"
+            theme_filename: Name of the theme file (e.g., "light.json")
                 
-        if combined_js:
-            self.inject_js(combined_js)
-    
-    def clear_cache(self, resource_type: Optional[ResourceType] = None) -> None:
+        Returns:
+            Parsed JSON data, or None if loading failed
         """
-        Clear the resource cache.
+        # Define the exact path where theme files should be found
+        exact_path = self._project_root / "assets" / "config" / "themes" / theme_filename
         
-        Args:
-            resource_type: Specific resource type to clear, or None for all
-        """
-        if resource_type:
-            self._cache[resource_type] = {}
-            self._logger.debug(f"Cleared {resource_type.value} cache")
-        else:
-            for res_type in ResourceType:
-                self._cache[res_type] = {}
-            self._logger.debug("Cleared all resource caches")
-
-
-# Create a singleton instance for easy importing
+        # Log the exact path we're checking
+        self._logger.debug(f"Looking for theme file at: {exact_path}")
+        
+        if not exact_path.exists():
+            self._logger.warning(f"Theme file not found: {exact_path}")
+            return None
+            
+        try:
+            # Read and parse the JSON file
+            with open(exact_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+                
+            # Parse the JSON content
+            data = json.loads(content)
+            self._logger.debug(f"Successfully loaded theme file: {exact_path}")
+            return data
+        except Exception as e:
+            self._logger.error(f"Error loading theme file {exact_path}: {str(e)}")
+            return None
+        
 resource_manager = ResourceManager()
