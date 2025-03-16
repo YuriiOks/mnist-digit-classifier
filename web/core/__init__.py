@@ -2,20 +2,20 @@
 # Copyright (c) 2025
 # File: core/__init__.py
 # Description: Core package initialization
-# Created: 2024-05-05
+# Created: 2025-03-16
 
 """Core functionality for the MNIST Digit Classifier."""
 
-from core.app_state.session_state import SessionState
-from core.app_state.theme_state import ThemeState
-from core.app_state.navigation_state import NavigationState
-from core.registry.view_registry import ViewRegistry
-from core.errors.error_handler import ErrorHandler
+from core.app_state import SessionState, ThemeState, NavigationState, initialize_app_state
+from core.errors import ErrorHandler, UIError, TemplateError, ComponentError
 
 __all__ = [
     "SessionState",
     "ThemeState",
     "NavigationState",
-    "ViewRegistry",
-    "ErrorHandler"
+    "initialize_app_state",
+    "ErrorHandler",
+    "UIError",
+    "TemplateError",
+    "ComponentError"
 ]
