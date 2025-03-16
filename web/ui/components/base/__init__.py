@@ -1,11 +1,13 @@
 # MNIST Digit Classifier
 # Copyright (c) 2025
 # File: ui/components/base/__init__.py
-# Description: Base components package
-# Created: 2024-05-01
+# Description: Base components package initialization
+# Created: 2025-03-16
 
-"""Base components for the MNIST Digit Classifier application."""
+"""Base component classes for the MNIST Digit Classifier."""
 
 from ui.components.base.component import Component
 
-__all__ = ['Component'] 
+__all__ = [
+    "Component"
+]
