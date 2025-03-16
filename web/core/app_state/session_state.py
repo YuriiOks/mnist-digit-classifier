@@ -2,7 +2,7 @@
 # Copyright (c) 2025
 # File: core/app_state/session_state.py
 # Description: Session state management for Streamlit
-# Created: 2024-05-01
+# Created: 2025-03-16
 
 import logging
 import streamlit as st
@@ -14,13 +14,14 @@ logger = logging.getLogger(__name__)
 
 
 class SessionState:
-    """Manage session state in Streamlit.
+    """
+    Manage session state in Streamlit.
 
     This class provides a unified interface for accessing and modifying
     Streamlit's session state, enabling consistent state management across
     the application.
     """
-
+    _initialized = False
     _logger = logging.getLogger(f"{__name__}.SessionState")
 
     @classmethod
@@ -28,20 +29,26 @@ class SessionState:
     @AspectUtils.log_method
     def initialize(cls) -> None:
         """Initialize session state with defaults if needed."""
-        # Check if any required default keys need to be initialized
+        if cls._initialized:
+            return
+        
+        # Initialize default state
         required_keys = [
-            # Add any required default keys here
+            # Add required keys here if needed
         ]
-
+        
         for key in required_keys:
             if key not in st.session_state:
                 st.session_state[key] = None
+        
+        cls._initialized = True
 
     @classmethod
     @AspectUtils.catch_errors
     @AspectUtils.log_method
     def get(cls, key: str, default: Any = None) -> Any:
-        """Get value from session state with optional default.
+        """
+        Get value from session state with optional default.
 
         Args:
             key: State key to retrieve
@@ -56,7 +63,8 @@ class SessionState:
     @AspectUtils.catch_errors
     @AspectUtils.log_method
     def set(cls, key: str, value: Any) -> None:
-        """Set value in session state.
+        """
+        Set value in session state.
 
         Args:
             key: State key to set
@@ -68,7 +76,8 @@ class SessionState:
     @AspectUtils.catch_errors
     @AspectUtils.log_method
     def delete(cls, key: str) -> None:
-        """Delete key from session state.
+        """
+        Delete key from session state.
 
         Args:
             key: State key to delete
@@ -80,7 +89,8 @@ class SessionState:
     @AspectUtils.catch_errors
     @AspectUtils.log_method
     def has_key(cls, key: str) -> bool:
-        """Check if key exists in session state.
+        """
+        Check if key exists in session state.
 
         Args:
             key: State key to check
@@ -102,9 +112,16 @@ class SessionState:
     @AspectUtils.catch_errors
     @AspectUtils.log_method
     def get_all(cls) -> Dict[str, Any]:
-        """Get all session state data.
+        """
+        Get all session state data.
 
         Returns:
             Dictionary of all session state data
         """
         return dict(st.session_state)
+
+    @classmethod
+    @property
+    def is_initialized(cls) -> bool:
+        """Whether session state is initialized"""
+        return cls._initialized
