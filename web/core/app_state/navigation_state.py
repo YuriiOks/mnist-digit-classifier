@@ -2,10 +2,10 @@
 # Copyright (c) 2025
 # File: core/app_state/navigation_state.py
 # Description: Navigation state management
-# Created: 2024-05-01
+# Created: 2025-03-16
 
 import logging
-from typing import Dict, Any, Optional, List
+from typing import Dict, List, Optional, Any
 
 from core.app_state.session_state import SessionState
 from utils.aspects import AspectUtils
@@ -14,17 +14,22 @@ logger = logging.getLogger(__name__)
 
 
 class NavigationState:
-    """Manage application navigation state."""
+    """
+    Manage application navigation state.
+    
+    This class provides state management for navigation, tracking the current view
+    and navigation history.
+    """
 
-    # Session state keys - RENAMED to avoid widget conflicts
+    # Session state keys
     ACTIVE_VIEW_KEY = "active_view"
-    NAV_HISTORY_KEY = "navigation_history"  # Changed from "nav_history"
-    ROUTES_KEY = "navigation_routes"        # Changed from "routes"
+    NAV_HISTORY_KEY = "navigation_history"
+    ROUTES_KEY = "navigation_routes"
 
     # Default view
     DEFAULT_VIEW = "home"
 
-    # Default routes - SIMPLIFIED to exactly 4 tabs
+    # Default routes
     DEFAULT_ROUTES = [
         {"id": "home", "label": "Home", "icon": "🏠"},
         {"id": "draw", "label": "Draw", "icon": "✏️"},
@@ -38,10 +43,6 @@ class NavigationState:
     @AspectUtils.catch_errors
     @AspectUtils.log_method
     def initialize(cls) -> None:
-
-        cls._logger = logging.getLogger(f"{__name__}.{cls.__class__.__name__}")
-        cls._logger.debug(f"Initializing {cls.__class__.__name__} instance")
-
         """Initialize navigation state with defaults if not already present."""
         # Set default active view if not set
         if not SessionState.has_key(cls.ACTIVE_VIEW_KEY):
@@ -54,16 +55,13 @@ class NavigationState:
         # Initialize routes if not set
         if not SessionState.has_key(cls.ROUTES_KEY):
             SessionState.set(cls.ROUTES_KEY, cls.DEFAULT_ROUTES)
-        else:
-            # Force update to the simplified routes - using set()
-            # instead of direct assignment
-            SessionState.set(cls.ROUTES_KEY, cls.DEFAULT_ROUTES)
 
     @classmethod
     @AspectUtils.catch_errors
     @AspectUtils.log_method
     def get_active_view(cls) -> str:
-        """Get the currently active view.
+        """
+        Get the currently active view.
 
         Returns:
             str: ID of the active view
@@ -76,7 +74,8 @@ class NavigationState:
     @AspectUtils.catch_errors
     @AspectUtils.log_method
     def set_active_view(cls, view_id: str) -> None:
-        """Set the active view and update navigation history.
+        """
+        Set the active view and update navigation history.
 
         Args:
             view_id: ID of the view to set as active
@@ -101,7 +100,8 @@ class NavigationState:
     @AspectUtils.catch_errors
     @AspectUtils.log_method
     def get_nav_history(cls) -> List[str]:
-        """Get the navigation history.
+        """
+        Get the navigation history.
 
         Returns:
             List[str]: List of view IDs in navigation history
@@ -114,7 +114,8 @@ class NavigationState:
     @AspectUtils.catch_errors
     @AspectUtils.log_method
     def get_routes(cls) -> List[Dict[str, Any]]:
-        """Get all available navigation routes.
+        """
+        Get all available navigation routes.
 
         Returns:
             List[Dict[str, Any]]: List of route definitions
@@ -126,32 +127,9 @@ class NavigationState:
     @classmethod
     @AspectUtils.catch_errors
     @AspectUtils.log_method
-    def add_route(cls, route: Dict[str, Any]) -> None:
-        """Add a new navigation route.
-
-        Args:
-            route: Route definition dictionary with id, label, and icon
-        """
-        cls.initialize()
-        routes = SessionState.get(cls.ROUTES_KEY, cls.DEFAULT_ROUTES)
-
-        # Check if route already exists
-        for i, existing_route in enumerate(routes):
-            if existing_route.get("id") == route.get("id"):
-                # Update existing route
-                routes[i] = route
-                SessionState.set(cls.ROUTES_KEY, routes)
-                return
-
-        # Add new route
-        routes.append(route)
-        SessionState.set(cls.ROUTES_KEY, routes)
-
-    @classmethod
-    @AspectUtils.catch_errors
-    @AspectUtils.log_method
     def go_back(cls) -> str:
-        """Navigate back to the previous view.
+        """
+        Navigate back to the previous view.
 
         Returns:
             str: ID of the previous view, or current view if history is empty
