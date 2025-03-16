@@ -198,12 +198,11 @@ class Component(ABC, Generic[T]):
                 key = key.lower()
                 key = "{" + key + "}"
                 # if class name is "Sidebar" 
-                if self.__component_name == "sidebar":
-                    print(f"key: {key}, value: {value}")
+                # if self.__component_name == "sidebar":
+                    # print(f"key: {key}, value: {value}")
                 rendered = rendered.replace(key, str(value))   # double curly braces
                 rendered = rendered.replace(f"${{{key.upper()}}}", str(value))
                 
-            print(rendered)
             return rendered
         except Exception as e:
             self._logger.error(f"Template rendering error: {str(e)}")
