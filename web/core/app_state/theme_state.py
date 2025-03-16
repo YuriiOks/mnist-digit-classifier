@@ -92,7 +92,8 @@ class ThemeState:
 
         try:
             # Load default config (fonts and settings)
-            default_config = resource_manager.load_json_resource("themes/default.json")
+            default_config = resource_manager.load_json_resource("config/themes/default.json")
+
             if default_config:
                 if "fonts" in default_config:
                     theme_config["fonts"].update(default_config["fonts"])
@@ -100,12 +101,14 @@ class ThemeState:
                     theme_config["settings"].update(default_config["settings"])
 
             # Load light theme colors
-            light_config = resource_manager.load_json_resource("themes/light.json")
+            light_config = resource_manager.load_json_resource("config/themes/light.json")
+
             if light_config and "colors" in light_config:
                 theme_config["colors"][cls.THEME_LIGHT] = light_config["colors"]
 
             # Load dark theme colors
-            dark_config = resource_manager.load_json_resource("themes/dark.json")
+            dark_config = resource_manager.load_json_resource("config/themes/dark.json")
+
             if dark_config and "colors" in dark_config:
                 theme_config["colors"][cls.THEME_DARK] = dark_config["colors"]
         except Exception as e:
