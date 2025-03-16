@@ -2,18 +2,19 @@
 # Copyright (c) 2025
 # File: core/errors/error_handler.py
 # Description: Base error handling classes and utilities
-# Created: 2024-05-01
+# Created: 2025-03-16
 
 import logging
 import traceback
 import sys
-from typing import Optional, Any, Dict, List, Type, Callable
+from typing import Optional, Any, Dict, Type, Callable
 import streamlit as st
 
 logger = logging.getLogger(__name__)
 
 class ErrorHandler:
-    """Base error handler class.
+    """
+    Base error handler class.
     
     Provides common error handling functionality for the application.
     """
@@ -40,7 +41,8 @@ class ErrorHandler:
         show_user_message: bool = True,
         context: Optional[Dict[str, Any]] = None
     ) -> None:
-        """Handle an error with appropriate logging and user feedback.
+        """
+        Handle an error with appropriate logging and user feedback.
         
         Args:
             error: The exception to handle
@@ -51,7 +53,6 @@ class ErrorHandler:
             show_user_message: Whether to show a message to the user
             context: Additional context for the error
         """
-        logger.debug("Handling error")
         try:
             # Prepare messages
             log_message = message or str(error) or cls.DEFAULT_ERROR_MESSAGE
@@ -67,12 +68,10 @@ class ErrorHandler:
             exc_info = sys.exc_info() if log_exception else None
             
             log_function(log_message, exc_info=exc_info)
-            logger.debug(f"Error logged with level {level}")
             
             # Show user message if requested
             if show_user_message:
                 cls._show_user_message(level, display_message)
-                logger.debug("User message displayed")
         except Exception as e:
             # Emergency fallback if error handler itself fails
             fallback_message = f"Error handler failed: {str(e)}"
@@ -85,15 +84,15 @@ class ErrorHandler:
     
     @staticmethod
     def _get_log_function(level: str) -> Callable:
-        """Get the appropriate logging function based on level.
+        """
+        Get the appropriate logging function based on level.
         
         Args:
             level: Error level
             
         Returns:
-            Callable: Logging function to use
+            Logging function to use
         """
-        logger.debug(f"Getting log function for level: {level}")
         if level == ErrorHandler.LEVEL_INFO:
             return logger.info
         elif level == ErrorHandler.LEVEL_WARNING:
@@ -106,13 +105,13 @@ class ErrorHandler:
     
     @staticmethod
     def _show_user_message(level: str, message: str) -> None:
-        """Show a message to the user via Streamlit.
+        """
+        Show a message to the user via Streamlit.
         
         Args:
             level: Error level
             message: Message to display
         """
-        logger.debug(f"Showing user message with level {level}: {message}")
         try:
             if level == ErrorHandler.LEVEL_INFO:
                 st.info(message)
@@ -130,7 +129,8 @@ class ErrorHandler:
     
     @classmethod
     def format_exception(cls, exc: Exception) -> str:
-        """Format an exception into a readable string with traceback.
+        """
+        Format an exception into a readable string with traceback.
         
         Args:
             exc: Exception to format
@@ -138,7 +138,6 @@ class ErrorHandler:
         Returns:
             str: Formatted exception string
         """
-        logger.debug("Formatting exception")
         try:
             exc_type = type(exc).__name__
             exc_msg = str(exc)
@@ -147,41 +146,3 @@ class ErrorHandler:
         except Exception as e:
             logger.error(f"Error formatting exception: {str(e)}")
             return f"Error: {str(exc)}"
-    
-    @classmethod
-    def log_error(
-        cls, 
-        error: Exception, 
-        message: Optional[str] = None, 
-        level: str = LEVEL_ERROR
-    ) -> None:
-        """Log an error without showing a user message.
-        
-        Args:
-            error: The exception to log
-            message: Optional custom message
-            level: Error level
-        """
-        logger.debug("Logging error")
-        cls.handle_error(
-            error,
-            level=level,
-            message=message,
-            show_user_message=False
-        )
-        logger.debug("Error logged successfully")
-    
-    @classmethod
-    def show_error(
-        cls,
-        message: str,
-        level: str = LEVEL_ERROR
-    ) -> None:
-        """Show an error message to the user without an exception.
-        
-        Args:
-            message: Message to show
-            level: Error level
-        """
-        logger.debug(f"Showing error message: {message}")
-        cls._show_user_message(level, message) 
