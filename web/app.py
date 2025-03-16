@@ -35,7 +35,7 @@ from ui.components.cards.card import Card, FeatureCard, WelcomeCard
 
 def load_core_css():
     """Load core CSS files."""
-    # Direct CSS paths that should match the project structure
+    # Paths relative to assets/css
     css_files = [
         "global/variables.css",
         "global/reset.css",
@@ -52,12 +52,14 @@ def load_core_css():
             loaded_css += f"\n/* {css_file} */\n{css_content}"
         else:
             logger.warning(f"Could not load core CSS: {css_file}")
+            # Add more specific logging here to help debug
+            logger.debug(f"Expected file at: assets/css/{css_file}")
     
     # Inject the combined CSS
     if loaded_css:
         resource_manager.inject_css(loaded_css)
     else:
-        logger.warning("No core CSS was loaded")
+        logger.error("No core CSS was loaded - app may display incorrectly")
 
 
 def load_view_css(view_name):
@@ -79,20 +81,16 @@ def render_home_view():
     
     # Load welcome card data from JSON
     welcome_data = resource_manager.load_json_resource("home/welcome_card.json")
+
+    print(f"welcome_data: {welcome_data}")
+
     if welcome_data:
         welcome_card = WelcomeCard(
             title=welcome_data.get("title", "MNIST Digit Classifier"),
             content=welcome_data.get("content", "Welcome to the MNIST Digit Classifier."),
             icon=welcome_data.get("icon", "👋")
         )
-        welcome_card.display()
-    else:
-        # Fallback if data not found
-        welcome_card = WelcomeCard(
-            title="MNIST Digit Classifier",
-            content="<b>Welcome to the MNIST Digit Classifier!</b><p>This application allows you to draw digits and have them recognized by a machine learning model.</p>",
-            icon="👋"
-        )
+        print(f"It must show the welcome card\n{welcome_card}")
         welcome_card.display()
     
     # Display "How It Works" section
@@ -100,6 +98,9 @@ def render_home_view():
     
     # Load feature cards data from JSON
     feature_cards = resource_manager.load_json_resource("home/feature_cards.json")
+
+    print(f"feature_cards: {feature_cards}")
+
     if feature_cards:
         # Create columns for feature cards
         cols = st.columns(len(feature_cards))
@@ -113,30 +114,6 @@ def render_home_view():
                     icon=card_data.get("icon", "")
                 )
                 feature_card.display()
-    else:
-        # Fallback with basic feature cards
-        cols = st.columns(3)
-        
-        with cols[0]:
-            FeatureCard(
-                title="1. Draw a Digit",
-                content="<p>Navigate to the Drawing Canvas and use your mouse or touch to draw any digit from 0-9.</p>",
-                icon="✏️"
-            ).display()
-        
-        with cols[1]:
-            FeatureCard(
-                title="2. Classify the Digit",
-                content="<p>Once you've drawn a digit, click the \"Classify\" button to have the model predict what number you've drawn.</p>",
-                icon="🔍"
-            ).display()
-        
-        with cols[2]:
-            FeatureCard(
-                title="3. View History",
-                content="<p>All your predictions are saved to your session history.</p>",
-                icon="📊"
-            ).display()
     
     # CTA section
     st.markdown("<hr style='margin: 2rem 0;'>", unsafe_allow_html=True)
@@ -190,47 +167,6 @@ def render_draw_view():
             st.success("This is a simulated prediction: The digit is 5")
 
 
-def render_history_view():
-    """Render the history view (placeholder)."""
-    load_view_css("history")
-    
-    st.write("### Prediction History")
-    st.write("This is a placeholder for the prediction history view. In a full implementation, this would show a history of predictions and analytics.")
-    
-    # Simple table placeholder
-    data = {
-        "Time": ["2025-03-16 10:30", "2025-03-16 10:35", "2025-03-16 10:40"],
-        "Digit": [5, 3, 7],
-        "Confidence": ["95%", "87%", "92%"],
-    }
-    
-    st.table(data)
-
-
-def render_settings_view():
-    """Render the settings view (placeholder)."""
-    load_view_css("settings")
-    
-    st.write("### Settings")
-    st.write("This is a placeholder for the settings view. In a full implementation, this would allow customizing app settings.")
-    
-    # Theme settings
-    st.subheader("Appearance")
-    theme_mode = theme_manager.get_current_theme()
-    
-    st.write(f"Current theme: **{theme_mode.capitalize()}**")
-    if st.button(f"Switch to {'Light' if theme_mode == 'dark' else 'Dark'} Mode"):
-        theme_manager.toggle_theme()
-        st.rerun()
-    
-    # Other settings placeholders
-    st.subheader("Canvas Settings")
-    st.slider("Line thickness", 1, 10, 3)
-    
-    st.subheader("Application Settings")
-    st.checkbox("Save prediction history", value=True)
-    st.checkbox("Show tooltips", value=True)
-
 
 def main():
     """Main entry point for the MNIST Digit Classifier application."""
@@ -259,16 +195,7 @@ def main():
     # Render the appropriate view content
     if current_view == "home":
         render_home_view()
-    elif current_view == "draw":
-        render_draw_view()
-    elif current_view == "history":
-        render_history_view()
-    elif current_view == "settings":
-        render_settings_view()
-    else:
-        # Fallback to home view
-        render_home_view()
-    
+
     # Render footer last
     layout.render_footer()
 
