@@ -476,8 +476,25 @@ class Layout:
         # Ensure theme is initialized
         theme_manager.initialize()
     
+    def render_header(self) -> None:
+        """Render just the application header."""
+        # Display sidebar
+        self.sidebar.display()
+        
+        # Display header
+        self.header.display()
+
+    def render_footer(self) -> None:
+        """Render just the application footer."""
+        # Add spacing before footer
+        st.markdown("<div style='height: 60px;'></div>", unsafe_allow_html=True)
+        self.footer.display()
+    
     def render(self) -> None:
-        """Render the full application layout."""
+        """
+        Render the full application layout.
+        This is maintained for backward compatibility.
+        """
         # Display sidebar
         self.sidebar.display()
         
