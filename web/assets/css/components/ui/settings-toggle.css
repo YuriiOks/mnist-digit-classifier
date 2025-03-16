@@ -1,0 +1,10 @@
+/* Toggle settings */
+.setting-toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .setting-toggle-label {
+    font-weight: 600;
+  }
