@@ -478,9 +478,6 @@ class Layout:
     
     def render_header(self) -> None:
         """Render just the application header."""
-        # Display sidebar
-        self.sidebar.display()
-        
         # Display header
         self.header.display()
 
