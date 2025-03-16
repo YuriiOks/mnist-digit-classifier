@@ -1,0 +1,252 @@
+/* MNIST Digit Classifier
+ * Copyright (c) 2025
+ * File: assets/css/components/buttons.css
+ * Description: Button component styles with enhanced navigation
+ * Created: 2024-05-03
+ * Updated: 2024-03-15
+ */
+
+/* === Base Button Styles === */
+button, .stButton button {
+  font-family: var(--font-primary);
+  font-weight: var(--font-weight-medium);
+  transition: var(--transition-speed-normal) var(--transition-timing);
+  cursor: pointer;
+  border-radius: var(--border-radius-md);
+  position: relative;
+  overflow: hidden;
+  margin: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-md);
+  font-size: var(--font-size-sm);
+  text-align: center;
+  border: var(--button-border-width) solid transparent;
+  box-shadow: var(--shadow-sm);
+}
+
+/* === Primary Button Styles === */
+button[data-testid="baseButton-primary"],
+.stButton button[kind="primary"],
+.stButton button[data-testid="baseButton-primary"] {
+  background: linear-gradient(90deg, var(--color-primary), var(--color-secondary)) !important;
+  color: var(--color-text-on-primary) !important;
+  border: none !important;
+  box-shadow: var(--shadow-md) !important;
+  text-shadow: var(--text-shadow-sm) !important;
+}
+
+/* Shimmer effect setup */
+button[data-testid="baseButton-primary"]::after,
+.stButton button[kind="primary"]::after,
+.stButton button[data-testid="baseButton-primary"]::after {
+  content: '' !important;
+  position: absolute !important;
+  top: -50% !important;
+  left: -50% !important;
+  width: 200% !important;
+  height: 200% !important;
+  background: var(--shimmer-gradient) !important;
+  transform: rotate(32deg) !important;
+  opacity: 0 !important;
+  transition: var(--transition-speed-normal) !important;
+  pointer-events: none !important;
+}
+
+/* Primary button hover effect */
+button[data-testid="baseButton-primary"]:hover,
+.stButton button[kind="primary"]:hover,
+.stButton button[data-testid="baseButton-primary"]:hover {
+  transform: var(--button-hover-transform) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+/* Primary button shimmer animation on hover */
+button[data-testid="baseButton-primary"]:hover::after,
+.stButton button[kind="primary"]:hover::after,
+.stButton button[data-testid="baseButton-primary"]:hover::after {
+  opacity: 1 !important;
+  animation: buttonShine 1.5s ease-in-out !important;
+}
+
+/* Animation for button shine effect */
+@keyframes buttonShine {
+  0% {
+    transform: rotate(30deg) translate(-50%, -50%);
+  }
+  100% {
+    transform: rotate(30deg) translate(50%, 50%);
+  }
+}
+
+/* === Secondary Button Styles === */
+button[data-testid="baseButton-secondary"],
+.stButton button[kind="secondary"],
+.stButton button[data-testid="baseButton-secondary"] {
+  background-color: transparent !important;
+  color: var(--color-primary) !important;
+  border: var(--border-width-thin) solid var(--color-primary) !important;
+}
+
+/* Secondary button hover effect */
+button[data-testid="baseButton-secondary"]:hover,
+.stButton button[kind="secondary"]:hover,
+.stButton button[data-testid="baseButton-secondary"]:hover {
+  background-color: rgba(var(--color-primary-rgb), 0.1) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+
+/* === Navigation Button Base Styles === */
+[data-testid="stButton"][data-baseweb-key^="nav_"] button {
+  width: 100%;
+  text-align: center;
+  padding: var(--spacing-sm) var(--spacing-md) !important;
+  margin-bottom: var(--spacing-sm) !important;
+  font-weight: var(--font-weight-medium) !important;
+  letter-spacing: 0.3px !important;
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--border-radius-lg) !important;
+  transition: all var(--transition-speed-normal) var(--transition-timing) !important;
+  border: var(--border-width-thin) solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 
+    var(--shadow-md),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Icon styling in navigation buttons */
+[data-testid="stButton"][data-baseweb-key^="nav_"] button span:first-child {
+  text-shadow: var(--nav-text-shadow) !important;
+  margin-right: var(--spacing-sm) !important;
+  font-size: var(--font-size-lg) !important;
+}
+
+/* === Navigation Button Hover Effects === */
+[data-testid="stButton"][data-baseweb-key^="nav_"] button:hover {
+  transform: var(--button-hover-transform) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+/* Add shimmer effect on hover */
+[data-testid="stButton"][data-baseweb-key^="nav_"] button::after {
+  content: '' !important;
+  position: absolute !important;
+  top: -50% !important;
+  left: -50% !important;
+  width: 200% !important;
+  height: 200% !important;
+  background: var(--shimmer-gradient-subtle) !important;
+  transform: rotate(30deg) !important;
+  opacity: 0 !important;
+  transition: var(--transition-speed-normal) !important;
+  pointer-events: none !important;
+}
+
+[data-testid="stButton"][data-baseweb-key^="nav_"] button:hover::after {
+  opacity: 1 !important;
+  animation: navButtonShine var(--animation-duration-slow) ease-in-out !important;
+}
+
+@keyframes navButtonShine {
+  0% {
+    transform: rotate(30deg) translate(-100%, -100%);
+  }
+  100% {
+    transform: rotate(30deg) translate(100%, 100%);
+  }
+}
+
+/* === Navigation Button Active State === */
+[data-testid="stButton"][data-baseweb-key^="nav_"] button.active,
+[data-testid="stButton"][data-baseweb-key^="nav_"][data-active="true"] button {
+  transform: translateY(0) !important;
+  box-shadow: 
+    var(--shadow-sm),
+    inset var(--text-shadow-lg) !important;
+  border-left: var(--border-width-thick) solid rgba(255, 255, 255, 0.8) !important;
+  padding-left: calc(var(--spacing-md) - var(--border-width-thick)) !important;
+}
+
+/* === Navigation Button Vertical Gradient System (REVERSED) === */
+/* Light Theme - Single top-to-bottom gradient broken into segments */
+[data-theme="light"] [data-testid="stButton"][data-baseweb-key="nav_home_btn"] button {
+  background: linear-gradient(180deg, var(--color-secondary), color-mix(in srgb, var(--color-secondary) 75%, var(--color-primary) 25%)) !important;
+}
+
+[data-theme="light"] [data-testid="stButton"][data-baseweb-key="nav_draw_btn"] button {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--color-secondary) 75%, var(--color-primary) 25%), color-mix(in srgb, var(--color-secondary) 50%, var(--color-primary) 50%)) !important;
+}
+
+[data-theme="light"] [data-testid="stButton"][data-baseweb-key="nav_history_btn"] button {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--color-secondary) 50%, var(--color-primary) 50%), color-mix(in srgb, var(--color-secondary) 25%, var(--color-primary) 75%)) !important;
+}
+
+[data-theme="light"] [data-testid="stButton"][data-baseweb-key="nav_settings_btn"] button {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--color-secondary) 25%, var(--color-primary) 75%), var(--color-primary)) !important;
+}
+
+/* Dark Theme - Same vertical gradient pattern with dark theme colors */
+[data-theme="dark"] [data-testid="stButton"][data-baseweb-key="nav_home_btn"] button {
+  background: linear-gradient(180deg, var(--color-secondary), color-mix(in srgb, var(--color-secondary) 75%, var(--color-primary) 25%)) !important;
+}
+
+[data-theme="dark"] [data-testid="stButton"][data-baseweb-key="nav_draw_btn"] button {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--color-secondary) 75%, var(--color-primary) 25%), color-mix(in srgb, var(--color-secondary) 50%, var(--color-primary) 50%)) !important;
+}
+
+[data-theme="dark"] [data-testid="stButton"][data-baseweb-key="nav_history_btn"] button {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--color-secondary) 50%, var(--color-primary) 50%), color-mix(in srgb, var(--color-secondary) 25%, var(--color-primary) 75%)) !important;
+}
+
+[data-theme="dark"] [data-testid="stButton"][data-baseweb-key="nav_settings_btn"] button {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--color-secondary) 25%, var(--color-primary) 75%), var(--color-primary)) !important;
+}
+
+/* === Button Focus States === */
+button:focus,
+.stButton button:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color) !important;
+}
+
+[data-testid="stButton"][data-baseweb-key^="nav_"] button:focus {
+  outline: none !important;
+  box-shadow: 
+    var(--shadow-md),
+    0 0 0 var(--border-width-thin) rgba(255, 255, 255, 0.5) !important;
+}
+
+/* === Button Sizes === */
+.button-small, .stButton.button-small button {
+  padding: var(--spacing-xs) var(--spacing-sm) !important;
+  font-size: var(--font-size-sm) !important;
+}
+
+.button-large, .stButton.button-large button {
+  padding: var(--spacing-sm) var(--spacing-lg) !important;
+  font-size: var(--font-size-lg) !important;
+}
+
+/* === Additional Theme-specific Adjustments === */
+[data-theme="dark"] button[data-testid="baseButton-secondary"],
+[data-theme="dark"] .stButton button[kind="secondary"],
+[data-theme="dark"] .stButton button[data-testid="baseButton-secondary"] {
+  border-color: var(--color-primary) !important;
+  color: var(--color-primary) !important;
+}
+
+/* === Disabled Button States === */
+button:disabled,
+.stButton button:disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Ensure transitions on theme change */
+[data-theme="light"] [data-testid="stButton"] button,
+[data-theme="dark"] [data-testid="stButton"] button {
+  transition: background var(--transition-speed-normal) var(--transition-timing),
+              transform var(--transition-speed-normal) var(--transition-timing),
+              box-shadow var(--transition-speed-normal) var(--transition-timing) !important;
+}
