@@ -7,3 +7,4 @@ pandas==2.0.3
 streamlit-option-menu==0.3.2
 streamlit-toggle-switch==1.0.2
 pyyaml==6.0.1
+st-click-detector==0.1.3
