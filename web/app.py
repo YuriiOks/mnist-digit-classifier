@@ -493,28 +493,41 @@ def render_sidebar():
     try:
         from ui.components.controls.bb8_toggle import BB8Toggle
         
-        # First explicitly load the BB8 CSS
+        # Load BB8 CSS explicitly first
         bb8_css = resource_manager.load_css("components/controls/bb8-toggle.css")
         if bb8_css:
             resource_manager.inject_css(bb8_css)
-            
-        # Create a container with custom height to make room for BB8
+        
+        # Use container with custom height to make room for BB8
         with st.sidebar.container():
             st.markdown("<div style='height: 14px'></div>", unsafe_allow_html=True)
             
-            # Create and display BB8 toggle with centered alignment
+            # Centered container for BB8
             st.markdown('<div style="display: flex; justify-content: center;">', unsafe_allow_html=True)
-            bb8_toggle = BB8Toggle(theme_manager=theme_manager, on_change=lambda theme: st.rerun())
+            
+            # Create and display the BB8 toggle
+            bb8_key = "sidebar_bb8_toggle"
+            bb8_toggle = BB8Toggle(
+                theme_manager_instance=theme_manager, 
+                on_change=lambda theme: st.rerun(),
+                key=bb8_key
+            )
             toggle_result = bb8_toggle.display()
+            
             st.markdown('</div>', unsafe_allow_html=True)
             
-            # Add theme label below toggle
-            st.markdown(f"""
-            <div style="text-align: center; font-size: 0.8rem; margin-top: 4px;">
-                {theme_manager.get_current_theme().capitalize()} Mode
-            </div>
-            """, unsafe_allow_html=True)
+            # Show current theme below toggle
+            current_theme = theme_manager.get_current_theme()
+            st.markdown(
+                f'<div style="text-align: center; font-size: 0.8rem; margin-top: 4px;">{current_theme.capitalize()} Mode</div>',
+                unsafe_allow_html=True
+            )
             
+            # Debug info
+            if st.session_state.get("debug_mode", False):
+                st.write(f"Toggle result: {toggle_result}")
+                st.write(f"Session state: {dict([(k, v) for k, v in st.session_state.items() if 'bb8' in str(k) or 'theme' in str(k)])}")
+
     except Exception as e:
         # Fallback to simple toggle if BB8 fails
         st.sidebar.error(f"Could not load BB8 toggle: {str(e)}")
@@ -660,7 +673,6 @@ def render_settings_view():
                 color: #212529;
                 text-align: center;
             ">
-                <div style="font-weight: bold; margin-bottom: 0.5rem;">Light Mode</div>
                 <div style="display: flex; justify-content: center; gap: 0.5rem;">
                     <div style="width: 24px; height: 24px; border-radius: 4px; background-color: #4361ee;"></div>
                     <div style="width: 24px; height: 24px; border-radius: 4px; background-color: #4cc9f0;"></div>
