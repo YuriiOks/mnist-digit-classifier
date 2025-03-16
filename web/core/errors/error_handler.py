@@ -125,7 +125,6 @@ class ErrorHandler:
         except Exception as e:
             # If Streamlit is not available, fallback to print
             logger.error(f"Could not display message to user: {str(e)}")
-            print(f"User Message ({level}): {message}", file=sys.stderr)
     
     @classmethod
     def format_exception(cls, exc: Exception) -> str:
