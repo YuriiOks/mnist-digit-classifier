@@ -193,38 +193,35 @@ class ResourceManager:
         return None
 
     def load_css(self, css_path: str) -> Optional[str]:
-        """Load a CSS file with robust path resolution for singular/plural variants."""
-        # Log requested path
-        self._logger.debug(f"Attempting to load CSS: {css_path}")
-        
-        # Try the original path first
-        content = self.load_text_resource(ResourceType.CSS, css_path)
-        if content:
-            return content
-        
-        # Try plural/singular variants
-        if css_path.endswith('.css'):
-            base_path = css_path[:-4]  # Remove .css extension
+        """Load a CSS file with improved debugging for BB8."""
+        # Debug log for BB8 toggle
+        if "bb8" in css_path.lower():
+            self._logger.info(f"Attempting to load BB8 CSS: {css_path}")
             
-            # Try adding/removing 's' at the end
-            if base_path.endswith('s'):
-                # Try singular form
-                singular_path = f"{base_path[:-1]}.css"
-                content = self.load_text_resource(ResourceType.CSS, singular_path)
-                if content:
-                    self._logger.info(f"Found CSS using singular form: {singular_path}")
-                    return content
-            else:
-                # Try plural form
-                plural_path = f"{base_path}s.css"
-                content = self.load_text_resource(ResourceType.CSS, plural_path)
-                if content:
-                    self._logger.info(f"Found CSS using plural form: {plural_path}")
-                    return content
+            # Try direct path under assets/css
+            direct_path = self._project_root / "assets" / "css" / css_path
+            if direct_path.exists():
+                self._logger.info(f"Found BB8 CSS at direct path: {direct_path}")
+                try:
+                    with open(direct_path, 'r', encoding='utf-8') as f:
+                        return f.read()
+                except Exception as e:
+                    self._logger.error(f"Error reading BB8 CSS file: {str(e)}")
         
-        # Log what we tried
-        self._logger.warning(f"Failed to load CSS file: {css_path} (tried singular/plural forms)")
-        return None
+        # Continue with regular CSS loading logic
+        content = self.load_text_resource(ResourceType.CSS, css_path)
+        
+        # If BB8 CSS wasn't found, log more details
+        if "bb8" in css_path.lower() and not content:
+            css_dir = self._project_root / "assets" / "css"
+            if css_dir.exists():
+                self._logger.info("Listing CSS directory contents:")
+                for root, dirs, files in os.walk(css_dir):
+                    for file in files:
+                        if file.endswith('.css'):
+                            self._logger.info(f"  - {os.path.join(os.path.relpath(root, css_dir), file)}")
+        
+        return content
 
     def load_template(self, template_path: str) -> Optional[str]:
         """Load a template file."""
