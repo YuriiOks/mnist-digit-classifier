@@ -1,0 +1,23 @@
+/* Prediction result component */
+.predicted-digit {
+    font-size: var(--font-size-4xl);
+    font-weight: 700;
+    color: var(--color-primary);
+  }
+  
+  .confidence-bar {
+    height: 8px;
+    background-color: var(--color-highlight);
+    border-radius: var(--border-radius-full);
+    overflow: hidden;
+  }
+  
+  .confidence-level {
+    height: 100%;
+    background-color: var(--color-primary);
+  }
+  
+  /* Animation for predictions */
+  .prediction-result {
+    animation: fadeIn 0.3s ease-out;
+  }
