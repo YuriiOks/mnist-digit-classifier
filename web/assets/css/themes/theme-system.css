@@ -36,7 +36,7 @@
   
   /* Text colors */
   --color-text: #f8f9fa;
-  --color-text-light: #d1d5db;
+  --color-text: #d1d5db;
   --color-text-muted: #9ca3af;
   
   /* Border and shadow */
@@ -78,7 +78,7 @@
   /* Dark theme specific aliases */
   --color-bg-secondary-dark: var(--color-background-alt);
   --color-border-dark: var(--color-border);
-  --color-text-secondary-dark: var(--color-text-light);
+  --color-text-secondary-dark: var(--color-text);
 }
 
 /* Light theme navigation gradients now defined only in variables.css */
