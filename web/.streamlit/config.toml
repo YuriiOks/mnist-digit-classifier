@@ -1,9 +1,13 @@
 [theme]
-primaryColor = "#007BFF"
-backgroundColor = "#FAFCFC"
-secondaryBackgroundColor = "#F8F9FA"
-textColor = "#262730"
-font = "sans serif"
+# Match your application's light theme (default)
+primaryColor = "#4361ee"  # Match --color-primary from CSS
+backgroundColor = "#f8f9fa"  # Match --color-background from CSS
+secondaryBackgroundColor = "#ffffff"  # Match --color-card from CSS
+textColor = "#212529"  # Match --color-text from CSS
+font = "system-ui, -apple-system, sans-serif"  # Match your --font-primary
+
+# Add dark theme support
+base = "light"  # This can be overridden programmatically when theme changes
 
 [server]
 enableCORS = false
