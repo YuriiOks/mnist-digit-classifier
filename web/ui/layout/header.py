@@ -42,30 +42,23 @@ class Header(Component[None]):
             key: Unique key for Streamlit.
             **kwargs: Additional keyword arguments.
         """
-        # Create a logger for debugging before initializing parent
-        self._init_logger = logging.getLogger(f"{__name__}.Header.__init__")
-        self._init_logger.info("Initializing Header component")
-        
-        # Set basic properties that don't depend on parent initialization
+        # Set basic properties before parent initialization
         self.__title = title
         self.__actions_html = actions_html
         self.__toggle_theme_callback = toggle_theme_callback or theme_manager.toggle_theme
         
         # Initialize parent with explicitly named parameters
-        try:
-            super().__init__(
-                component_type="layout",
-                component_name="header",
-                id=id,
-                classes=classes or [],
-                attributes=attributes or {},
-                key=key or "app_header",
-                **kwargs
-            )
-            self._init_logger.info("Header component parent initialized successfully")
-        except Exception as e:
-            self._init_logger.error(f"Error initializing Header parent: {str(e)}", exc_info=True)
-            raise
+        super().__init__(
+            component_type="layout",
+            component_name="header",
+            id=id,
+            classes=classes or [],
+            attributes=attributes or {},
+            key=key or "app_header",
+            **kwargs
+        )
+        
+        self._logger.debug("Header component initialized successfully")
     
     @property
     def title(self) -> str:
@@ -88,6 +81,7 @@ class Header(Component[None]):
         self.__actions_html = value
     
     @AspectUtils.catch_errors
+    @AspectUtils.log_method
     def render(self) -> str:
         """
         Render the header component.
@@ -95,8 +89,6 @@ class Header(Component[None]):
         Returns:
             HTML representation of the header.
         """
-        self._logger.info("Rendering header")
-        
         # Try to render using template
         template_content = self.render_template(
             "components/layout/header.html",
@@ -107,11 +99,9 @@ class Header(Component[None]):
         )
         
         if template_content:
-            self._logger.info("Successfully rendered header using template")
             return template_content
         
         # Fallback to direct HTML generation
-        self._logger.info("Falling back to direct HTML generation for header")
         return f"""
         <div class="app-header">
             <h1>{self.__title}</h1>
@@ -120,23 +110,24 @@ class Header(Component[None]):
         """
     
     @AspectUtils.catch_errors
+    @AspectUtils.log_method
     def display(self) -> None:
         """Display the header component in Streamlit."""
-        self._logger.info("Displaying header")
+        # Load CSS for header
+        self._load_component_css()
         
-        try:
-            # Load CSS for header if needed
-            header_css = resource_manager.load_css("components/layout/header.css")
-            if header_css:
-                resource_manager.inject_css(header_css)
-                self._logger.info("Loaded header CSS")
-            
-            # Render the HTML
-            header_html = self.render()
-            
-            # Display in Streamlit
-            st.markdown(header_html, unsafe_allow_html=True)
-            self._logger.info("Header displayed successfully")
-        except Exception as e:
-            self._logger.error(f"Error displaying header: {str(e)}", exc_info=True)
-            st.error("Error displaying the application header")
+        # Render the HTML
+        header_html = self.render()
+        
+        # Display in Streamlit
+        st.markdown(header_html, unsafe_allow_html=True)
+    
+    def _load_component_css(self) -> None:
+        """Load CSS specific to this component."""
+        css_path = "components/layout/header.css"
+        css_content = resource_manager.load_css(css_path)
+        if css_content:
+            resource_manager.inject_css(css_content)
+            self._logger.debug(f"Loaded CSS: {css_path}")
+        else:
+            self._logger.warning(f"Could not load CSS: {css_path}")
