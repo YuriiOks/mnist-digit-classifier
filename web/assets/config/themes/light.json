@@ -3,7 +3,9 @@
   "displayName": "Default Theme",
   "colors": {
     "primary": "#4361ee",
+    "primary-rgb": "67, 97, 238",
     "secondary": "#4cc9f0",
+    "secondary-rgb": "76, 201, 240",
     "accent": "#4895ef",
     "background": "#f8f9fa",
     "backgroundAlt": "#f1f3f5",
