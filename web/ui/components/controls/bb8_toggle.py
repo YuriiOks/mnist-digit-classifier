@@ -70,52 +70,15 @@ class BB8Toggle(Component[Dict[str, Any]]):
 
         # Unique ID so multiple toggles don't conflict
         wrapper_id = f"bb8-toggle-{uuid.uuid4().hex[:8]}"
+        print(wrapper_id)
 
         checked_attr = "checked" if is_dark else ""
 
         # 2) Inline all the CSS along with the BB8 HTML:
-        full_html = f"""
-        <style>
-        {BB8_INLINE_CSS}
-        </style>
-        <div id="{wrapper_id}" style="text-align:center; padding-top:20px; padding-bottom:20px;">
-          <a href="#" id="bb8-toggle" style="display:inline-block; text-decoration:none;">
-            <label class="bb8-toggle">
-              <input class="bb8-toggle__checkbox" type="checkbox" {checked_attr} />
-              <div class="bb8-toggle__container">
-                <div class="bb8-toggle__scenery">
-                  <div class="bb8-toggle__star"></div>
-                  <div class="bb8-toggle__star"></div>
-                  <div class="bb8-toggle__star"></div>
-                  <div class="bb8-toggle__star"></div>
-                  <div class="bb8-toggle__star"></div>
-                  <div class="bb8-toggle__star"></div>
-                  <div class="bb8-toggle__star"></div>
-                  <div class="tatto-1"></div>
-                  <div class="tatto-2"></div>
-                  <div class="gomrassen"></div>
-                  <div class="hermes"></div>
-                  <div class="chenini"></div>
-                  <div class="bb8-toggle__cloud"></div>
-                  <div class="bb8-toggle__cloud"></div>
-                  <div class="bb8-toggle__cloud"></div>
-                </div>
-                <div class="bb8">
-                  <div class="bb8__head-container">
-                    <div class="bb8__antenna"></div>
-                    <div class="bb8__antenna"></div>
-                    <div class="bb8__head"></div>
-                  </div>
-                  <div class="bb8__body"></div>
-                </div>
-                <div class="artificial__hidden">
-                  <div class="bb8__shadow"></div>
-                </div>
-              </div>
-            </label>
-          </a>
-        </div>
-        """
+
+        template = resource_manager.load_template("assets/templates/components/controls/bb8-toggle.html")
+        full_html = template.replace("{BB8_INLINE_CSS}", BB8_INLINE_CSS)
+        full_html = full_html.replace("{checked_attr}", checked_attr)
 
         # Use st_click_detector to see if user clicked on the anchor with id="bb8-toggle"
         clicked = click_detector(full_html, key=f"{self.__key}_{current_theme}")
