@@ -56,12 +56,8 @@ class DrawView(View):
         }
         
         # Load tabs data
-        tabs_data = resource_manager.load_json_resource("draw/tabs.json") or [
-            {"id": "draw", "title": "Draw Digit", "icon": "✏️", "content": "Draw a digit here.", "active": True},
-            {"id": "upload", "title": "Upload Image", "icon": "📤", "content": "Upload an image of a digit.", "active": False},
-            {"id": "url", "title": "Image URL", "icon": "🔗", "content": "Enter a URL to a digit image.", "active": False}
-        ]
-        
+        tabs_data = resource_manager.load_json_resource("draw/tabs.json")
+
         # Load tips data
         tips_data = resource_manager.load_json_resource("draw/tips.json") or {
             "title": "Tips for Best Results",
@@ -110,7 +106,25 @@ class DrawView(View):
         )
         welcome_card.display()
 
-    def _render_tab_buttons(self) -> None:
+    @AspectUtils.catch_errors
+    @AspectUtils.log_method
+    def __render_feature_card(self, tab_data: List[Dict[str, Any]]) -> None:
+        """
+        Render the feature card for the current tab.
+        
+        Args:
+            tabs_data: List of tab data from JSON
+        """
+        # Find the current tab's data
+        
+        feature_card = FeatureCard(
+            title=tab_data.get("title", ""),
+            content=tab_data.get("content", ""),
+            icon=tab_data.get("icon", "")
+        )
+        feature_card.display()
+
+    def __render_tab_buttons(self) -> None:
         """Render tab selection buttons."""
         tab_cols = st.columns(3)
         with tab_cols[0]:
@@ -137,10 +151,10 @@ class DrawView(View):
                 st.session_state.active_tab = "url"
                 st.rerun()
     
-    def _render_draw_tab(self) -> None:
+    def __render_draw_tab(self, draw_data) -> None:
         """Render the draw digit tab content."""
-        st.markdown("<h3>Draw a Digit</h3>", unsafe_allow_html=True)
-        st.markdown("<p>Use your mouse or touch to draw a digit from 0-9.</p>", unsafe_allow_html=True)
+
+        self.__render_feature_card(draw_data)
         
         # Add canvas for drawing
         try:
@@ -180,10 +194,9 @@ class DrawView(View):
             </div>
             """, unsafe_allow_html=True)
     
-    def _render_upload_tab(self) -> None:
+    def __render_upload_tab(self, upload_data) -> None:
         """Render the upload image tab content."""
-        st.markdown("<h3>Upload an Image</h3>", unsafe_allow_html=True)
-        st.markdown("<p>Upload an image of a handwritten digit (PNG, JPG, JPEG).</p>", unsafe_allow_html=True)
+        self.__render_feature_card(upload_data)
         
         # File uploader - use the key from session state
         uploaded_file = st.file_uploader("Upload digit image", 
@@ -202,11 +215,10 @@ class DrawView(View):
             except Exception as e:
                 st.error(f"Error processing image: {str(e)}")
     
-    def _render_url_tab(self) -> None:
+    def __render_url_tab(self, url_data) -> None:
         """Render the URL input tab content."""
-        st.markdown("<h3>Enter Image URL</h3>", unsafe_allow_html=True)
-        st.markdown("<p>Provide a URL to an image of a handwritten digit.</p>", unsafe_allow_html=True)
-        
+        self.__render_feature_card(url_data)
+
         # URL input - use the key from session state
         url = st.text_input("Image URL", 
                           key=st.session_state.url_input_key, 
@@ -239,7 +251,7 @@ class DrawView(View):
             except Exception as e:
                 st.error(f"Error loading image from URL: {str(e)}")
                 
-    def _render_action_buttons(self) -> None:
+    def __render_action_buttons(self) -> None:
         """Render action buttons (Clear, Predict)."""
         # Add buttons in a row
         button_cols = st.columns(2)
@@ -274,7 +286,7 @@ class DrawView(View):
                 st.session_state.show_correction = False
                 st.session_state.prediction_correct = None
                 
-    def _render_prediction_result(self) -> None:
+    def __render_prediction_result(self) -> None:
         """Render prediction result if available."""
         if st.session_state.prediction_made:
             st.markdown("<hr>", unsafe_allow_html=True)
@@ -345,21 +357,21 @@ class DrawView(View):
         self.__render_welcome_card(welcome_data)
 
         # Tab navigation
-        self._render_tab_buttons()
+        self.__render_tab_buttons()
         
         st.markdown("<hr>", unsafe_allow_html=True)
         
         # Input container based on active tab
         if st.session_state.active_tab == "draw":
-            self._render_draw_tab()
+            self.__render_draw_tab(tabs_data[0])
         elif st.session_state.active_tab == "upload":
-            self._render_upload_tab()
+            self.__render_upload_tab(tabs_data[1])
         elif st.session_state.active_tab == "url":
-            self._render_url_tab()
+            self.__render_url_tab(tabs_data[2])
         
         # Action buttons - always visible regardless of active tab
         st.markdown("<hr>", unsafe_allow_html=True)
-        self._render_action_buttons()
+        self.__render_action_buttons()
         
         # Prediction result
-        self._render_prediction_result()
+        self.__render_prediction_result()
