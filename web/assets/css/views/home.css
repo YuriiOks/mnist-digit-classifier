@@ -5,12 +5,6 @@
  * Created: 2024-05-03
  */
 
-/* Hero section */
-.home-hero {
-  text-align: center;
-  margin-bottom: var(--spacing-2xl);
-  padding: var(--spacing-2xl) 0;
-}
 
 .home-title {
   font-size: var(--font-size-4xl);
@@ -19,9 +13,8 @@
 
 .home-subtitle {
   font-size: var(--font-size-xl);
-  color: var(--color-text-light);
+  color: var(--color-text);
   max-width: 600px;
-  margin: 0 auto var(--spacing-lg) auto;
 }
 
 /* Feature cards section */
@@ -33,7 +26,7 @@
 }
 
 .welcome-card-container {
-  margin-bottom: var(--spacing-2xl);
+  margin-bottom: 0.5rem;
 }
 
 /* How it works section */
@@ -58,26 +51,6 @@
   margin-bottom: var(--spacing-sm);
 }
 
-/* Call to action section */
-.cta-section {
-  text-align: center;
-  padding: var(--spacing-2xl) 0;
-  background-color: var(--color-card);
-  border-radius: var(--border-radius-lg);
-  margin-bottom: var(--spacing-2xl);
-}
-
-.cta-title {
-  font-size: var(--font-size-3xl);
-  margin-bottom: var(--spacing-lg);
-}
-
-.cta-buttons {
-  display: flex;
-  justify-content: center;
-  gap: var(--spacing-md);
-}
-
 /* Home page sections */
 .home-section {
   margin-bottom: 2.5rem;
@@ -91,28 +64,6 @@
   gap: var(--spacing-lg);
 }
 
-/* CTA Section Alignment fixes for Streamlit */
-.cta-section .stHorizontalBlock {
-  align-items: center !important;
-}
-
-.cta-section h2 {
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-.cta-section .stButton {
-  margin-top: 0 !important;
-  display: flex;
-  justify-content: center;
-}
-
-.cta-section .stButton button {
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
 
 /* Responsive adjustments */
 @media (max-width: var(--breakpoint-md)) {
@@ -124,8 +75,4 @@
     font-size: var(--font-size-lg);
   }
   
-  .cta-buttons {
-    flex-direction: column;
-    align-items: center;
-  }
 }
