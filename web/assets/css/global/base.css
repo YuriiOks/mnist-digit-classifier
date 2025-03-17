@@ -77,7 +77,7 @@ a:hover {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-text-light);
+  background: var(--color-text);
 }
 
 /* Animations moved to animations.css */
