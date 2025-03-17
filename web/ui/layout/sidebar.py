@@ -117,11 +117,22 @@ class Sidebar(Component[None]):
             nav_items = NavigationState.get_routes()
             active_view = NavigationState.get_active_view()
             
+            # Define mapping of navigation IDs to CSS-expected keys
+            nav_key_mapping = {
+                "home": "nav_home_btn",
+                "draw": "nav_draw_btn", 
+                "history": "nav_history_btn",
+                "settings": "nav_settings_btn"
+            }
+
             # Create navigation buttons
             for item in nav_items:
+                # Use the exact key format expected by CSS
+                button_key = nav_key_mapping.get(item['id'], f"nav_{item['id']}_btn")
+                
                 if st.button(
                     f"{item['icon']} {item['label']}",
-                    key=f"nav_{item['id']}",
+                    key=button_key,
                     type="primary" if active_view == item['id'] else "secondary",
                     use_container_width=True
                 ):
