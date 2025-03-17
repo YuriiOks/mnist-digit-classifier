@@ -48,16 +48,9 @@ def load_core_css():
         "global/base.css", 
         "global/reset.css",
 
-        # Buttons
-        "components/controls/buttons.css",
-        
-        # Cards
-        "components/cards/card.css",
-
         # Layout
         "components/layout/header.css",        
         "components/layout/footer.css",
-        "components/layout/sidebar.css",
 
         # Theme system
         "themes/theme-system.css",
@@ -86,16 +79,6 @@ def load_core_css():
         logger.info(f"Successfully loaded {loaded_count} CSS files, {failed_count} failed")
     else:
         logger.error("No core CSS was loaded - app may display incorrectly")
-
-def render_sidebar():
-    """
-    Render the sidebar using the Sidebar component.
-    """
-    from ui.layout.sidebar import Sidebar
-    
-    # Create and display the sidebar component
-    sidebar = Sidebar()
-    sidebar.display()
 
 def main():
     """Main entry point for the MNIST Digit Classifier application."""
