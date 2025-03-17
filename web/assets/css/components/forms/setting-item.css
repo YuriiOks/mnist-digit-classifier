@@ -10,7 +10,7 @@
   }
   
   .setting-description {
-    color: var(--color-text-light);
+    color: var(--color-text);
     font-size: var(--font-size-sm);
     margin-bottom: var(--spacing-sm);
   }
