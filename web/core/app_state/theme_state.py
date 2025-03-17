@@ -37,39 +37,56 @@ class ThemeState:
     DEFAULT_THEME = THEME_LIGHT
     DEFAULT_COLORS = {
         THEME_LIGHT: {
-            "primary": "#4361ee",
-            "secondary": "#4cc9f0",
-            "background": "#FFFFFF",
-            "surface": "#F5F5F5",
-            "text": "#333333",
-            "text_secondary": "#555555",
-            "border": "#DDDDDD",
-            "error": "#FF3B30",
-            "success": "#34C759",
-            "warning": "#FFCC00"
+                "primary": "#4361ee",
+                "primary-rgb": "67, 97, 238",
+                "secondary": "#4cc9f0",
+                "secondary-rgb": "76, 201, 240",
+                "accent": "#4895ef",
+                "accent-rgb": "72, 149, 239",
+                "background": "#f8f9fa",
+                "background-alt": "#f1f3f5",
+                "card": "#ffffff",
+                "card-alt": "#f1f3f5",
+                "text": "#212529",
+                "text-light": "#6c757d",
+                "text-muted": "#adb5bd",
+                "border": "#dee2e6",
+                "success": "#4cc9f0",
+                "warning": "#fbbf24",
+                "error": "#f87171",
+                "info": "#60a5fa"
         },
         THEME_DARK: {
-            "primary": "#7B7BFF",
-            "secondary": "#40C7D7",
-            "background": "#121212",
-            "surface": "#1E1E1E",
-            "text": "#FFFFFF",
-            "text_secondary": "#BBBBBB",
-            "border": "#333333",
-            "error": "#FF453A",
-            "success": "#32D74B",
-            "warning": "#FFD60A"
+                "primary": "#ee4347",
+                "primary-rgb": "238, 67, 71",
+                "secondary": "#f0c84c",
+                "secondary-rgb": "240, 200, 76",
+                "accent": "#5e81f4",
+                "accent-rgb": "94, 129, 244",
+                "background": "#121212",
+                "background-alt": "#1a1a1a",
+                "color-card": "#1e1e1e",
+                "card": "#1e1e1e",
+                "card-alt": "#252525",
+                "text": "#f8f9fa",
+                "text-light": "#d1d5db",
+                "text-muted": "#9ca3af",
+                "border": "#383838",
+                "success": "#34d399",
+                "warning": "#fbbf24",
+                "error": "#f87171",
+                "info": "#60a5fa"
         }
     }
     DEFAULT_FONTS = {
-        "heading": "system-ui, sans-serif",
-        "body": "system-ui, sans-serif",
-        "code": "monospace"
+                "primary": "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+                "heading": "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+                "code": "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace"
     }
     DEFAULT_SETTINGS = {
-        "animations_enabled": True,
-        "transitions_speed": "normal",
-        "border_radius": "4px"
+                "border-radius": "0.5rem",
+                "shadow-strength": "1.4",
+                "animations-enabled": True
     }
 
     _logger = logging.getLogger(f"{__name__}.ThemeState")
@@ -151,6 +168,7 @@ class ThemeState:
             if not SessionState.has_key(cls.THEME_SETTINGS_KEY):
                 settings = theme_config.get("settings", cls.DEFAULT_SETTINGS)
                 SessionState.set(cls.THEME_SETTINGS_KEY, settings)
+
         except Exception as e:
             cls._logger.error(f"Error initializing theme state: {e}")
             # Fallback defaults
