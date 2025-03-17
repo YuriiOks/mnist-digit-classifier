@@ -269,12 +269,39 @@ class ResourceManager:
             self._logger.error(f"Error rendering template {template_path}: {str(e)}")
             return None
     
-    def inject_css(self, css_content: str) -> None:
-        """Inject CSS content into Streamlit."""
-        if not css_content:
-            return
-            
-        # Inject with proper style tags
+    _static_css_loaded = set()  # Track static CSS files by path
+    _dynamic_css_current = {}   # Track current theme-dynamic CSS content
+    
+    def inject_css(self, css_content: str, source_path: Optional[str] = None, 
+                   is_dynamic: bool = False) -> None:
+        """
+        Inject CSS with intelligent caching based on the CSS type.
+        
+        Args:
+            css_content: The CSS content to inject
+            source_path: Original path of the CSS file (for tracking)
+            is_dynamic: Whether this CSS should be updated on theme changes
+        """
+        if source_path:
+            # For static CSS files (loaded only once)
+            if not is_dynamic and source_path in self._static_css_loaded:
+                self._logger.debug(f"Skipping already loaded static CSS: {source_path}")
+                return
+                
+            if not is_dynamic:
+                self._static_css_loaded.add(source_path)
+        
+        # For dynamic CSS (theme-related)
+        if is_dynamic and source_path:
+            # Only inject if content changed
+            if source_path in self._dynamic_css_current and \
+               self._dynamic_css_current[source_path] == css_content:
+                self._logger.debug(f"Skipping unchanged dynamic CSS: {source_path}")
+                return
+                
+            self._dynamic_css_current[source_path] = css_content
+                
+        # Inject the CSS
         st.markdown(f"<style>{css_content}</style>", unsafe_allow_html=True)
     
     def load_and_inject_css(self, css_paths: List[str]) -> None:
