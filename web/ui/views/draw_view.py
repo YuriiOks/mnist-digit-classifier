@@ -5,16 +5,23 @@
 # Created: 2025-03-17
 
 import streamlit as st
+import logging
 import time
 import random
-import logging
-from typing import Optional
+from typing import Optional, Dict, Any, List, Tuple
 from PIL import Image
 import io
 
 from ui.views.base_view import View
+from ui.components.cards.card import WelcomeCard, FeatureCard
+from ui.components.feedback.prediction_result import PredictionResult
+from ui.components.inputs.canvas import DrawingCanvas
+from ui.components.inputs.file_upload import ImageUpload
+from ui.components.inputs.url_input import ImageUrlInput
 from core.app_state.canvas_state import CanvasState
-from core.app_state.settings_state import SettingsState
+from core.app_state.history_state import HistoryState
+from utils.resource_manager import resource_manager
+from utils.aspects import AspectUtils
 
 class DrawView(View):
     """Draw view for the MNIST Digit Classifier application."""
@@ -26,8 +33,44 @@ class DrawView(View):
             title="Digit Recognition",
             description="Choose a method to input a digit for recognition."
         )
+        # Hide the default header since we'll use welcome card
+        self.show_header = False
         
-    def _initialize_session_state(self) -> None:
+        # Logger initialization
+        self.__logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
+        
+    @AspectUtils.catch_errors
+    @AspectUtils.log_method
+    def __load_view_data(self) -> Tuple[Dict[str, Any], List[Dict[str, Any]], Dict[str, Any]]:
+        """
+        Load necessary JSON data for the view.
+        
+        Returns:
+            Tuple containing welcome card data, tabs data, and tips data
+        """
+        # Load welcome card data
+        welcome_data = resource_manager.load_json_resource("draw/welcome_card.json") or {
+            "title": "Draw & Recognize Digits",
+            "icon": "✏️",
+            "content": "Welcome to the drawing tool! Choose a method to input a digit."
+        }
+        
+        # Load tabs data
+        tabs_data = resource_manager.load_json_resource("draw/tabs.json") or [
+            {"id": "draw", "title": "Draw Digit", "icon": "✏️", "content": "Draw a digit here.", "active": True},
+            {"id": "upload", "title": "Upload Image", "icon": "📤", "content": "Upload an image of a digit.", "active": False},
+            {"id": "url", "title": "Image URL", "icon": "🔗", "content": "Enter a URL to a digit image.", "active": False}
+        ]
+        
+        # Load tips data
+        tips_data = resource_manager.load_json_resource("draw/tips.json") or {
+            "title": "Tips for Best Results",
+            "items": ["Draw clearly", "Center your digit", "Use a thick stroke"]
+        }
+        
+        return welcome_data, tabs_data, tips_data
+        
+    def __initialize_session_state(self) -> None:
         """Initialize session state variables for the draw view."""
         # Initialize session state variables if they don't exist
         if "active_tab" not in st.session_state:
@@ -50,7 +93,23 @@ class DrawView(View):
             st.session_state.url_input_key = "url_input_initial"
         if "reset_counter" not in st.session_state:
             st.session_state.reset_counter = 0
-            
+
+    @AspectUtils.catch_errors
+    @AspectUtils.log_method
+    def __render_welcome_card(self, welcome_data: Dict[str, Any]) -> None:
+        """
+        Render the welcome card at the top of the view.
+        
+        Args:
+            welcome_data: Welcome card data from JSON
+        """
+        welcome_card = WelcomeCard(
+            title=welcome_data.get("title", "Draw & Recognize Digits"),
+            content=welcome_data.get("content", "Welcome to the drawing tool!"),
+            icon=welcome_data.get("icon", "✏️")
+        )
+        welcome_card.display()
+
     def _render_tab_buttons(self) -> None:
         """Render tab selection buttons."""
         tab_cols = st.columns(3)
@@ -277,8 +336,14 @@ class DrawView(View):
     def render(self) -> None:
         """Render the draw view content."""
         # Initialize session state variables
-        self._initialize_session_state()
+        self.__initialize_session_state()
         
+        # Load welcome card and tab data
+        welcome_data, tabs_data, tips_data = self.__load_view_data()
+
+        # Render welcome card
+        self.__render_welcome_card(welcome_data)
+
         # Tab navigation
         self._render_tab_buttons()
         
