@@ -6,7 +6,7 @@
 
 """UI components, layouts, and views for the MNIST Digit Classifier."""
 
-from ui.layout.layout_components import Layout, Header, Footer, Sidebar
+from ui.layout import Layout, Header, Footer, Sidebar
 from ui.theme.theme_manager import ThemeManager, theme_manager
 from ui.components.base.component import Component
 from ui.components.cards.card import Card, FeatureCard, WelcomeCard
