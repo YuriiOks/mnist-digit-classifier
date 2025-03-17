@@ -8,8 +8,6 @@
 
 from ui.components.controls.buttons import Button, PrimaryButton, SecondaryButton, IconButton
 from ui.components.controls.bb8_toggle import BB8Toggle
-from ui.components.controls.bb8_toggle_css import get_bb8_toggle_css
-from ui.components.controls.bb8_toggle_template import get_bb8_toggle_template
 
 __all__ = [
     "Button",
@@ -17,6 +15,4 @@ __all__ = [
     "SecondaryButton",
     "IconButton",
     "BB8Toggle",
-    "get_bb8_toggle_css",
-    "get_bb8_toggle_template"
 ]
