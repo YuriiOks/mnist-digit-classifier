@@ -5,7 +5,7 @@
  * Created: 2024-05-03
  */
 
- .app-header {
+.app-header {
   background: linear-gradient(
     90deg,
     var(--color-primary),
@@ -19,7 +19,9 @@
   text-align: center;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
 }
+
 
 /* Header title styling with text shadow for better readability */
 .app-header h1 {
