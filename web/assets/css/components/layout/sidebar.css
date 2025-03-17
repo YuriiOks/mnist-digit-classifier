@@ -3,7 +3,7 @@
  * File: assets/css/components/layout/sidebar.css
  * Description: Sidebar component styles with enhanced visuals
  * Created: 2024-05-03
- * Updated: 2024-03-15
+ * Updated: 2025-03-17
  */
 
 /* Sidebar styling with gradient overlay */
@@ -17,15 +17,15 @@
   border-right: var(--border-width-thin) solid var(--color-border);
   width: var(--sidebar-width) !important;
   box-shadow: var(--shadow-md);
-  position: relative !important; /* Enable positioning context */
-  min-height: 100vh !important; /* Ensure full height */
+  position: relative !important;
+  min-height: 100vh !important;
 }
 
 section[data-testid="stSidebar"] > div {
   background-color: var(--color-card);
   width: var(--sidebar-width);
   background-image: inherit;
-  padding-bottom: 90px !important; /* Make space for the footer */
+  padding-bottom: 90px !important;
   min-height: 100vh !important;
 }
 
@@ -142,40 +142,6 @@ section[data-testid="stSidebar"] > div {
 }
 
 /* Sidebar footer - positioned fixed at the bottom */
-/* Sidebar footer - positioned fixed at the bottom */
-.sidebar-footer {
-  text-align: center;
-  padding: var(--spacing-md);
-  font-size: var(--font-size-xs);
-  color: var(--color-text-muted);
-  
-  /* Enhanced gradient background with better shine effect */
-  background: linear-gradient(
-    to bottom,
-    rgba(var(--color-background-rgb, 248, 249, 250), 0.0),
-    rgba(var(--color-background-rgb, 248, 249, 250), 0.7)
-  );
-  background-size: 100% 200%; /* Make gradient larger than the element */
-  background-position: 0 -30px; /* Position to show the most visible part */
-  
-  padding-top: var(--spacing-lg);
-  
-  /* Fixed positioning at the bottom of the sidebar */
-  position: absolute !important;
-  bottom: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  width: 100% !important;
-  border-top: 1px solid var(--color-border);
-  z-index: 10 !important;
-  
-  /* Add subtle box shadow for additional depth */
-  box-shadow: 0 -4px 6px -6px rgba(0, 0, 0, 0.1);
-}
-
-/* Add subtle shine effect to footer */
-/* Sidebar footer - positioned fixed at the bottom with enhanced gradient */
-/* Sidebar footer - positioned fixed at the bottom with animated shine effect */
 .sidebar-footer {
   text-align: center;
   padding: var(--spacing-md);
@@ -249,7 +215,6 @@ section[data-testid="stSidebar"] > div {
   }
 }
 
-
 /* Dark theme adjustments for footer shine */
 [data-theme="dark"] .sidebar-footer::after {
   background: linear-gradient(
@@ -263,17 +228,6 @@ section[data-testid="stSidebar"] > div {
 section[data-testid="stSidebar"] {
   width: var(--sidebar-width) !important;
   flex-shrink: 0 !important;
-}
-
-/* Hide sidebar collapse button */
-button[kind="header"] {
-  display: none !important;
-}
-
-/* Navigation button hover effects */
-.nav-buttons-container button:hover {
-  transform: var(--button-hover-transform);
-  box-shadow: var(--shadow-md);
 }
 
 /* Mobile sidebar */
