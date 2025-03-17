@@ -82,18 +82,7 @@
   color: var(--color-primary) !important;
 }
 
-/* Card sizes */
-.card.small {
-  max-width: 300px;
-}
 
-.card.medium {
-  max-width: 500px;
-}
-
-.card.large {
-  max-width: 800px;
-}
 
 /* === Theme-Specific Overrides === */
 
