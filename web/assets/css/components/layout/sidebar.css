@@ -88,7 +88,7 @@ section[data-testid="stSidebar"] > div {
 
 .sidebar-subheader {
   font-size: var(--font-size-sm);
-  color: var(--color-text-light);
+  color: var(--color-text);
   max-width: 85%;
   margin: 0 auto;
 }
