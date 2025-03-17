@@ -24,7 +24,7 @@
   
   .history-entry-time {
     font-size: var(--font-size-sm);
-    color: var(--color-text-light);
+    color: var(--color-text);
   }
   
   .history-entry-content {
@@ -77,6 +77,6 @@
   }
   
   .history-empty-description {
-    color: var(--color-text-light);
+    color: var(--color-text);
     margin-bottom: var(--spacing-lg);
   }
