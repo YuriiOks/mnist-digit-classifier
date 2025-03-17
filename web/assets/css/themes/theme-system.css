@@ -108,3 +108,11 @@ html, html * {
 .bb8-toggle .bb8__body {
   transition: var(--transition);
 }
+
+[data-theme="dark"] .bb8-toggle__checkbox {
+  checked: true;
+}
+
+[data-theme="light"] .bb8-toggle__checkbox {
+  checked: false;
+}
