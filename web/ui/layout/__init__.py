@@ -6,7 +6,10 @@
 
 """Layout components for the MNIST Digit Classifier."""
 
-from ui.layout.layout_components import Layout, Header, Footer, Sidebar
+from ui.layout.header import Header
+from ui.layout.footer import Footer
+from ui.layout.sidebar import Sidebar
+from ui.layout.layout import Layout
 
 __all__ = [
     "Layout",
