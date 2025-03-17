@@ -33,7 +33,7 @@
 }
 
 .card-content {
-  color: var(--color-text-light);
+  color: var(--color-text);
 }
 
 .card-icon {
@@ -106,5 +106,15 @@
 /* Dark theme overrides */
 [data-theme="dark"] .card {
   box-shadow: var(--shadow-md);
+  
 }
 
+
+[data-theme="dark"] .card.welcome-card {
+  /* Try to use the gradient if RGB values are available */
+  background: linear-gradient(
+    90deg,
+    rgba(var(123, 123, 255), 0.15),
+    rgba(var(64, 199, 215), 0.15) !important;
+  );
+}
