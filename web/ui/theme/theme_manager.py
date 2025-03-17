@@ -247,15 +247,6 @@ class ThemeManager:
         theme_data = self.get_theme_data(theme_mode)
         st.session_state[self.THEME_DATA_KEY] = theme_data
         
-        # Apply data-theme attribute via JavaScript
-        js_code = f"""
-        <script>
-            document.documentElement.setAttribute('data-theme', '{theme_mode}');
-            localStorage.setItem('theme-preference', '{theme_mode}');
-        </script>
-        """
-        st.markdown(js_code, unsafe_allow_html=True)
-        
         # Apply CSS variables
         self._apply_css_variables(theme_data)
     
@@ -293,6 +284,7 @@ class ThemeManager:
         
         # Inject CSS variables
         css = "\n".join(css_vars)
+        print(f"{css[:20]} to be continued...")
         resource_manager.inject_css(css)
     
     @AspectUtils.catch_errors
