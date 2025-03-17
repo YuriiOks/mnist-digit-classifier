@@ -89,45 +89,7 @@ class BB8Toggle(Component[Dict[str, Any]]):
         is_dark = self.__theme_manager.is_dark_mode()
         
         # Simple inline styled version (we're not using the template anymore)
-        return f"""
-        <a href="#" id="bb8-toggle">
-            <!-- BB8 body -->
-            <div style="
-                position: absolute;
-                left: {105 if not is_dark else 'calc(100% - 75px)'}px;
-                top: 15px;
-                transition: 0.4s;
-                z-index: 2;
-            ">
-                <!-- Head -->
-                <div style="
-                    width: 40px;
-                    height: 25px;
-                    background: white;
-                    border-radius: 25px 25px 0 0;
-                    margin-bottom: -3px;
-                "></div>
-                
-                <!-- Body -->
-                <div style="
-                    width: 60px;
-                    height: 60px;
-                    background: white;
-                    border-radius: 50%;
-                "></div>
-            </div>
-            
-            <!-- Ground -->
-            <div style="
-                position: absolute; 
-                width: 100%; 
-                height: 30%; 
-                bottom: 0; 
-                background: #b18d71; 
-                z-index: 1;
-            "></div>
-        </a>
-        """
+        return f""
 
     @AspectUtils.catch_errors
     @AspectUtils.log_method
