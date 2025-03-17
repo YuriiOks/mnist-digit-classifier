@@ -2,7 +2,7 @@
 # Copyright (c) 2025
 # File: ui/__init__.py
 # Description: UI package initialization
-# Created: 2025-03-16
+# Created: 2025-03-17
 
 """UI components, layouts, and views for the MNIST Digit Classifier."""
 
