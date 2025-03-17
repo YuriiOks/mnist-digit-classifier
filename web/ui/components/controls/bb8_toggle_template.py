@@ -10,39 +10,10 @@ import uuid  # Add this import
 
 # The complete HTML template for the BB8 toggle component
 BB8_TOGGLE_TEMPLATE = """
-<!-- Animation handler script -->
-<script>
-function animateBB8Toggle(elementId, currentTheme) {
-  // Get the wrapper element
-  const wrapper = document.getElementById(elementId);
-  if (!wrapper) return;
-  
-  // Add animating class to start animation
-  wrapper.classList.add('bb8-toggle-animating');
-  
-  // Find the checkbox and toggle it
-  const checkbox = wrapper.querySelector('.bb8-toggle__checkbox');
-  if (checkbox) {
-    checkbox.checked = currentTheme === 'light';
-  }
-  
-  // Set a timeout for animation completion (based on CSS transition time)
-  setTimeout(function() {
-    // Send message to Streamlit to update theme
-    window.parent.postMessage({
-      type: 'streamlit:setComponentValue',
-      value: {
-        execute_theme_change: currentTheme === 'light' ? 'dark' : 'light',
-        toggle_id: elementId
-      }
-    }, '*');
-  }, 600); // Make sure this is longer than your CSS animation duration
-}
-</script>
-
 <!-- BB8 toggle wrapper with unique ID -->
-<div id="{wrapper_id}" class="bb8-toggle-wrapper" data-theme="{current_theme}">
+<div style="text-align:center; padding-top:20px; padding-bottom:20px;">
   <!-- Clickable area that triggers animation -->
+  <a href="#" id="bb8-toggle" style="display:inline-block; text-decoration:none;">
   <a href="#" class="bb8-toggle-clickable" onclick="animateBB8Toggle('{wrapper_id}', '{current_theme}'); return false;">
     <label class="bb8-toggle">
       <input class="bb8-toggle__checkbox" type="checkbox" {checked}>
