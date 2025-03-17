@@ -2,18 +2,36 @@
 # Copyright (c) 2025
 # File: ui/components/__init__.py
 # Description: Components package initialization
-# Created: 2024-05-01
+# Created: 2025-03-17
 
-# Import components for easier access
-from ui.components.base_component import BaseComponent
+"""UI components for the MNIST Digit Classifier."""
+
+from ui.components.base.component import Component
+from ui.components.cards.card import Card, FeatureCard, WelcomeCard
+from ui.components.controls.buttons import Button, PrimaryButton, SecondaryButton, IconButton
+from ui.components.controls.bb8_toggle import BB8Toggle
 from ui.components import navigation
-from ui.components import cards
-from ui.components import controls
+from ui.components import feedback
+from ui.components import inputs
 
-# Make components available at the package level
 __all__ = [
-    "BaseComponent",
+    # Base components
+    "Component",
+    
+    # Card components
+    "Card",
+    "FeatureCard",
+    "WelcomeCard",
+    
+    # Control components
+    "Button",
+    "PrimaryButton",
+    "SecondaryButton",
+    "IconButton",
+    "BB8Toggle",
+    
+    # Component packages
     "navigation",
-    "cards",
-    "controls"
+    "feedback",
+    "inputs"
 ]
