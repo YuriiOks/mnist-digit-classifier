@@ -38,28 +38,20 @@ class Footer(Component[None]):
             key: Unique key for Streamlit.
             **kwargs: Additional keyword arguments.
         """
-        # Create a logger for debugging before initializing parent
-        self._init_logger = logging.getLogger(f"{__name__}.Footer.__init__")
-        self._init_logger.info("Initializing Footer component")
-        
         # Initialize parent with explicitly named parameters
-        try:
-            super().__init__(
-                component_type="layout",
-                component_name="footer",
-                id=id,
-                classes=classes or [],
-                attributes=attributes or {},
-                key=key or "app_footer",
-                **kwargs
-            )
-            self._init_logger.info("Footer component parent initialized successfully")
-            
-            # Set default content if none provided
-            self.__content = content or self._get_default_content()
-        except Exception as e:
-            self._init_logger.error(f"Error initializing Footer parent: {str(e)}", exc_info=True)
-            raise
+        super().__init__(
+            component_type="layout",
+            component_name="footer",
+            id=id,
+            classes=classes or [],
+            attributes=attributes or {},
+            key=key or "app_footer",
+            **kwargs
+        )
+        
+        # Set default content if none provided
+        self.__content = content or self.__get_default_content()
+        self._logger.debug("Footer component initialized successfully")
     
     @property
     def content(self) -> str:
@@ -71,7 +63,7 @@ class Footer(Component[None]):
         """Set the footer content."""
         self.__content = value
     
-    def _get_default_content(self) -> str:
+    def __get_default_content(self) -> str:
         """
         Get default footer content.
         
@@ -98,6 +90,7 @@ class Footer(Component[None]):
         """
     
     @AspectUtils.catch_errors
+    @AspectUtils.log_method
     def render(self) -> str:
         """
         Render the footer component.
@@ -105,8 +98,6 @@ class Footer(Component[None]):
         Returns:
             HTML representation of the footer.
         """
-        self._logger.info("Rendering footer")
-        
         # Try to render using template
         template_content = self.render_template(
             "components/layout/footer.html",
@@ -117,11 +108,9 @@ class Footer(Component[None]):
         )
         
         if template_content:
-            self._logger.info("Successfully rendered footer using template")
             return template_content
         
         # Fallback to direct HTML generation
-        self._logger.info("Falling back to direct HTML generation for footer")
         return f"""
         <footer class="app-footer">
             <div class="footer-content">
@@ -131,23 +120,24 @@ class Footer(Component[None]):
         """
     
     @AspectUtils.catch_errors
+    @AspectUtils.log_method
     def display(self) -> None:
         """Display the footer component in Streamlit."""
-        self._logger.info("Displaying footer")
+        # Load CSS for footer
+        self._load_component_css()
         
-        try:
-            # Load CSS for footer if needed
-            footer_css = resource_manager.load_css("components/layout/footer.css")
-            if footer_css:
-                resource_manager.inject_css(footer_css)
-                self._logger.info("Loaded footer CSS")
-            
-            # Render the HTML
-            footer_html = self.render()
-            
-            # Display in Streamlit
-            st.markdown(footer_html, unsafe_allow_html=True)
-            self._logger.info("Footer displayed successfully")
-        except Exception as e:
-            self._logger.error(f"Error displaying footer: {str(e)}", exc_info=True)
-            st.error("Error displaying the application footer")
+        # Render the HTML
+        footer_html = self.render()
+        
+        # Display in Streamlit
+        st.markdown(footer_html, unsafe_allow_html=True)
+    
+    def _load_component_css(self) -> None:
+        """Load CSS specific to this component."""
+        css_path = "components/layout/footer.css"
+        css_content = resource_manager.load_css(css_path)
+        if css_content:
+            resource_manager.inject_css(css_content)
+            self._logger.debug(f"Loaded CSS: {css_path}")
+        else:
+            self._logger.warning(f"Could not load CSS: {css_path}")
