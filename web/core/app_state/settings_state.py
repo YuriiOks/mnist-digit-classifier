@@ -39,7 +39,7 @@ class SettingsState:
                     "canvas_size": 280,               # canvas size in pixels
                     "stroke_width": 15,               # line width
                     "stroke_color": "#000000",      # line color
-                    "background_color": "#FFFFFF",  # canvas background
+                    "background_color": "#ffffff",  # canvas background
                     "enable_grid": False,             # show grid on canvas
                 },
                 # Prediction settings
