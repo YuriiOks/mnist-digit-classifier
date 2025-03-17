@@ -13,6 +13,8 @@ from typing import Optional
 from ui.views.base_view import View
 from core.app_state.history_state import HistoryState
 from core.app_state.navigation_state import NavigationState
+from utils.resource_manager import resource_manager
+from ui.components.cards.card import WelcomeCard, FeatureCard
 
 class HistoryView(View):
     """History view for the MNIST Digit Classifier application."""
@@ -39,9 +41,22 @@ class HistoryView(View):
             st.session_state.history_page = 1
         if not hasattr(st.session_state, 'history_items_per_page'):
             st.session_state.history_items_per_page = 12
+
+    def _load_view_data(self):
+        """
+        Load necessary JSON data for the History/Settings view.
+        """
+        data = resource_manager.load_json_resource("history/history_view.json")  # or "settings/settings_view.json"
+        if not data:
+            data = {}  # fallback
+
+        return data
     
     def _render_empty_state(self) -> None:
         """Render the empty state when no history is available."""
+
+
+
         st.markdown("""
         <div style="text-align: center; padding: 4rem 2rem; background-color: var(--color-background-alt); border-radius: 8px; margin: 2rem 0;">
             <div style="font-size: 4rem; margin-bottom: 1rem;">📊</div>
@@ -278,6 +293,18 @@ class HistoryView(View):
         """Render the history view content."""
         # Initialize session state variables
         self._initialize_session_state()
+
+        data = self._load_view_data()
+
+        # Example: Render a welcome card if it exists
+        welcome = data.get("welcome_card", {})
+        if welcome:
+            welcome_card = WelcomeCard(
+                title=welcome.get("title", "History"),
+                content=welcome.get("content", "View your predictions."),
+                icon=welcome.get("icon", "📊")
+            )
+            welcome_card.display()
         
         # Get all predictions from history state
         all_predictions = HistoryState.get_predictions()
@@ -344,3 +371,11 @@ class HistoryView(View):
         
         # Render delete handler
         self._render_delete_handler()
+
+        tips_data = data.get("tips", {})
+        if tips_data:
+            FeatureCard(
+                title=tips_data.get("title", "Tips"),
+                content="<ul>" + "".join(f"<li>{tip}</li>" for tip in tips_data.get("items", [])) + "</ul>",
+                icon="💡"
+            ).display()
