@@ -38,6 +38,8 @@ class HomeView(View):
         )
         welcome_card.display()
         
+        st.markdown("<hr style='margin: 2rem 0;'>", unsafe_allow_html=True)
+        
         # Display "How It Works" section
         st.markdown("<h2 id='how-it-works'>How It Works</h2>", unsafe_allow_html=True)
         
@@ -56,17 +58,20 @@ class HomeView(View):
                     icon=card_data.get("icon", "")
                 )
                 feature_card.display()
+
+        st.markdown("<hr style='margin: 2rem 0;'>", unsafe_allow_html=True)
+        
+        col1, col2 = st.columns(2)
         
         # CTA section
-        st.markdown("<hr style='margin: 2rem 0;'>", unsafe_allow_html=True)
-        st.markdown('<div class="cta-section">', unsafe_allow_html=True)
+        # st.markdown('<div class="cta-section">', unsafe_allow_html=True)
         
-        cta_col1, cta_col2 = st.columns([2, 3])
+        # cta_col1, cta_col2 = st.columns([2, 3])
         
-        with cta_col1:
+        with col1:
             st.markdown("<h2 id='ready-to-try-it-out' style='margin: 0;'>Ready to try it out?</h2>", unsafe_allow_html=True)
         
-        with cta_col2:
+        with col2:
             if st.button("Start Drawing", type="primary"):
                 NavigationState.set_active_view("draw")
                 st.rerun()
