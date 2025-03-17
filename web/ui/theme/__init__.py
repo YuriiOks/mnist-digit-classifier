@@ -7,8 +7,11 @@
 """Theme components for the MNIST Digit Classifier."""
 
 from ui.theme.theme_manager import ThemeManager, theme_manager
+from ui.theme.css_manager import CSSManager, css_manager
 
 __all__ = [
+    "CSSManager",
+    "css_manager",
     "ThemeManager",
     "theme_manager"
 ]
