@@ -1089,6 +1089,81 @@ def render_history_view():
     """, unsafe_allow_html=True)
 
 
+# def render_sidebar():
+#     """
+#     Render a unified sidebar with navigation and theme toggle.
+#     """
+#     from ui.theme.theme_manager import theme_manager
+#     from core.app_state.navigation_state import NavigationState
+#     import datetime
+#     from ui.components.controls.bb8_toggle import BB8Toggle
+    
+#     # Render header
+#     st.sidebar.markdown(
+#         """
+#         <div class="sidebar-header">
+#             <div class="gradient-text">MNIST App</div>
+#             <div class="sidebar-subheader">Digit Classification AI</div>
+#         </div>
+#         """,
+#         unsafe_allow_html=True
+#     )
+    
+#     # Navigation items
+#     nav_items = [
+#         {"id": "home", "label": "Home", "icon": "🏠"},
+#         {"id": "draw", "label": "Draw", "icon": "✏️"},
+#         {"id": "history", "label": "History", "icon": "📊"},
+#         {"id": "settings", "label": "Settings", "icon": "⚙️"}
+#     ]
+    
+#     # Get current view
+#     active_view = NavigationState.get_active_view()
+    
+#     # Add some spacing
+#     st.sidebar.markdown("<div style='height: 8px'></div>", unsafe_allow_html=True)
+    
+#     # Create navigation buttons
+#     for item in nav_items:
+#         if st.sidebar.button(
+#             f"{item['icon']} {item['label']}",
+#             key=f"nav_{item['id']}",
+#             type="primary" if active_view == item['id'] else "secondary",
+#             use_container_width=True
+#         ):
+#             NavigationState.set_active_view(item['id'])
+#             st.rerun()
+    
+#     # Add divider
+#     st.sidebar.markdown('<div class="divider"></div>', unsafe_allow_html=True)
+    
+#     # BB8 Toggle Container
+#     with st.sidebar.container():
+#         # Create and display the BB8 toggle
+#         bb8_key = "sidebar_bb8_toggle"
+#         bb8_toggle = BB8Toggle(
+#             theme_manager_instance=theme_manager, 
+#             on_change=lambda theme: st.rerun(),
+#             key=bb8_key
+#         )
+#         toggle_result = bb8_toggle.display()
+    
+#     # Add divider
+#     st.sidebar.markdown('<div class="divider"></div>', unsafe_allow_html=True)
+    
+#     # Add version in footer
+#     current_year = datetime.datetime.now().year
+#     version = "1.0.0"  # Can be fetched from a config
+    
+#     st.sidebar.markdown(
+#         f"""
+#         <div class="sidebar-footer">
+#             <p>Version {version}</p>
+#             <p>© {current_year} MNIST Classifier</p>
+#         </div>
+#         """,
+#         unsafe_allow_html=True
+#     )
 def render_sidebar():
     """
     Render a unified sidebar with navigation and theme toggle.
@@ -1096,9 +1171,10 @@ def render_sidebar():
     from ui.theme.theme_manager import theme_manager
     from core.app_state.navigation_state import NavigationState
     import datetime
+    # Import your revised BB8Toggle component:
     from ui.components.controls.bb8_toggle import BB8Toggle
     
-    # Render header
+    # Sidebar header
     st.sidebar.markdown(
         """
         <div class="sidebar-header">
@@ -1117,10 +1193,9 @@ def render_sidebar():
         {"id": "settings", "label": "Settings", "icon": "⚙️"}
     ]
     
-    # Get current view
     active_view = NavigationState.get_active_view()
     
-    # Add some spacing
+    # Spacer
     st.sidebar.markdown("<div style='height: 8px'></div>", unsafe_allow_html=True)
     
     # Create navigation buttons
@@ -1134,26 +1209,26 @@ def render_sidebar():
             NavigationState.set_active_view(item['id'])
             st.rerun()
     
-    # Add divider
+    # Divider
     st.sidebar.markdown('<div class="divider"></div>', unsafe_allow_html=True)
     
     # BB8 Toggle Container
     with st.sidebar.container():
-        # Create and display the BB8 toggle
-        bb8_key = "sidebar_bb8_toggle"
+        # Instantiate BB8Toggle
         bb8_toggle = BB8Toggle(
-            theme_manager_instance=theme_manager, 
-            on_change=lambda theme: st.rerun(),
-            key=bb8_key
+            theme_manager_instance=theme_manager,
+            on_change=lambda new_theme: st.rerun(),  # reload to apply new theme
+            key="sidebar_bb8_toggle"
         )
-        toggle_result = bb8_toggle.display()
+        # Display the toggle; it handles theme switching internally
+        bb8_toggle.display()
     
-    # Add divider
+    # Another divider
     st.sidebar.markdown('<div class="divider"></div>', unsafe_allow_html=True)
     
-    # Add version in footer
+    # Footer with version/year
     current_year = datetime.datetime.now().year
-    version = "1.0.0"  # Can be fetched from a config
+    version = "1.0.0"  # Or load from config
     
     st.sidebar.markdown(
         f"""
