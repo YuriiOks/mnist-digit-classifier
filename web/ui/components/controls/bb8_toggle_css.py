@@ -8,24 +8,6 @@
 
 # The complete CSS for the BB8 toggle component
 BB8_TOGGLE_CSS = """
-/* BB8 toggle clickable wrapper */
-.bb8-toggle-wrapper {
-  position: relative;
-}
-
-/* This class will be added to trigger the move animation */
-.bb8-toggle-animating {
-  pointer-events: none; /* Prevent additional clicks during animation */
-}
-
-/* Make sure the BB8 element can be clicked */
-.bb8-toggle-clickable {
-  display: block;
-  cursor: pointer;
-  text-decoration: none;
-}
-
-/* From Uiverse.io by Galahhad - Enhanced for better theme switching */ 
 .bb8-toggle {
     --toggle-size: 16px;
     /* finally I removed the scale now everything depends on the font-size */
@@ -965,6 +947,7 @@ BB8_TOGGLE_CSS = """
   .bb8:hover .bb8__head::after {
     background-position: 0 0 !important;
   }
+
 
 [data-theme="dark"] .bb8-toggle__checkbox {
     checked: true;
