@@ -213,7 +213,7 @@
   /* Colors should follow --color-{category}-{variant} pattern */
   --color-primary-light: rgba(var(--color-primary-rgb), 0.7);
   --color-primary-lighter: rgba(var(--color-primary-rgb), 0.3);
-  --color-primary-dark: #3046c0;  /* Darker version of primary blue */
+
   
   /* Aliases for backward compatibility */
   --primary-color: var(--color-primary);
@@ -274,4 +274,3 @@
   border-radius: var(--border-radius-md) var(--border-radius-md) 0 0;
 }
 
-/* Animation definitions moved to animations.css */
