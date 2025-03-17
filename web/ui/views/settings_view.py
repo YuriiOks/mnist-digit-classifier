@@ -69,11 +69,16 @@ class SettingsView(View):
     
     def _render_theme_settings(self) -> None:
         """Render theme settings tab content."""
-        st.markdown("<h3>Theme Settings</h3>", unsafe_allow_html=True)
         
-        # Theme Mode
-        st.markdown("<h4>Theme Mode</h4>", unsafe_allow_html=True)
-        
+        # Theme Mode card
+        fc = FeatureCard(
+            title="Theme Mode",
+            content="<b>Select a theme for the application.</b>",
+            icon="🎨"
+        )
+        fc.display()
+
+
         # Get current theme
         current_theme = theme_manager.get_current_theme()
         
@@ -103,6 +108,7 @@ class SettingsView(View):
                 color: #212529;
                 text-align: center;
             ">
+                <div style="font-weight: bold; margin-bottom: 0.5rem;">Light Mode</div>
                 <div style="display: flex; justify-content: center; gap: 0.5rem;">
                     <div style="width: 24px; height: 24px; border-radius: 4px; background-color: #4361ee;"></div>
                     <div style="width: 24px; height: 24px; border-radius: 4px; background-color: #4cc9f0;"></div>
@@ -129,7 +135,7 @@ class SettingsView(View):
                 border: 1px solid #383838;
                 padding: 1rem;
                 margin-top: 0.5rem;
-                background-color: #121212;
+                background-color: #535353;
                 color: #f8f9fa;
                 text-align: center;
             ">
@@ -140,205 +146,178 @@ class SettingsView(View):
                 </div>
             </div>
             """, unsafe_allow_html=True)
-        
-        # Font settings
-        st.markdown("<h4>Typography</h4>", unsafe_allow_html=True)
-        
-        font_options = ["System Default", "Sans-serif", "Serif", "Monospace"]
-        current_font = SettingsState.get_setting("theme", "font_family", "System Default")
-        
-        selected_font = st.selectbox(
-            "Font Family", 
-            options=font_options,
-            index=font_options.index(current_font) if current_font in font_options else 0,
-            key="font_family"
-        )
-        
-        if selected_font != current_font:
-            SettingsState.set_setting("theme", "font_family", selected_font)
-            
-            # Apply font change via CSS
-            font_css = ""
-            if selected_font == "Sans-serif":
-                font_css = "body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important; }"
-            elif selected_font == "Serif":
-                font_css = "body { font-family: Georgia, 'Times New Roman', Times, serif !important; }"
-            elif selected_font == "Monospace":
-                font_css = "body { font-family: SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace !important; }"
-            elif selected_font == "System Default":
-                font_css = "body { font-family: var(--font-primary) !important; }"
-            
-            if font_css:
-                st.markdown(f"<style>{font_css}</style>", unsafe_allow_html=True)
     
     def _render_canvas_settings(self) -> None:
         """Render canvas settings tab content."""
-        st.markdown("<h3>Canvas Settings</h3>", unsafe_allow_html=True)
+
+        tab_cols = st.columns(2)
         
-        # Canvas size
-        st.markdown("<h4>Drawing Canvas</h4>", unsafe_allow_html=True)
-        
-        canvas_size = SettingsState.get_setting("canvas", "canvas_size", 280)
-        new_canvas_size = st.slider(
-            "Canvas Size",
-            min_value=200,
-            max_value=400,
-            value=canvas_size,
-            step=20,
-            key="canvas_size_slider"
-        )
-        
-        if new_canvas_size != canvas_size:
-            SettingsState.set_setting("canvas", "canvas_size", new_canvas_size)
-            # Reset canvas key to ensure it reloads with new size
-            if "canvas_key" in st.session_state:
-                import time
-                st.session_state.canvas_key = f"canvas_{hash(time.time())}"
-        
-        # Stroke width
-        stroke_width = SettingsState.get_setting("canvas", "stroke_width", 15)
-        new_stroke_width = st.slider(
-            "Default Stroke Width",
-            min_value=5,
-            max_value=30,
-            value=stroke_width,
-            step=1,
-            key="stroke_width_slider"
-        )
-        
-        if new_stroke_width != stroke_width:
-            SettingsState.set_setting("canvas", "stroke_width", new_stroke_width)
-        
-        # Colors
-        st.markdown("<h4>Colors</h4>", unsafe_allow_html=True)
-        
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            stroke_color = SettingsState.get_setting("canvas", "stroke_color", "#000000")
-            new_stroke_color = st.color_picker(
-                "Stroke Color",
-                value=stroke_color,
-                key="stroke_color_picker"
+        with tab_cols[0]:
+            # Canvas size
+            st.markdown("<h2>Drawing Canvas</h2>", unsafe_allow_html=True)
+            
+            canvas_size = SettingsState.get_setting("canvas", "canvas_size", 280)
+            new_canvas_size = st.slider(
+                "Canvas Size",
+                min_value=200,
+                max_value=400,
+                value=canvas_size,
+                step=20,
+                key="canvas_size_slider"
             )
             
-            if new_stroke_color != stroke_color:
-                SettingsState.set_setting("canvas", "stroke_color", new_stroke_color)
-        
-        with col2:
-            bg_color = SettingsState.get_setting("canvas", "background_color", "#FFFFFF")
-            new_bg_color = st.color_picker(
-                "Background Color",
-                value=bg_color,
-                key="bg_color_picker"
+            if new_canvas_size != canvas_size:
+                SettingsState.set_setting("canvas", "canvas_size", new_canvas_size)
+                # Reset canvas key to ensure it reloads with new size
+                if "canvas_key" in st.session_state:
+                    import time
+                    st.session_state.canvas_key = f"canvas_{hash(time.time())}"
+
+            # Stroke width
+            stroke_width = SettingsState.get_setting("canvas", "stroke_width", 15)
+            new_stroke_width = st.slider(
+                "Default Stroke Width",
+                min_value=5,
+                max_value=30,
+                value=stroke_width,
+                step=1,
+                key="stroke_width_slider"
             )
             
-            if new_bg_color != bg_color:
-                SettingsState.set_setting("canvas", "background_color", new_bg_color)
-        
-        # Grid settings
-        enable_grid = SettingsState.get_setting("canvas", "enable_grid", False)
-        new_enable_grid = st.toggle("Show Grid on Canvas", value=enable_grid, key="grid_toggle")
-        
-        if new_enable_grid != enable_grid:
-            SettingsState.set_setting("canvas", "enable_grid", new_enable_grid)
-            # Apply grid CSS
-            if new_enable_grid:
-                grid_css = """
-                .canvas-container canvas {
-                    background-image: linear-gradient(#ddd 1px, transparent 1px), 
-                                      linear-gradient(90deg, #ddd 1px, transparent 1px);
-                    background-size: 20px 20px;
-                }
-                """
-                st.markdown(f"<style>{grid_css}</style>", unsafe_allow_html=True)
+            if new_stroke_width != stroke_width:
+                SettingsState.set_setting("canvas", "stroke_width", new_stroke_width)
+
+        with tab_cols[1]:
+
+            # Colors
+            st.markdown("<h2>Colors</h2>", unsafe_allow_html=True)
+            
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                stroke_color = SettingsState.get_setting("canvas", "stroke_color", "#000000")
+                new_stroke_color = st.color_picker(
+                    "Stroke Color",
+                    value=stroke_color,
+                    key="stroke_color_picker"
+                )
+                
+                if new_stroke_color != stroke_color:
+                    SettingsState.set_setting("canvas", "stroke_color", new_stroke_color)
+            
+            with col2:
+                bg_color = SettingsState.get_setting("canvas", "background_color", "#FFFFFF")
+                new_bg_color = st.color_picker(
+                    "Background Color",
+                    value=bg_color,
+                    key="bg_color_picker"
+                )
+                
+                if new_bg_color != bg_color:
+                    SettingsState.set_setting("canvas", "background_color", new_bg_color)
+            
+            # Grid settings
+            enable_grid = SettingsState.get_setting("canvas", "enable_grid", False)
+            new_enable_grid = st.toggle("Show Grid on Canvas", value=enable_grid, key="grid_toggle")
+            
+            if new_enable_grid != enable_grid:
+                SettingsState.set_setting("canvas", "enable_grid", new_enable_grid)
+                # Apply grid CSS
+                if new_enable_grid:
+                    grid_css = """
+                    .canvas-container canvas {
+                        background-image: linear-gradient(#ddd 1px, transparent 1px), 
+                                        linear-gradient(90deg, #ddd 1px, transparent 1px);
+                        background-size: 20px 20px;
+                    }
+                    """
+                    st.markdown(f"<style>{grid_css}</style>", unsafe_allow_html=True)
     
     def _render_prediction_settings(self) -> None:
         """Render prediction settings tab content."""
-        st.markdown("<h3>Prediction Settings</h3>", unsafe_allow_html=True)
+        tab_cols = st.columns(2)
+
+        with tab_cols[0]:
         
-        # Auto-predict
-        st.markdown("<h4>Prediction Behavior</h4>", unsafe_allow_html=True)
-        
-        auto_predict = SettingsState.get_setting("prediction", "auto_predict", False)
-        new_auto_predict = st.toggle("Auto-predict after drawing", value=auto_predict, key="auto_predict_toggle")
-        
-        if new_auto_predict != auto_predict:
-            SettingsState.set_setting("prediction", "auto_predict", new_auto_predict)
-        
-        # Confidence settings
-        st.markdown("<h4>Confidence Display</h4>", unsafe_allow_html=True)
-        
-        show_confidence = SettingsState.get_setting("prediction", "show_confidence", True)
-        new_show_confidence = st.toggle("Show confidence percentage", value=show_confidence, key="confidence_toggle")
-        
-        if new_show_confidence != show_confidence:
-            SettingsState.set_setting("prediction", "show_confidence", new_show_confidence)
-        
-        min_confidence = SettingsState.get_setting("prediction", "min_confidence", 0.5)
-        new_min_confidence = st.slider(
-            "Minimum Confidence Threshold",
-            min_value=0.0,
-            max_value=1.0,
-            value=min_confidence,
-            step=0.05,
-            format="%.2f",
-            key="min_confidence_slider"
-        )
-        
-        if new_min_confidence != min_confidence:
-            SettingsState.set_setting("prediction", "min_confidence", new_min_confidence)
-        
-        # Show alternatives
-        show_alternatives = SettingsState.get_setting("prediction", "show_alternatives", True)
-        new_show_alternatives = st.toggle("Show alternative predictions", value=show_alternatives, key="alternatives_toggle")
-        
-        if new_show_alternatives != show_alternatives:
-            SettingsState.set_setting("prediction", "show_alternatives", new_show_alternatives)
+            # Auto-predict
+            st.markdown("<h2>Prediction Behavior</h2>", unsafe_allow_html=True)
+            
+            auto_predict = SettingsState.get_setting("prediction", "auto_predict", False)
+            new_auto_predict = st.toggle("Auto-predict after drawing", value=auto_predict, key="auto_predict_toggle")
+            
+            if new_auto_predict != auto_predict:
+                SettingsState.set_setting("prediction", "auto_predict", new_auto_predict)
+
+        with tab_cols[1]:    
+            # Confidence settings
+            st.markdown("<h2>Confidence Display</h2>", unsafe_allow_html=True)
+            
+            show_confidence = SettingsState.get_setting("prediction", "show_confidence", True)
+            new_show_confidence = st.toggle("Show confidence percentage", value=show_confidence, key="confidence_toggle")
+            
+            if new_show_confidence != show_confidence:
+                SettingsState.set_setting("prediction", "show_confidence", new_show_confidence)
+            
+            min_confidence = SettingsState.get_setting("prediction", "min_confidence", 0.5)
+            new_min_confidence = st.slider(
+                "Minimum Confidence Threshold",
+                min_value=0.0,
+                max_value=1.0,
+                value=min_confidence,
+                step=0.05,
+                format="%.2f",
+                key="min_confidence_slider"
+            )
+            
+            if new_min_confidence != min_confidence:
+                SettingsState.set_setting("prediction", "min_confidence", new_min_confidence)
     
     def _render_app_settings(self) -> None:
         """Render application settings tab content."""
-        st.markdown("<h3>Application Settings</h3>", unsafe_allow_html=True)
+
+        tab_cols = st.columns(2)
         
-        # History settings
-        st.markdown("<h4>History</h4>", unsafe_allow_html=True)
+        with tab_cols[0]:
+            # History settings
+            st.markdown("<h2>History</h2>", unsafe_allow_html=True)
+            
+            save_history = SettingsState.get_setting("app", "save_history", True)
+            new_save_history = st.toggle("Save prediction history", value=save_history, key="save_history_toggle")
+            
+            if new_save_history != save_history:
+                SettingsState.set_setting("app", "save_history", new_save_history)
+            
+            max_history = SettingsState.get_setting("app", "max_history", 50)
+            new_max_history = st.slider(
+                "Maximum History Items",
+                min_value=10,
+                max_value=100,
+                value=max_history,
+                step=10,
+                key="max_history_slider"
+            )
+            
+            if new_max_history != max_history:
+                SettingsState.set_setting("app", "max_history", new_max_history)
         
-        save_history = SettingsState.get_setting("app", "save_history", True)
-        new_save_history = st.toggle("Save prediction history", value=save_history, key="save_history_toggle")
-        
-        if new_save_history != save_history:
-            SettingsState.set_setting("app", "save_history", new_save_history)
-        
-        max_history = SettingsState.get_setting("app", "max_history", 50)
-        new_max_history = st.slider(
-            "Maximum History Items",
-            min_value=10,
-            max_value=100,
-            value=max_history,
-            step=10,
-            key="max_history_slider"
-        )
-        
-        if new_max_history != max_history:
-            SettingsState.set_setting("app", "max_history", new_max_history)
-        
-        # UI settings
-        st.markdown("<h4>User Interface</h4>", unsafe_allow_html=True)
-        
-        show_tooltips = SettingsState.get_setting("app", "show_tooltips", True)
-        new_show_tooltips = st.toggle("Show tooltips", value=show_tooltips, key="tooltips_toggle")
-        
-        if new_show_tooltips != show_tooltips:
-            SettingsState.set_setting("app", "show_tooltips", new_show_tooltips)
-            # Apply tooltip CSS
-            if not new_show_tooltips:
-                st.markdown("<style>[data-tooltip]{display:none !important;}</style>", unsafe_allow_html=True)
-        
-        debug_mode = SettingsState.get_setting("app", "debug_mode", False)
-        new_debug_mode = st.toggle("Debug mode", value=debug_mode, key="debug_mode_toggle")
-        
-        if new_debug_mode != debug_mode:
-            SettingsState.set_setting("app", "debug_mode", new_debug_mode)
+        with tab_cols[1]:
+            # UI settings
+            st.markdown("<h2>User Interface</h2>", unsafe_allow_html=True)
+            
+            show_tooltips = SettingsState.get_setting("app", "show_tooltips", True)
+            new_show_tooltips = st.toggle("Show tooltips", value=show_tooltips, key="tooltips_toggle")
+            
+            if new_show_tooltips != show_tooltips:
+                SettingsState.set_setting("app", "show_tooltips", new_show_tooltips)
+                # Apply tooltip CSS
+                if not new_show_tooltips:
+                    st.markdown("<style>[data-tooltip]{display:none !important;}</style>", unsafe_allow_html=True)
+            
+            debug_mode = SettingsState.get_setting("app", "debug_mode", False)
+            new_debug_mode = st.toggle("Debug mode", value=debug_mode, key="debug_mode_toggle")
+            
+            if new_debug_mode != debug_mode:
+                SettingsState.set_setting("app", "debug_mode", new_debug_mode)
     
     def _render_reset_button(self) -> None:
         """Render reset settings button."""
@@ -353,7 +332,7 @@ class SettingsView(View):
                 SettingsState.reset_to_defaults()
                 
                 # Reset theme to default
-                theme_manager.apply_theme(theme_manager.DEFAULT_THEME)
+                theme_manager.apply_theme(theme_manager.LIGHT_THEME)
                 
                 # Force a rerun to update the UI with default values
                 st.session_state.active_settings_tab = "theme"  # Reset to first tab
@@ -364,7 +343,7 @@ class SettingsView(View):
         """
         Load necessary JSON data for the History/Settings view.
         """
-        data = resource_manager.load_json_resource("settings/settings_view.json")  # or "settings/settings_view.json"
+        data = resource_manager.load_json_resource("settings/settings_view.json") 
         if not data:
             data = {}  # fallback
 
