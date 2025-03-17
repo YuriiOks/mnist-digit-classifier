@@ -5,6 +5,7 @@
 # Created: 2025-03-16
 
 import streamlit as st
+from st_click_detector import click_detector
 import logging
 from typing import Optional, Callable, Dict, Any
 
@@ -12,47 +13,12 @@ from ui.components.base.component import Component
 from ui.theme.theme_manager import ThemeManager, theme_manager
 from utils.resource_manager import resource_manager
 from utils.aspects import AspectUtils
+from typing import Optional, Callable, Dict, Any
 
-# Default BB8 toggle HTML as fallback
-BB8_HTML = """
-<label class="bb8-toggle">
-    <input class="bb8-toggle__checkbox" type="checkbox" data-name="bb8-checkbox">
-    <div class="bb8-toggle__container" data-name="bb8-container">
-      <div class="bb8-toggle__scenery">
-        <div class="bb8-toggle__star"></div>
-        <div class="bb8-toggle__star"></div>
-        <div class="bb8-toggle__star"></div>
-        <div class="bb8-toggle__star"></div>
-        <div class="bb8-toggle__star"></div>
-        <div class="bb8-toggle__star"></div>
-        <div class="bb8-toggle__star"></div>
-        <div class="tatto-1"></div>
-        <div class="tatto-2"></div>
-        <div class="gomrassen"></div>
-        <div class="hermes"></div>
-        <div class="chenini"></div>
-        <div class="bb8-toggle__cloud"></div>
-        <div class="bb8-toggle__cloud"></div>
-        <div class="bb8-toggle__cloud"></div>
-      </div>
-      <div class="bb8">
-        <div class="bb8__head-container">
-          <div class="bb8__antenna"></div>
-          <div class="bb8__antenna"></div>
-          <div class="bb8__head"></div>
-        </div>
-        <div class="bb8__body"></div>
-      </div>
-      <div class="artificial__hidden">
-        <div class="bb8__shadow"></div>
-      </div>
-    </div>
-  </label>
-"""
-
+# In ui/components/controls/bb8_toggle.py
 
 class BB8Toggle(Component[Dict[str, Any]]):
-    """BB8-themed toggle component to switch between themes."""
+    """BB8-themed toggle component for theme switching."""
 
     def __init__(
         self,
@@ -65,18 +31,7 @@ class BB8Toggle(Component[Dict[str, Any]]):
         attributes: Optional[Dict[str, str]] = None,
         **kwargs
     ):
-        """
-        Initialize the BB8Toggle component.
-
-        Args:
-            theme_manager_instance: Manages theme changes.
-            on_change: Callback function when theme changes.
-            key: Streamlit unique key.
-            id: HTML ID for the component.
-            classes: List of CSS classes to apply.
-            attributes: Dictionary of HTML attributes.
-            **kwargs: Additional keyword arguments.
-        """
+        """Initialize the BB8Toggle component."""
         super().__init__(
             component_type="controls",
             component_name="bb8_toggle",
@@ -90,11 +45,12 @@ class BB8Toggle(Component[Dict[str, Any]]):
         self.__theme_manager = theme_manager_instance or theme_manager
         self.__on_change = on_change
         self.__key = key
-        
+    
     @AspectUtils.catch_errors
     @AspectUtils.log_method
     def _load_bb8_toggle_css(self) -> None:
         """Load the BB8 toggle CSS."""
+        # Same as your existing implementation
         # Try multiple potential paths for the CSS
         potential_paths = [
             "components/controls/bb8-toggle.css",
@@ -120,94 +76,187 @@ class BB8Toggle(Component[Dict[str, Any]]):
                 display: inline-block;
                 cursor: pointer;
             }
-            .bb8-toggle__container {
-                width: 170px;
-                height: 90px;
-                background: linear-gradient(#2c4770, #070e2b 35%, #628cac 50% 70%, #a6c5d4);
-                border-radius: 99em;
-                position: relative;
-                transition: 0.4s;
-            }
-            .bb8-toggle__checkbox {
-                display: none;
-            }
-            .bb8 {
-                position: absolute;
-                left: 15px;
-                top: 15px;
-                transition: 0.4s;
-            }
-            .bb8__body {
-                width: 60px;
-                height: 60px;
-                background: white;
-                border-radius: 50%;
-            }
-            .bb8__head {
-                width: 40px;
-                height: 25px;
-                background: white;
-                border-radius: 25px 25px 0 0;
-                margin-bottom: -3px;
-            }
-            .bb8-toggle__checkbox:checked + .bb8-toggle__container .bb8 {
-                left: calc(100% - 75px);
-            }
+            /* Minimal styles to make it work */
             """
             resource_manager.inject_css(min_css)
 
     @AspectUtils.catch_errors
     @AspectUtils.log_method
     def render(self) -> str:
-        """Render the BB8 toggle component.
-        
-        Returns:
-            HTML representation of the BB8 toggle.
-        """
-        # First try to load the template
-        template_content = self.load_template("components/controls/bb8-toggle.html")
-        
-        if template_content:
-            # Set the checked state based on current theme
-            is_dark = self.__theme_manager.is_dark_mode()
-            if is_dark:
-                template_content = template_content.replace('<input class="bb8-toggle__checkbox" type="checkbox">', 
-                                                        '<input class="bb8-toggle__checkbox" type="checkbox" checked>')
-            
-            return template_content
-        
-        # Fallback to the default BB8 HTML
-        html = BB8_HTML
-        
-        # Set the checked state based on current theme
+        """Render the BB8 toggle component."""
+        # Get current theme
+        current_theme = self.__theme_manager.get_current_theme()
         is_dark = self.__theme_manager.is_dark_mode()
-        if is_dark:
-            html = html.replace('<input class="bb8-toggle__checkbox" type="checkbox">', 
-                            '<input class="bb8-toggle__checkbox" type="checkbox" checked>')
         
-        return html
+        # Simple inline styled version (we're not using the template anymore)
+        return f"""
+        <a href="#" id="bb8-toggle" style="
+            display: inline-block; 
+            width: 170px; 
+            height: 90px; 
+            background: linear-gradient(#2c4770, #070e2b 35%, #628cac 50% 70%, #a6c5d4);
+            background-position-y: {0 if is_dark else '-5.625em'};
+            border-radius: 999em; 
+            position: relative; 
+            overflow: hidden;
+            cursor: pointer;
+            text-decoration: none;
+            transition: 0.4s;
+        ">
+            <!-- BB8 body -->
+            <div style="
+                position: absolute;
+                left: {105 if not is_dark else 'calc(100% - 75px)'}px;
+                top: 15px;
+                transition: 0.4s;
+                z-index: 2;
+            ">
+                <!-- Head -->
+                <div style="
+                    width: 40px;
+                    height: 25px;
+                    background: white;
+                    border-radius: 25px 25px 0 0;
+                    margin-bottom: -3px;
+                "></div>
+                
+                <!-- Body -->
+                <div style="
+                    width: 60px;
+                    height: 60px;
+                    background: white;
+                    border-radius: 50%;
+                "></div>
+            </div>
+            
+            <!-- Ground -->
+            <div style="
+                position: absolute; 
+                width: 100%; 
+                height: 30%; 
+                bottom: 0; 
+                background: #b18d71; 
+                z-index: 1;
+            "></div>
+        </a>
+        """
 
     @AspectUtils.catch_errors
     @AspectUtils.log_method
     def display(self) -> Dict[str, Any]:
-        """Display the BB8 toggle component and handle theme changes.
+        """Display the BB8 toggle with click detection."""
+        try:
+            from st_click_detector import click_detector
+        except ImportError:
+            st.error("Please install st-click-detector: pip install streamlit-click-detector")
+            return {"error": "st_click_detector not installed"}
         
-        Returns:
-            Dict containing theme information.
+        # Get theme state
+        current_theme = self.__theme_manager.get_current_theme()
+        is_dark = current_theme == "dark"
+        
+        # Standalone BB8 toggle with ALL styling inline
+        bb8_html = f"""
+        <div style="text-align:center; padding-top:20px; padding-bottom:20px;">
+        <a href="#" id="bb8-toggle" style="display:inline-block; text-decoration:none;">
+            <div style="
+            width: 170px;
+            height: 90px;
+            background: linear-gradient(#2c4770, #070e2b 35%, #628cac 50% 70%, #a6c5d4);
+            background-position-y: {0 if is_dark else '-90px'};
+            border-radius: 99em;
+            position: relative;
+            overflow: hidden;
+            transition: 0.4s;
+            cursor: pointer;
+            ">
+            <!-- BB8 droid -->
+            <div style="
+                position: absolute;
+                left: {85 if is_dark else 15}px;
+                top: 15px;
+                transition: 0.4s;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                z-index: 2;
+            ">
+                <!-- Head -->
+                <div style="
+                width: 40px;
+                height: 25px;
+                background: white;
+                border-radius: 25px 25px 0 0;
+                margin-bottom: -3px;
+                position: relative;
+                "></div>
+                
+                <!-- Body -->
+                <div style="
+                width: 60px;
+                height: 60px;
+                background: white;
+                border-radius: 50%;
+                position: relative;
+                ">
+                <!-- Orange marking -->
+                <div style="
+                    position: absolute;
+                    width: 20px;
+                    height: 20px;
+                    background: #de7d2f;
+                    border-radius: 50%;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                "></div>
+                </div>
+            </div>
+            
+            <!-- Ground -->
+            <div style="
+                position: absolute;
+                width: 100%;
+                height: 30%;
+                bottom: 0;
+                background: #b18d71;
+                z-index: 1;
+            "></div>
+            
+            <!-- Shadow -->
+            <div style="
+                position: absolute;
+                width: 60px;
+                height: 10px;
+                background: rgba(0,0,0,0.2);
+                border-radius: 50%;
+                bottom: 10px;
+                left: {85 if is_dark else 15}px;
+                transform: skew({70 if is_dark else -70}deg);
+                transition: 0.4s;
+                z-index: 1;
+            "></div>
+            </div>
+        </a>
+        </div>
         """
-        # Make sure the CSS is loaded
-        self._load_bb8_toggle_css()
         
-        # Render the HTML
-        html = self.render()
+        # Use click detector
+        clicked = click_detector(bb8_html, key=f"bb8_{current_theme}")
         
-        # Add JavaScript for handling the toggle change with a unique ID to avoid conflicts
-        # Generate a unique ID for this toggle instance
+        # Handle click
+        if clicked == "bb8-toggle":
+            new_theme = "light" if is_dark else "dark"
+            self.__theme_manager.apply_theme(new_theme)
+            
+            # Call on_change if provided
+            if self.__on_change:
+                self.__on_change(new_theme)
+            
+            st.rerun()
         
-        # Combine HTML and JavaScript
-        combined_html = f"{html}"
-        
-        # Display the component
-        st.markdown(combined_html, unsafe_allow_html=True)
-        
-        
+        return {
+            "theme": current_theme,
+            "is_dark": is_dark,
+            "key": self.__key
+        }
