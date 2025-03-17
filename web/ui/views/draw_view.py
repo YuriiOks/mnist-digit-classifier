@@ -154,10 +154,17 @@ class DrawView(View):
     def __render_draw_tab(self, draw_data) -> None:
         """Render the draw digit tab content."""
 
-        self.__render_feature_card(draw_data)
+        tab_cols = st.columns(2)
+
+        with tab_cols[0]:
+            # Render feature card for the current tab
+
+
+            self.__render_feature_card(draw_data)
+
+        with tab_cols[1]:
         
-        # Add canvas for drawing
-        try:
+            # Add canvas for drawing
             from streamlit_drawable_canvas import st_canvas
             
             # Canvas configuration
@@ -173,60 +180,53 @@ class DrawView(View):
                 key=st.session_state.canvas_key,
                 display_toolbar=True,
             )
-        except ImportError:
-            st.error("The streamlit-drawable-canvas package is not installed. Please install it with: pip install streamlit-drawable-canvas")
-            
-            # Show placeholder canvas
-            st.markdown("""
-            <div style="
-                width: 280px;
-                height: 280px;
-                border: 2px dashed #ccc;
-                border-radius: 8px;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                margin-bottom: 20px;
-            ">
-                <p style="color: #888888; font-size: 1.2em;">
-                    Drawing Canvas (Requires streamlit-drawable-canvas)
-                </p>
-            </div>
-            """, unsafe_allow_html=True)
+
     
     def __render_upload_tab(self, upload_data) -> None:
         """Render the upload image tab content."""
-        self.__render_feature_card(upload_data)
+
+        tab_cols = st.columns(2)
+
+        with tab_cols[0]:
+            # Render feature card for the current tab
+            self.__render_feature_card(upload_data)
         
-        # File uploader - use the key from session state
-        uploaded_file = st.file_uploader("Upload digit image", 
-                                        type=["png", "jpg", "jpeg"], 
-                                        key=st.session_state.file_upload_key)
-        
-        # Preview uploaded image
-        if uploaded_file is not None:
-            try:
-                from PIL import Image
-                import io
-                
-                # Read and display the image
-                image = Image.open(uploaded_file)
-                st.image(image, caption="Uploaded Image", width=280)
-            except Exception as e:
-                st.error(f"Error processing image: {str(e)}")
+        with tab_cols[1]:
+
+            # File uploader - use the key from session state
+            uploaded_file = st.file_uploader("Upload digit image", 
+                                            type=["png", "jpg", "jpeg"], 
+                                            key=st.session_state.file_upload_key)
+            
+            # Preview uploaded image
+            if uploaded_file is not None:
+                try:
+                    from PIL import Image
+                    import io
+                    
+                    # Read and display the image
+                    image = Image.open(uploaded_file)
+                    st.image(image, caption="Uploaded Image", width=280)
+                except Exception as e:
+                    st.error(f"Error processing image: {str(e)}")
     
     def __render_url_tab(self, url_data) -> None:
         """Render the URL input tab content."""
-        self.__render_feature_card(url_data)
 
-        # URL input - use the key from session state
-        url = st.text_input("Image URL", 
-                          key=st.session_state.url_input_key, 
-                          placeholder="https://example.com/digit.jpg")
+        tab_cols = st.columns(2)
+
+        with tab_cols[0]:
+            # Render feature card for the current tab
+            self.__render_feature_card(url_data)
+
+        with tab_cols[1]:
+            # URL input - use the key from session state
+            url = st.text_input("Image URL", 
+                            key=st.session_state.url_input_key, 
+                            placeholder="https://example.com/digit.jpg")
         
-        # Load image if URL is provided
-        if url:
-            try:
+            # Load image if URL is provided
+            if url:
                 import requests
                 from PIL import Image
                 import io
@@ -248,8 +248,7 @@ class DrawView(View):
                             st.image(image, caption="Image from URL", width=280)
                     else:
                         st.error(f"Failed to load image. Status code: {response.status_code}")
-            except Exception as e:
-                st.error(f"Error loading image from URL: {str(e)}")
+
                 
     def __render_action_buttons(self) -> None:
         """Render action buttons (Clear, Predict)."""
@@ -345,6 +344,19 @@ class DrawView(View):
                             st.success(f"Thank you! Recorded the correct digit as {i}.")
                             st.session_state.show_correction = False
     
+
+    def __render_tip_card(self, tips_data: Dict[str, Any]) -> None:
+        """Render the tips card."""
+        if tips_data:
+            items = tips_data.get("items", [])
+            numbered_list = "\n".join(f"\n{i+1}. {tip}" for i, tip in enumerate(items))
+            
+            FeatureCard(
+                title=tips_data.get("title", "Tips"),
+                content=numbered_list,
+                icon="💡"
+            ).display()
+
     def render(self) -> None:
         """Render the draw view content."""
         # Initialize session state variables
@@ -375,3 +387,6 @@ class DrawView(View):
         
         # Prediction result
         self.__render_prediction_result()
+
+        # Tips card
+        self.__render_tip_card(tips_data)
