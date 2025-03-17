@@ -21,7 +21,7 @@
 }
 
 .debug-description {
-  color: var(--color-text-light);
+  color: var(--color-text);
   max-width: 800px;
 }
 
@@ -63,7 +63,7 @@
 .color-value {
   font-family: var(--font-code);
   font-size: var(--font-size-xs);
-  color: var(--color-text-light);
+  color: var(--color-text);
 }
 
 /* Typography samples */
@@ -94,7 +94,7 @@
 .font-sample-value {
   font-family: var(--font-code);
   font-size: var(--font-size-xs);
-  color: var(--color-text-light);
+  color: var(--color-text);
 }
 
 /* Component previews */
