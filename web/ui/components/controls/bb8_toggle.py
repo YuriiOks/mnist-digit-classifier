@@ -90,19 +90,7 @@ class BB8Toggle(Component[Dict[str, Any]]):
         
         # Simple inline styled version (we're not using the template anymore)
         return f"""
-        <a href="#" id="bb8-toggle" style="
-            display: inline-block; 
-            width: 170px; 
-            height: 90px; 
-            # background: linear-gradient(#2c4770, #070e2b 35%, #628cac 50% 70%, #a6c5d4);
-            background-position-y: {0 if is_dark else '-5.625em'};
-            border-radius: 999em; 
-            position: relative; 
-            overflow: hidden;
-            cursor: pointer;
-            text-decoration: none;
-            transition: 0.4s;
-        ">
+        <a href="#" id="bb8-toggle">
             <!-- BB8 body -->
             <div style="
                 position: absolute;
