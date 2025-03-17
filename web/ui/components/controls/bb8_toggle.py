@@ -94,7 +94,7 @@ class BB8Toggle(Component[Dict[str, Any]]):
             display: inline-block; 
             width: 170px; 
             height: 90px; 
-            background: linear-gradient(#2c4770, #070e2b 35%, #628cac 50% 70%, #a6c5d4);
+            # background: linear-gradient(#2c4770, #070e2b 35%, #628cac 50% 70%, #a6c5d4);
             background-position-y: {0 if is_dark else '-5.625em'};
             border-radius: 999em; 
             position: relative; 
