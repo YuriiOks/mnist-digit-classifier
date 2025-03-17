@@ -201,53 +201,169 @@ button[data-testid="baseButton-secondary"]:hover,
   background: linear-gradient(180deg, color-mix(in srgb, var(--color-secondary) 25%, var(--color-primary) 75%), var(--color-primary)) !important;
 }
 
-/* === Button Focus States === */
-button:focus,
-.stButton button:focus {
-  outline: none !important;
-  box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color) !important;
+/* COMPLETELY REWRITTEN NAVIGATION BUTTON STYLES */
+
+/* First, let's target all navigation buttons */
+[data-testid="stButton"] > button[kind] {
+  font-weight: var(--font-weight-medium) !important;
+  letter-spacing: 0.3px !important;
+  border-radius: var(--border-radius-lg) !important;
+  transition: all var(--transition-speed-normal) var(--transition-timing) !important;
+  border: var(--border-width-thin) solid rgba(255, 255, 255, 0.1) !important;
+  padding: var(--spacing-sm) var(--spacing-md) !important;
 }
 
-[data-testid="stButton"][data-baseweb-key^="nav_"] button:focus {
-  outline: none !important;
-  box-shadow: 
-    var(--shadow-md),
-    0 0 0 var(--border-width-thin) rgba(255, 255, 255, 0.5) !important;
+/* Add targeted styles for each navigation button using nth-of-type */
+/* HOME BUTTON */
+[data-testid="element-container"]:nth-of-type(1) [data-testid="stButton"] > button[kind] {
+  background: linear-gradient(180deg, var(--color-secondary), color-mix(in srgb, var(--color-secondary) 75%, var(--color-primary) 25%)) !important;
+  color: var(--color-text-on-primary) !important;
+  box-shadow: var(--shadow-md) !important;
 }
 
-/* === Button Sizes === */
-.button-small, .stButton.button-small button {
-  padding: var(--spacing-xs) var(--spacing-sm) !important;
-  font-size: var(--font-size-sm) !important;
+/* DRAW BUTTON */
+[data-testid="element-container"]:nth-of-type(2) [data-testid="stButton"] > button[kind] {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--color-secondary) 75%, var(--color-primary) 25%), color-mix(in srgb, var(--color-secondary) 50%, var(--color-primary) 50%)) !important;
+  color: var(--color-text-on-primary) !important;
+  box-shadow: var(--shadow-md) !important;
 }
 
-.button-large, .stButton.button-large button {
-  padding: var(--spacing-sm) var(--spacing-lg) !important;
+/* HISTORY BUTTON */
+[data-testid="element-container"]:nth-of-type(3) [data-testid="stButton"] > button[kind] {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--color-secondary) 50%, var(--color-primary) 50%), color-mix(in srgb, var(--color-secondary) 25%, var(--color-primary) 75%)) !important;
+  color: var(--color-text-on-primary) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+
+/* SETTINGS BUTTON */
+[data-testid="element-container"]:nth-of-type(4) [data-testid="stButton"] > button[kind] {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--color-secondary) 25%, var(--color-primary) 75%), var(--color-primary)) !important;
+  color: var(--color-text-on-primary) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+
+/* Add hover effects for all nav buttons */
+[data-testid="stButton"] > button[kind]:hover {
+  transform: var(--button-hover-transform) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+/* Make button icons look nicer */
+[data-testid="stButton"] > button[kind] span:first-child {
+  text-shadow: var(--text-shadow-sm) !important;
+  margin-right: var(--spacing-sm) !important;
   font-size: var(--font-size-lg) !important;
 }
 
-/* === Additional Theme-specific Adjustments === */
-[data-theme="dark"] button[data-testid="baseButton-secondary"],
-[data-theme="dark"] .stButton button[kind="secondary"],
-[data-theme="dark"] .stButton button[data-testid="baseButton-secondary"] {
-  border-color: var(--color-primary) !important;
-  color: var(--color-primary) !important;
+/* Active button styling */
+button[kind="primary"] {
+  transform: translateY(0) !important;
+  box-shadow: var(--shadow-sm), inset var(--text-shadow-lg) !important;
+  border-left: var(--border-width-thick) solid rgba(255, 255, 255, 0.8) !important;
 }
 
-/* === Disabled Button States === */
-button:disabled,
-.stButton button:disabled {
-  opacity: 0.6 !important;
-  cursor: not-allowed !important;
-  transform: none !important;
-  box-shadow: none !important;
+/* Dark theme adjustments */
+[data-theme="dark"] [data-testid="stButton"] > button[kind] {
+  border-color: rgba(255, 255, 255, 0.15) !important;
 }
 
-/* Ensure transitions on theme change */
-[data-theme="light"] [data-testid="stButton"] button,
-[data-theme="dark"] [data-testid="stButton"] button {
-  transition: background var(--transition-speed-normal) var(--transition-timing),
-              transform var(--transition-speed-normal) var(--transition-timing),
-              box-shadow var(--transition-speed-normal) var(--transition-timing) !important;
+/* Navigation button styling */
+.nav-button {
+  display: block;
+  width: 100%;
+  padding: 12px 15px;
+  margin: 8px 0;
+  text-align: center;
+  border-radius: 8px;
+  color: white !important;
+  text-decoration: none !important;
+  border: none;
+  font-weight: 500;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
 }
 
+.nav-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Specific gradients for each button */
+.nav-home { 
+  background: linear-gradient(180deg, var(--color-secondary), color-mix(in srgb, var(--color-secondary) 75%, var(--color-primary) 25%));
+}
+
+.nav-draw { 
+  background: linear-gradient(180deg, color-mix(in srgb, var(--color-secondary) 75%, var(--color-primary) 25%), color-mix(in srgb, var(--color-secondary) 50%, var(--color-primary) 50%));
+}
+
+.nav-history { 
+  background: linear-gradient(180deg, color-mix(in srgb, var(--color-secondary) 50%, var(--color-primary) 50%), color-mix(in srgb, var(--color-secondary) 25%, var(--color-primary) 75%));
+}
+
+.nav-settings { 
+  background: linear-gradient(180deg, color-mix(in srgb, var(--color-secondary) 25%, var(--color-primary) 75%), var(--color-primary));
+}
+
+/* Active button styling */
+.nav-active {
+  border-left: 3px solid white;
+  padding-left: 17px; /* Adjusted for the border */
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Shimmer effect for buttons */
+.nav-button::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: rotate(30deg);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.nav-button:hover::after {
+  opacity: 1;
+  animation: buttonShine 1.5s ease-in-out;
+}
+
+@keyframes buttonShine {
+  0% {
+    transform: rotate(30deg) translate(-100%, -100%);
+  }
+  100% {
+    transform: rotate(30deg) translate(100%, 100%);
+  }
+}
+
+/* Fix for icon alignment */
+.nav-button i, 
+.nav-button svg,
+.nav-button img {
+  vertical-align: middle;
+  margin-right: 8px;
+}
+
+/* Target Streamlit-generated elements that might interfere */
+[data-testid="stMarkdownContainer"] a {
+  text-decoration: none !important;
+  color: inherit !important;
+}
+
+/* Make sure stMarkdown doesn't add margins that break our design */
+[data-testid="stMarkdownContainer"] {
+  margin-bottom: 0 !important;
+}
