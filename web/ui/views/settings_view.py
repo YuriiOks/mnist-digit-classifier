@@ -11,6 +11,9 @@ from typing import Optional
 from ui.views.base_view import View
 from core.app_state.settings_state import SettingsState
 from ui.theme.theme_manager import theme_manager
+from utils.resource_manager import resource_manager
+from ui.components.cards.card import WelcomeCard, FeatureCard
+
 
 class SettingsView(View):
     """Settings view for the MNIST Digit Classifier application."""
@@ -357,11 +360,31 @@ class SettingsView(View):
                 st.success("All settings have been reset to defaults.")
                 st.rerun()
         
+    def _load_view_data(self):
+        """
+        Load necessary JSON data for the History/Settings view.
+        """
+        data = resource_manager.load_json_resource("settings/settings_view.json")  # or "settings/settings_view.json"
+        if not data:
+            data = {}  # fallback
+
+        return data
+
     def render(self) -> None:
         """Render the settings view content."""
         # Initialize session state variables
         self._initialize_session_state()
-        
+        data = self._load_view_data()
+    
+        welcome_data = data.get("welcome_card", {})
+        if welcome_data:
+            wc = WelcomeCard(
+                title=welcome_data.get("title", "Settings"),
+                content=welcome_data.get("content", ""),
+                icon=welcome_data.get("icon", "⚙️")
+            )
+            wc.display()
+
         # Render tab buttons
         self._render_tab_buttons()
         
