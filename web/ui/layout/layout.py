@@ -6,14 +6,14 @@
 
 import streamlit as st
 import logging
-import traceback
-from typing import Optional
+from typing import Optional, Dict, Any
 
 # Import the individual layout components
 from ui.layout.header import Header
 from ui.layout.footer import Footer
 from ui.layout.sidebar import Sidebar
 from ui.theme.theme_manager import theme_manager
+from utils.aspects import AspectUtils
 
 
 class Layout:
@@ -33,86 +33,99 @@ class Layout:
             header_actions: HTML for additional header actions.
             footer_content: Custom footer content (HTML).
         """
-        self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
-        self.logger.info("Initializing Layout manager")
+        self.__logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
+        self.__logger.info("Initializing Layout manager")
         
-        try:
-            self.header = Header(title=title, actions_html=header_actions)
-            self.logger.info("Header component initialized")
-        except Exception as e:
-            self.logger.error(f"Error initializing Header: {str(e)}")
-            self.logger.error(traceback.format_exc())
-            self.header = None
-            
-        try:
-            self.footer = Footer(content=footer_content)
-            self.logger.info("Footer component initialized")
-        except Exception as e:
-            self.logger.error(f"Error initializing Footer: {str(e)}")
-            self.logger.error(traceback.format_exc())
-            self.footer = None
-            
-        try:
-            self.sidebar = Sidebar()
-            self.logger.info("Sidebar component initialized")
-        except Exception as e:
-            self.logger.error(f"Error initializing Sidebar: {str(e)}")
-            self.logger.error(traceback.format_exc())
-            self.sidebar = None
+        # Initialize components with proper error handling
+        self.__header = self.__init_header(title, header_actions)
+        self.__footer = self.__init_footer(footer_content)
+        self.__sidebar = self.__init_sidebar()
         
         # Ensure theme is initialized
         theme_manager.initialize()
     
+    @property
+    def header(self) -> Optional[Header]:
+        """Get the header component."""
+        return self.__header
+    
+    @property
+    def footer(self) -> Optional[Footer]:
+        """Get the footer component."""
+        return self.__footer
+    
+    @property
+    def sidebar(self) -> Optional[Sidebar]:
+        """Get the sidebar component."""
+        return self.__sidebar
+    
+    def __init_header(self, title: str, actions_html: str) -> Optional[Header]:
+        """Initialize header component with error handling."""
+        try:
+            header = Header(title=title, actions_html=actions_html)
+            self.__logger.info("Header component initialized")
+            return header
+        except Exception as e:
+            self.__logger.error(f"Error initializing Header: {str(e)}", exc_info=True)
+            return None
+    
+    def __init_footer(self, content: Optional[str]) -> Optional[Footer]:
+        """Initialize footer component with error handling."""
+        try:
+            footer = Footer(content=content)
+            self.__logger.info("Footer component initialized")
+            return footer
+        except Exception as e:
+            self.__logger.error(f"Error initializing Footer: {str(e)}", exc_info=True)
+            return None
+    
+    def __init_sidebar(self) -> Optional[Sidebar]:
+        """Initialize sidebar component with error handling."""
+        try:
+            sidebar = Sidebar()
+            self.__logger.info("Sidebar component initialized")
+            return sidebar
+        except Exception as e:
+            self.__logger.error(f"Error initializing Sidebar: {str(e)}", exc_info=True)
+            return None
+    
+    @AspectUtils.catch_errors
+    @AspectUtils.log_method
     def render_header(self) -> None:
         """Render just the application header."""
-        if self.header is None:
-            self.logger.error("Cannot render header: component is not initialized")
+        if self.__header is None:
+            self.__logger.error("Cannot render header: component is not initialized")
             st.error("Error initializing header component")
             return
             
-        try:
-            self.logger.info("Rendering header")
-            self.header.display()
-            self.logger.info("Header rendered successfully")
-        except Exception as e:
-            self.logger.error(f"Error rendering header: {str(e)}")
-            self.logger.error(traceback.format_exc())
-            st.error("Error rendering header component")
-
+        self.__header.display()
+    
+    @AspectUtils.catch_errors
+    @AspectUtils.log_method
     def render_footer(self) -> None:
         """Render just the application footer."""
-        if self.footer is None:
-            self.logger.error("Cannot render footer: component is not initialized")
+        if self.__footer is None:
+            self.__logger.error("Cannot render footer: component is not initialized")
             st.error("Error initializing footer component")
             return
             
-        try:
-            # Add spacing before footer
-            st.markdown("<div style='height: 60px;'></div>", unsafe_allow_html=True)
-            self.logger.info("Rendering footer")
-            self.footer.display()
-            self.logger.info("Footer rendered successfully")
-        except Exception as e:
-            self.logger.error(f"Error rendering footer: {str(e)}")
-            self.logger.error(traceback.format_exc())
-            st.error("Error rendering footer component")
+        # Add spacing before footer
+        st.markdown("<div style='height: 60px;'></div>", unsafe_allow_html=True)
+        self.__footer.display()
     
+    @AspectUtils.catch_errors
+    @AspectUtils.log_method
     def render_sidebar(self) -> None:
         """Render just the application sidebar."""
-        if self.sidebar is None:
-            self.logger.error("Cannot render sidebar: component is not initialized")
+        if self.__sidebar is None:
+            self.__logger.error("Cannot render sidebar: component is not initialized")
             st.error("Error initializing sidebar component") 
             return
             
-        try:
-            self.logger.info("Rendering sidebar")
-            self.sidebar.display()
-            self.logger.info("Sidebar rendered successfully")
-        except Exception as e:
-            self.logger.error(f"Error rendering sidebar: {str(e)}")
-            self.logger.error(traceback.format_exc())
-            st.error("Error rendering sidebar component")
+        self.__sidebar.display()
     
+    @AspectUtils.catch_errors
+    @AspectUtils.log_method
     def render(self) -> None:
         """
         Render the full application layout.
