@@ -1206,59 +1206,6 @@ def main():
     # Render footer last
     layout.render_footer()
 
-    # print("MNIST Resource Debug Tool")
-    # print("-----------------------")
-    
-    # # Detect environment
-    # in_docker = Path("/app").exists()
-    # print(f"Running in Docker container: {in_docker}")
-    
-    # # Determine base path
-    # base_path = Path("/app") if in_docker else Path.cwd()
-    # print(f"Base path: {base_path}")
-    
-    # # Check assets directory
-    # assets_path = base_path / "assets"
-    # if assets_path.exists():
-    #     print(f"\nAssets directory exists: {assets_path}")
-    # else:
-    #     print(f"\nAssets directory NOT FOUND: {assets_path}")
-    #     # Try to find assets directory
-    #     for root, dirs, _ in os.walk(base_path):
-    #         if "assets" in dirs:
-    #             assets_path = Path(root) / "assets"
-    #             print(f"Found assets directory at: {assets_path}")
-    #             break
-    
-    # # List CSS files
-    # css_path = assets_path / "css"
-    # if css_path.exists():
-    #     print(f"\nCSS files in {css_path}:")
-    #     css_files = find_files(css_path, ".css")
-    #     for file in css_files:
-    #         print(f"  - {file}")
-    # else:
-    #     print(f"\nCSS directory NOT FOUND: {css_path}")
-    
-    # # List JSON files
-    # data_path = assets_path / "data"
-    # if data_path.exists():
-    #     print(f"\nJSON files in {data_path}:")
-    #     json_files = find_files(data_path, ".json")
-    #     for file in json_files:
-    #         print(f"  - {file}")
-    # else:
-    #     print(f"\nData directory NOT FOUND: {data_path}")
-    
-    # # List templates
-    # templates_path = assets_path / "templates"
-    # if templates_path.exists():
-    #     print(f"\nTemplates in {templates_path}:")
-    #     template_files = find_files(templates_path, ".html")
-    #     for file in template_files:
-    #         print(f"  - {file}")
-    # else:
-    #     print(f"\nTemplates directory NOT FOUND: {templates_path}")
 
 if __name__ == "__main__":
     try:
@@ -1267,3 +1214,5 @@ if __name__ == "__main__":
         logger.critical(f"Application failed to start: {str(e)}", exc_info=True)
         st.error("The application encountered a critical error. Please check the logs for details.")
         st.code(str(e))
+
+
