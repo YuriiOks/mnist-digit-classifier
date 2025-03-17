@@ -168,8 +168,8 @@ class HistoryView(View):
                             st.markdown(f"""
                             <div style="border: 1px solid var(--color-border); border-radius: 8px; padding: 1rem; margin-bottom: 1rem; background-color: var(--color-card);">
                                 <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                                    <div style="font-size: 0.8rem; color: var(--color-text-light);">{timestamp_str}</div>
-                                    <div style="font-size: 0.8rem; color: var(--color-text-light);"><span class="highlight">Confidence: {confidence_pct}</span></div>
+                                    <div style="font-size: 0.8rem; color: var(--color-text);">{timestamp_str}</div>
+                                    <div style="font-size: 0.8rem; color: var(--color-text);"><span class="highlight">Confidence: {confidence_pct}</span></div>
                                 </div>
                                 <div style="display: flex; gap: 1rem; align-items: center;">
                                     <div style="width: 80px; height: 80px; display: flex; justify-content: center; align-items: center; background-color: var(--color-background); border-radius: 4px;">
@@ -178,7 +178,7 @@ class HistoryView(View):
                                     <div>
                                         <div style="font-weight: bold; margin-bottom: 0.25rem;">Prediction: {item['digit']}</div>
                                         {f'<div style="color: var(--color-success); font-size: 0.9rem;">Corrected to: {item["corrected_digit"]}</div>' if item["corrected_digit"] is not None else ''}
-                                        <div style="font-size: 0.9rem; color: var(--color-text-light);">Input: {item["input_type"].capitalize()}</div>
+                                        <div style="font-size: 0.9rem; color: var(--color-text);">Input: {item["input_type"].capitalize()}</div>
                                     </div>
                                 </div>
                                 <div style="display: flex; justify-content: flex-end; margin-top: 0.5rem;">
