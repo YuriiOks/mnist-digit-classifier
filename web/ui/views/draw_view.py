@@ -8,9 +8,11 @@ import streamlit as st
 import logging
 import time
 import random
+import base64
 from typing import Optional, Dict, Any, List, Tuple
 from PIL import Image
 import io
+import psycopg2
 
 from ui.views.base_view import View
 from ui.components.cards.card import WelcomeCard, FeatureCard
@@ -150,22 +152,24 @@ class DrawView(View):
                         use_container_width=True):
                 st.session_state.active_tab = "url"
                 st.rerun()
-    
+
+
     def __render_draw_tab(self, draw_data) -> None:
         """Render the draw digit tab content."""
-
         tab_cols = st.columns(2)
 
         with tab_cols[0]:
             # Render feature card for the current tab
-
-
             self.__render_feature_card(draw_data)
 
         with tab_cols[1]:
-        
             # Add canvas for drawing
             from streamlit_drawable_canvas import st_canvas
+            import numpy as np
+            from PIL import Image
+            import io
+            import base64
+            from core.app_state.canvas_state import CanvasState
             
             # Canvas configuration
             stroke_width = st.slider("Brush Width", 10, 25, 15)
@@ -180,11 +184,25 @@ class DrawView(View):
                 key=st.session_state.canvas_key,
                 display_toolbar=True,
             )
+            
+            # Store canvas result in session state for prediction
+            if canvas_result.image_data is not None:
+                # Immediately store in CanvasState when drawing happens
+                img_array = canvas_result.image_data
+                img = Image.fromarray(img_array).convert('L')
+                buffer = io.BytesIO()
+                img.save(buffer, format="PNG")
+                img_bytes = buffer.getvalue()
+                
+                # Store in CanvasState
+                CanvasState.set_image_data(img_bytes)
+                CanvasState.set_input_type(CanvasState.CANVAS_INPUT)
+                
+                # Debug output (optional)
+                st.session_state['canvas_drawing_detected'] = True
 
-    
     def __render_upload_tab(self, upload_data) -> None:
         """Render the upload image tab content."""
-
         tab_cols = st.columns(2)
 
         with tab_cols[0]:
@@ -192,27 +210,38 @@ class DrawView(View):
             self.__render_feature_card(upload_data)
         
         with tab_cols[1]:
-
             # File uploader - use the key from session state
+            from PIL import Image
+            import io
+            from core.app_state.canvas_state import CanvasState
+            
             uploaded_file = st.file_uploader("Upload digit image", 
                                             type=["png", "jpg", "jpeg"], 
                                             key=st.session_state.file_upload_key)
             
-            # Preview uploaded image
+            # Preview uploaded image and store data
             if uploaded_file is not None:
                 try:
-                    from PIL import Image
-                    import io
-                    
                     # Read and display the image
                     image = Image.open(uploaded_file)
                     st.image(image, caption="Uploaded Image", width=280)
+                    
+                    # Immediately store the uploaded file in CanvasState
+                    uploaded_file.seek(0)  # Reset file pointer to beginning
+                    img_bytes = uploaded_file.getvalue()
+                    
+                    # Store in CanvasState
+                    CanvasState.set_image_data(img_bytes)
+                    CanvasState.set_input_type(CanvasState.UPLOAD_INPUT)
+                    
+                    # Debug output (optional)
+                    st.session_state['upload_detected'] = True
+                    
                 except Exception as e:
                     st.error(f"Error processing image: {str(e)}")
-    
+
     def __render_url_tab(self, url_data) -> None:
         """Render the URL input tab content."""
-
         tab_cols = st.columns(2)
 
         with tab_cols[0]:
@@ -221,36 +250,89 @@ class DrawView(View):
 
         with tab_cols[1]:
             # URL input - use the key from session state
+            import requests
+            from PIL import Image
+            import io
+            from core.app_state.canvas_state import CanvasState
+            
             url = st.text_input("Image URL", 
                             key=st.session_state.url_input_key, 
                             placeholder="https://example.com/digit.jpg")
         
-            # Load image if URL is provided
+            # Load button
             if url:
-                import requests
-                from PIL import Image
-                import io
-                
-                # Show loading indicator
-                with st.spinner("Loading image from URL..."):
-                    # Fetch image from URL
-                    response = requests.get(url, timeout=5)
-                    
-                    # Check if the request was successful
-                    if response.status_code == 200:
-                        # Check if the content type is an image
-                        content_type = response.headers.get('Content-Type', '')
-                        if not content_type.startswith('image/'):
-                            st.error("The URL doesn't point to an image.")
-                        else:
-                            # Process and display the image
-                            image = Image.open(io.BytesIO(response.content))
-                            st.image(image, caption="Image from URL", width=280)
-                    else:
-                        st.error(f"Failed to load image. Status code: {response.status_code}")
-                
+                if st.button("Load Image", key="load_url_image"):
+                    try:
+                        # Show loading indicator
+                        with st.spinner("Loading image from URL..."):
+                            # Fetch image from URL
+                            response = requests.get(url, timeout=5)
+                            
+                            # Check if the request was successful
+                            if response.status_code == 200:
+                                # Check if the content type is an image
+                                content_type = response.headers.get('Content-Type', '')
+                                if not content_type.startswith('image/'):
+                                    st.error("The URL doesn't point to an image.")
+                                else:
+                                    # Process and display the image
+                                    img_bytes = response.content
+                                    image = Image.open(io.BytesIO(img_bytes))
+                                    st.image(image, caption="Image from URL", width=280)
+                                    
+                                    # Store in CanvasState
+                                    CanvasState.set_image_data(img_bytes)
+                                    CanvasState.set_input_type(CanvasState.URL_INPUT)
+                                    
+                                    # Debug output (optional)
+                                    st.session_state['url_image_loaded'] = True
+                            else:
+                                st.error(f"Failed to load image. Status code: {response.status_code}")
+                    except Exception as e:
+                        st.error(f"Error loading image: {str(e)}")
+        
+        # Display preview if already loaded
+        if CanvasState.get_input_type() == CanvasState.URL_INPUT and CanvasState.get_image_data():
+            img_bytes = CanvasState.get_image_data()
+            if img_bytes:
+                try:
+                    img = Image.open(io.BytesIO(img_bytes))
+                    st.image(img, caption="Loaded Image", width=280)
+                except Exception:
+                    pass
+
     def __render_action_buttons(self) -> None:
         """Render action buttons (Clear, Predict)."""
+        # Add a test image button for debugging
+        if st.button("Load Test Image", key="test_digit"):
+            # Create a simple test image (a vertical line like digit "1")
+            from PIL import Image
+            import io
+            import numpy as np
+            from core.app_state.canvas_state import CanvasState
+            
+            # Create a white 28x28 image
+            test_img = Image.new('L', (28, 28), 255)
+            
+            # Draw a vertical line (digit "1")
+            for y in range(5, 23):
+                for x in range(12, 16):
+                    test_img.putpixel((x, y), 0)  # Black pixel
+            
+            # Display the test image
+            st.image(test_img, caption="Test Digit: 1", width=100)
+            
+            # Convert to bytes
+            buffer = io.BytesIO()
+            test_img.save(buffer, format="PNG")
+            img_bytes = buffer.getvalue()
+            
+            # Store in CanvasState
+            CanvasState.set_image_data(img_bytes)
+            CanvasState.set_input_type("test")
+            
+            st.success("Test image loaded! Click Predict to test the model.")
+        
         # Add buttons in a row
         button_cols = st.columns(2)
         
@@ -271,6 +353,10 @@ class DrawView(View):
                 st.session_state.url_input_key = f"url_input_{timestamp}"
                 st.session_state.reset_counter += 1
                 
+                # Clear canvas state
+                from core.app_state.canvas_state import CanvasState
+                CanvasState.clear_all()
+                
                 # Trigger a rerun to apply the changes
                 st.rerun()
         
@@ -278,34 +364,24 @@ class DrawView(View):
         with button_cols[1]:
             if st.button("Predict", key="predict", type="primary", use_container_width=True):
                 try:
-                    # Get image data based on active tab
-                    image_data = None
+                    # Get image data from CanvasState
+                    from core.app_state.canvas_state import CanvasState
+                    image_data = CanvasState.get_image_data()
                     
-                    if st.session_state.active_tab == "draw":
-                        # Get canvas image data
-                        image_data = CanvasState.get_image_data()
-                        if not image_data:
-                            st.error("Please draw a digit first")
-                            return
-                            
-                    elif st.session_state.active_tab == "upload":
-                        # Get uploaded image data
-                        image_data = CanvasState.get_image_data()
-                        if not image_data:
-                            st.error("Please upload an image first")
-                            return
-                            
-                    elif st.session_state.active_tab == "url":
-                        # Get URL image data
-                        image_data = CanvasState.get_image_data()
-                        if not image_data:
-                            st.error("Please enter a valid image URL first")
-                            return
+                    # Check if we have image data
+                    if image_data is None:
+                        st.error("No image data available. Please draw, upload or load an image first.")
+                        return
+                    
+                    # Show image data info for debugging
+                    st.info(f"Processing image data: {len(image_data)} bytes")
                     
                     # Show prediction in progress
                     with st.spinner("Predicting digit..."):
-                        # Initialize the classifier
+                        # Import the digit classifier
                         from model.digit_classifier import DigitClassifier
+                        
+                        # Initialize the classifier
                         classifier = DigitClassifier()
                         
                         # Make prediction
@@ -324,11 +400,15 @@ class DrawView(View):
                         # Get the input type from CanvasState
                         input_type = CanvasState.get_input_type()
                         
+                        # Encode image data for history
+                        import base64
+                        encoded_image = base64.b64encode(image_data).decode('utf-8') if image_data else None
+                        
                         # Add prediction to history
                         HistoryState.add_prediction(
                             digit=predicted_digit,
                             confidence=confidence,
-                            image_data=base64.b64encode(image_data).decode('utf-8') if image_data else None,
+                            image_data=encoded_image,
                             input_type=input_type
                         )
                         
@@ -376,7 +456,8 @@ class DrawView(View):
                 elif st.session_state.confidence > 0.9:
                     confidence_color = "green"
                     
-                st.progress(st.session_state.confidence, text=confidence_pct)
+                safe_confidence = max(0.01, st.session_state.confidence)
+                st.progress(safe_confidence, text=confidence_pct)
                 
                 confidence_message = "Low confidence" if st.session_state.confidence < 0.6 else \
                                 "Medium confidence" if st.session_state.confidence < 0.9 else \
