@@ -248,7 +248,6 @@ class DrawView(View):
                             st.image(image, caption="Image from URL", width=280)
                     else:
                         st.error(f"Failed to load image. Status code: {response.status_code}")
-
                 
     def __render_action_buttons(self) -> None:
         """Render action buttons (Clear, Predict)."""
@@ -278,13 +277,74 @@ class DrawView(View):
         # Predict button
         with button_cols[1]:
             if st.button("Predict", key="predict", type="primary", use_container_width=True):
-                # Simulated prediction
-                st.session_state.predicted_digit = random.randint(0, 9)
-                st.session_state.confidence = random.uniform(0.7, 0.99)
-                st.session_state.prediction_made = True
-                st.session_state.show_correction = False
-                st.session_state.prediction_correct = None
-                
+                try:
+                    # Get image data based on active tab
+                    image_data = None
+                    
+                    if st.session_state.active_tab == "draw":
+                        # Get canvas image data
+                        image_data = CanvasState.get_image_data()
+                        if not image_data:
+                            st.error("Please draw a digit first")
+                            return
+                            
+                    elif st.session_state.active_tab == "upload":
+                        # Get uploaded image data
+                        image_data = CanvasState.get_image_data()
+                        if not image_data:
+                            st.error("Please upload an image first")
+                            return
+                            
+                    elif st.session_state.active_tab == "url":
+                        # Get URL image data
+                        image_data = CanvasState.get_image_data()
+                        if not image_data:
+                            st.error("Please enter a valid image URL first")
+                            return
+                    
+                    # Show prediction in progress
+                    with st.spinner("Predicting digit..."):
+                        # Initialize the classifier
+                        from model.digit_classifier import DigitClassifier
+                        classifier = DigitClassifier()
+                        
+                        # Make prediction
+                        predicted_digit, confidence = classifier.predict(image_data)
+                        
+                        # Store prediction results in session state
+                        st.session_state.predicted_digit = predicted_digit
+                        st.session_state.confidence = confidence
+                        st.session_state.prediction_made = True
+                        st.session_state.show_correction = False
+                        st.session_state.prediction_correct = None
+                        
+                        # Add to history state
+                        from core.app_state.history_state import HistoryState
+                        
+                        # Get the input type from CanvasState
+                        input_type = CanvasState.get_input_type()
+                        
+                        # Add prediction to history
+                        HistoryState.add_prediction(
+                            digit=predicted_digit,
+                            confidence=confidence,
+                            image_data=base64.b64encode(image_data).decode('utf-8') if image_data else None,
+                            input_type=input_type
+                        )
+                        
+                    # Success message
+                    st.success(f"Predicted digit: {predicted_digit} with {confidence:.2%} confidence")
+                        
+                except ConnectionError as e:
+                    st.error(f"Connection error: {str(e)}")
+                    self.__logger.error(f"Connection error in prediction: {str(e)}")
+                except ValueError as e:
+                    st.error(f"Error processing image: {str(e)}")
+                    self.__logger.error(f"Value error in prediction: {str(e)}")
+                except Exception as e:
+                    st.error(f"An unexpected error occurred: {str(e)}")
+                    self.__logger.error(f"Unexpected error in prediction: {str(e)}", exc_info=True)
+
     def __render_prediction_result(self) -> None:
         """Render prediction result if available."""
         if st.session_state.prediction_made:
@@ -310,8 +370,19 @@ class DrawView(View):
                 confidence_pct = f"{st.session_state.confidence * 100:.1f}%"
                 
                 # Progress bar for confidence
-                st.progress(st.session_state.confidence)
-                st.markdown(f"<p>The model is {confidence_pct} confident in this prediction.</p>", unsafe_allow_html=True)
+                confidence_color = "normal"
+                if st.session_state.confidence < 0.6:
+                    confidence_color = "red"
+                elif st.session_state.confidence > 0.9:
+                    confidence_color = "green"
+                    
+                st.progress(st.session_state.confidence, text=confidence_pct)
+                
+                confidence_message = "Low confidence" if st.session_state.confidence < 0.6 else \
+                                "Medium confidence" if st.session_state.confidence < 0.9 else \
+                                "High confidence"
+                                
+                st.markdown(f"<p>The model is <b>{confidence_message}</b> in this prediction.</p>", unsafe_allow_html=True)
                 
                 # Feedback options
                 st.markdown("<h4>Is this correct?</h4>", unsafe_allow_html=True)
@@ -323,6 +394,20 @@ class DrawView(View):
                     if st.button("👍 Yes", key=f"thumbs_up_{st.session_state.reset_counter}", use_container_width=True):
                         st.session_state.prediction_correct = True
                         st.session_state.show_correction = False
+                        
+                        # Get the current prediction to log feedback
+                        current_pred = HistoryState.get_current_prediction()
+                        if current_pred:
+                            # Log confirmation to database if available
+                            try:
+                                from services.prediction.prediction_service import prediction_service
+                                prediction_service.update_true_label(
+                                    current_pred["id"], 
+                                    current_pred["digit"]
+                                )
+                            except Exception as e:
+                                self.__logger.error(f"Error logging confirmation: {str(e)}")
+                        
                         st.success("Thank you for your feedback!")
                 
                 with feedback_col2:
@@ -339,11 +424,38 @@ class DrawView(View):
                 for i in range(10):
                     with digit_cols[i]:
                         if st.button(str(i), key=f"digit_{i}_{st.session_state.reset_counter}"):
-                            # In a real app, you would save this correction to a database
+                            # Get the current prediction to update
+                            current_pred = HistoryState.get_current_prediction()
+                            if current_pred:
+                                # Update the history entry with correction
+                                HistoryState.set_user_correction(current_pred["id"], i)
+                                
+                                # Log correction to database if available
+                                try:
+                                    from services.prediction.prediction_service import prediction_service
+                                    prediction_service.update_true_label(
+                                        current_pred["id"], 
+                                        i
+                                    )
+                                except Exception as e:
+                                    self.__logger.error(f"Error logging correction: {str(e)}")
+                                    
                             st.session_state.corrected_digit = i
                             st.success(f"Thank you! Recorded the correct digit as {i}.")
                             st.session_state.show_correction = False
-    
+            
+            # If we have probabilities, show distribution
+            if hasattr(st.session_state, "probabilities") and st.session_state.probabilities:
+                st.markdown("<h4>Probability Distribution</h4>", unsafe_allow_html=True)
+                
+                # Convert probabilities to a format for bar chart
+                probs = st.session_state.probabilities
+                chart_data = {"Digit": list(range(10)), "Probability": probs}
+                import pandas as pd
+                df = pd.DataFrame(chart_data)
+                
+                # Bar chart
+                st.bar_chart(df.set_index("Digit"))
 
     def __render_tip_card(self, tips_data: Dict[str, Any]) -> None:
         """Render the tips card."""
