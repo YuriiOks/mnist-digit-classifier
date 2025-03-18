@@ -156,7 +156,7 @@ class CanvasState:
     @AspectUtils.catch_errors
     @AspectUtils.log_method
     def get_image_data(cls) -> Optional[bytes]:
-        """Get image data.
+        """Get image data as bytes for prediction.
 
         Returns:
             Image data as bytes or None if not set
@@ -164,8 +164,98 @@ class CanvasState:
         cls.initialize()
         encoded = SessionState.get(cls.IMAGE_DATA_KEY)
         if encoded:
-            return base64.b64decode(encoded)
+            try:
+                # Decode from base64 to bytes
+                return base64.b64decode(encoded)
+            except Exception as e:
+                cls._logger.error(f"Error decoding image data: {str(e)}")
+                return None
         return None
+
+    @classmethod
+    @AspectUtils.catch_errors
+    @AspectUtils.log_method
+    def get_processed_image_data(cls) -> Optional[bytes]:
+        """Get image data processed for the model.
+        
+        This applies any necessary preprocessing before sending to model API.
+
+        Returns:
+            Processed image data as bytes or None if not available
+        """
+        # Get raw image data
+        image_data = cls.get_image_data()
+        if not image_data:
+            return None
+        
+        try:
+            # Open as PIL Image
+            from PIL import Image
+            import io
+            
+            img = Image.open(io.BytesIO(image_data)).convert('L')
+            
+            # Basic preprocessing - center the digit
+            img = cls._center_digit(img)
+            
+            # Convert back to bytes
+            buffer = io.BytesIO()
+            img.save(buffer, format="PNG")
+            return buffer.getvalue()
+        except Exception as e:
+            cls._logger.error(f"Error processing image: {str(e)}")
+            return image_data  # Return original if processing fails
+
+    @classmethod
+    def _center_digit(cls, image: 'Image.Image') -> 'Image.Image':
+        """Center the digit in the image.
+        
+        Args:
+            image: PIL Image
+            
+        Returns:
+            Centered PIL Image
+        """
+        try:
+            import numpy as np
+            
+            # Convert to numpy array
+            img_array = np.array(image)
+            
+            # Invert if white digit on black background
+            if np.mean(img_array) > 127:
+                img_array = 255 - img_array
+            
+            # Find non-zero pixels (the digit)
+            rows, cols = np.where(img_array < 127)
+            
+            # If no digit found, return original
+            if len(rows) == 0 or len(cols) == 0:
+                return image
+            
+            # Find bounding box
+            top, bottom = np.min(rows), np.max(rows)
+            left, right = np.min(cols), np.max(cols)
+            
+            # Calculate center of digit
+            center_y, center_x = (top + bottom) // 2, (left + right) // 2
+            
+            # Calculate center of image
+            height, width = img_array.shape
+            img_center_y, img_center_x = height // 2, width // 2
+            
+            # Calculate translation
+            dy, dx = img_center_y - center_y, img_center_x - center_x
+            
+            # Create new image and paste with offset
+            from PIL import Image
+            new_img = Image.new('L', (width, height), 255)
+            new_img.paste(image, (dx, dy))
+            
+            return new_img
+        except Exception as e:
+            cls._logger.error(f"Error centering digit: {str(e)}")
+            return image  # Return original if centering fails
 
     @classmethod
     @AspectUtils.catch_errors
