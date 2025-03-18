@@ -126,37 +126,62 @@ class CanvasState:
         cls,
         image_data: Union[bytes, np.ndarray, Image.Image]
     ) -> None:
-        """Set image data.
+        """Set image data with enhanced error handling and verification.
 
         Args:
             image_data: Image data as bytes, numpy array, or PIL Image
         """
         cls.initialize()
 
-        # Convert to bytes if needed
-        if isinstance(image_data, np.ndarray):
-            # Convert numpy array to PIL Image
-            img = Image.fromarray(image_data.astype('uint8'))
-            buffer = io.BytesIO()
-            img.save(buffer, format="PNG")
-            image_data = buffer.getvalue()
-        elif isinstance(image_data, Image.Image):
-            buffer = io.BytesIO()
-            image_data.save(buffer, format="PNG")
-            image_data = buffer.getvalue()
+        try:
+            # Convert to bytes if needed
+            if isinstance(image_data, np.ndarray):
+                # Convert numpy array to PIL Image
+                img = Image.fromarray(image_data.astype('uint8'))
+                buffer = io.BytesIO()
+                img.save(buffer, format="PNG")
+                image_data = buffer.getvalue()
+                cls._logger.debug("Converted numpy array to bytes")
+            elif isinstance(image_data, Image.Image):
+                buffer = io.BytesIO()
+                image_data.save(buffer, format="PNG")
+                image_data = buffer.getvalue()
+                cls._logger.debug("Converted PIL Image to bytes")
 
-        # Store as base64 string
-        if isinstance(image_data, bytes):
+            # Verify it's valid image data
+            if not isinstance(image_data, bytes):
+                raise ValueError(f"Invalid image data type: {type(image_data)}")
+            
+            # Check if data is empty
+            if len(image_data) == 0:
+                raise ValueError("Empty image data")
+                
+            # Try to open as image to verify it's valid
+            try:
+                img = Image.open(io.BytesIO(image_data))
+                img.verify()  # Verify it's a valid image
+                cls._logger.debug(f"Valid image data verified: {img.format} {img.size[0]}x{img.size[1]}")
+            except Exception as e:
+                cls._logger.warning(f"Image verification failed: {str(e)}")
+                # Continue anyway as some raw data might still be usable by the model
+
+            # Store as base64 string
             encoded = base64.b64encode(image_data).decode('utf-8')
             SessionState.set(cls.IMAGE_DATA_KEY, encoded)
-        else:
-            logger.warning(f"Unsupported image data type: {type(image_data)}")
+            cls._logger.info(f"Image data stored: {len(encoded)} chars (base64)")
+            
+            # Store timestamp for debugging
+            import time
+            SessionState.set("last_image_update", time.time())
+        except Exception as e:
+            cls._logger.error(f"Error setting image data: {str(e)}", exc_info=True)
+            raise
 
     @classmethod
     @AspectUtils.catch_errors
     @AspectUtils.log_method
     def get_image_data(cls) -> Optional[bytes]:
-        """Get image data as bytes for prediction.
+        """Get image data with verification.
 
         Returns:
             Image data as bytes or None if not set
@@ -165,12 +190,41 @@ class CanvasState:
         encoded = SessionState.get(cls.IMAGE_DATA_KEY)
         if encoded:
             try:
-                # Decode from base64 to bytes
-                return base64.b64decode(encoded)
+                decoded = base64.b64decode(encoded)
+                cls._logger.debug(f"Retrieved image data: {len(decoded)} bytes")
+                return decoded
             except Exception as e:
-                cls._logger.error(f"Error decoding image data: {str(e)}")
+                cls._logger.error(f"Error decoding image data: {str(e)}", exc_info=True)
                 return None
-        return None
+        else:
+            cls._logger.debug("No image data found in session state")
+            return None
+
+    @classmethod
+    @AspectUtils.catch_errors
+    @AspectUtils.log_method
+    def check_image_data(cls) -> Tuple[bool, Optional[str]]:
+        """
+        Check if image data exists and is valid.
+        
+        Returns:
+            Tuple of (is_valid, error_message)
+        """
+        try:
+            data = cls.get_image_data()
+            if data is None:
+                return False, "No image data available"
+                
+            if len(data) == 0:
+                return False, "Empty image data"
+                
+            # Try to open the image to verify it's valid
+            img = Image.open(io.BytesIO(data))
+            img.verify()
+            
+            return True, None
+        except Exception as e:
+            return False, str(e)
 
     @classmethod
     @AspectUtils.catch_errors
