@@ -69,7 +69,8 @@ class HistoryState:
         cls,
         digit: int,
         confidence: float,
-        image_data: Optional[str] = None
+        image_data: Optional[str] = None,
+        input_type: Optional[str] = None
     ) -> Dict[str, Any]:
         """Add a new prediction to history.
 
@@ -77,6 +78,7 @@ class HistoryState:
             digit: The predicted digit
             confidence: Confidence score (0-1)
             image_data: Optional base64 encoded image data
+            input_type: Type of input (canvas, upload, url)
 
         Returns:
             Dict[str, Any]: The newly created prediction entry
@@ -89,12 +91,19 @@ class HistoryState:
             "digit": digit,
             "confidence": confidence,
             "timestamp": datetime.now(),
-            "image": image_data
+            "image": image_data,
+            "input_type": input_type or "unknown"
         }
 
         # Add to history
         history = SessionState.get(cls.HISTORY_KEY, [])
         history.append(prediction)
+        
+        # Limit history size if needed
+        max_history = 100  # Could be configurable in settings
+        if len(history) > max_history:
+            history = history[-max_history:]
+            
         SessionState.set(cls.HISTORY_KEY, history)
 
         # Update current prediction
