@@ -191,9 +191,9 @@ class HistoryView(View):
                                 </div>
                             </div>
                             """, unsafe_allow_html=True)
-    
+
     def _render_pagination(self, total_items: int, total_pages: int) -> None:
-        """Render pagination controls."""
+        """Render pagination controls using streamlit-pagination."""
         # Calculate start and end indices
         items_per_page = st.session_state.history_items_per_page
         start_idx = (st.session_state.history_page - 1) * items_per_page
@@ -203,42 +203,76 @@ class HistoryView(View):
         st.markdown(f"""
         <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
             <div>
-                <span>Showing {start_idx + 1}-{end_idx} of {total_items} predictions</span>
+                <span>Showing {start_idx + 1 if total_items > 0 else 0}-{end_idx} of {total_items} predictions</span>
             </div>
             <div>
-                <span>Page {st.session_state.history_page} of {total_pages}</span>
+                <span>Page {st.session_state.history_page} of {max(1, total_pages)}</span>
             </div>
         </div>
         """, unsafe_allow_html=True)
         
-        # Pagination controls
-        pagination_cols = st.columns([1, 3, 1])
-        
-        with pagination_cols[0]:
-            if st.button("← Previous", key="prev_page", disabled=st.session_state.history_page <= 1):
-                st.session_state.history_page -= 1
-                st.rerun()
-        
-        with pagination_cols[1]:
-            # Page selector
-            page_numbers = list(range(1, total_pages + 1))
-            selected_page = st.select_slider(
-                "",
-                options=page_numbers,
-                value=st.session_state.history_page,
-                key="page_selector",
-                label_visibility="collapsed"
+        # If we have the streamlit-pagination library
+        try:
+            from streamlit_pagination import pagination_component
+            
+            # Ensure total_pages is at least 1 to avoid errors
+            max_pages = max(1, total_pages)
+            
+            # Define layout options
+            layout = {
+                'color': 'primary',
+                'style': {'margin-top': '10px'}
+            }
+            
+            # Use the pagination component with correct parameters
+            selected_page = pagination_component(
+                max_pages,  # Total number of pages
+                layout=layout,
+                key="history_pagination"  # Unique key
             )
             
-            if selected_page != st.session_state.history_page:
-                st.session_state.history_page = selected_page
+            # Page values from the component are 0-based, convert to 1-based
+            page_number = selected_page + 1
+            
+            # Update current page if changed
+            if page_number != st.session_state.history_page:
+                st.session_state.history_page = page_number
                 st.rerun()
-        
-        with pagination_cols[2]:
-            if st.button("Next →", key="next_page", disabled=st.session_state.history_page >= total_pages):
-                st.session_state.history_page += 1
-                st.rerun()
-    
+                
+        except (ImportError, AttributeError) as e:
+            st.warning(f"Pagination component unavailable: {str(e)}")
+            # Fallback to basic pagination if library not installed
+            pagination_cols = st.columns([1, 3, 1])
+            
+            with pagination_cols[0]:
+                if st.button("← Previous", key="history_prev_page", 
+                            disabled=st.session_state.history_page <= 1):
+                    st.session_state.history_page -= 1
+                    st.rerun()
+            
+            with pagination_cols[1]:
+                # Page selector - ensure max value is at least 1
+                max_page = max(1, total_pages)
+                page_options = list(range(1, max_page + 1))
+                if page_options:
+                    selected_page = st.select_slider(
+                        "Page",
+                        options=page_options,
+                        value=min(st.session_state.history_page, max_page),
+                        key="history_page_selector",
+                        label_visibility="hidden"
+                    )
+                    
+                    if selected_page != st.session_state.history_page:
+                        st.session_state.history_page = selected_page
+                        st.rerun()
+            
+            with pagination_cols[2]:
+                if st.button("Next →", key="history_next_page", 
+                            disabled=st.session_state.history_page >= total_pages):
+                    st.session_state.history_page += 1
+                    st.rerun()
+
     def _render_clear_all_button(self) -> None:
         """Render the clear history button."""
         st.markdown("<hr>", unsafe_allow_html=True)
