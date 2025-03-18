@@ -4,7 +4,9 @@ CREATE TABLE IF NOT EXISTS prediction_logs (
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     prediction INTEGER NOT NULL,
     true_label INTEGER,
-    confidence FLOAT NOT NULL
+    confidence FLOAT NOT NULL,
+    input_type VARCHAR(20),
+    image_data TEXT
 );
 
 -- Create index for faster querying
