@@ -5,7 +5,7 @@
 # Created: 2024-05-01
 
 import logging
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, Tuple
 import uuid
 from datetime import datetime
 import base64
@@ -21,6 +21,9 @@ class HistoryState:
 
     HISTORY_KEY = "prediction_history"
     CURRENT_PREDICTION_KEY = "current_prediction"
+
+    # Define logger
+    _logger = logging.getLogger(f"{__name__}.HistoryState")
 
     @classmethod
     @AspectUtils.catch_errors
@@ -95,7 +98,7 @@ class HistoryState:
             "input_type": input_type or "unknown"
         }
 
-        # Add to history
+        # Add to session state history
         history = SessionState.get(cls.HISTORY_KEY, [])
         history.append(prediction)
         
@@ -108,6 +111,18 @@ class HistoryState:
 
         # Update current prediction
         SessionState.set(cls.CURRENT_PREDICTION_KEY, prediction)
+        
+        # Log to database if available
+        try:
+            from services.data.database_service import database_service
+            database_service.log_prediction(
+                prediction=digit,
+                confidence=confidence,
+                input_type=input_type,
+                image_data=image_data
+            )
+        except Exception as e:
+            cls._logger.warning(f"Failed to log prediction to database: {str(e)}")
 
         return prediction
 
@@ -117,8 +132,17 @@ class HistoryState:
     def clear_history(cls) -> None:
         """Clear all prediction history."""
         cls.initialize()
+        
+        # Clear session state
         SessionState.set(cls.HISTORY_KEY, [])
         SessionState.set(cls.CURRENT_PREDICTION_KEY, None)
+        
+        # Clear database if available
+        try:
+            from services.data.database_service import database_service
+            database_service.clear_history()
+        except Exception as e:
+            cls._logger.warning(f"Failed to clear history in database: {str(e)}")
 
     @classmethod
     @AspectUtils.catch_errors
@@ -133,24 +157,64 @@ class HistoryState:
     def get_paginated_history(
         cls,
         page: int = 1,
-        page_size: int = 10
-    ) -> List[Dict[str, Any]]:
-        """Get paginated prediction history.
+        page_size: int = 10,
+        digit_filter: Optional[int] = None,
+        min_confidence: float = 0.0
+    ) -> Tuple[List[Dict[str, Any]], int, int]:
+        """Get paginated prediction history with database support.
 
         Args:
             page: Page number (1-based)
             page_size: Number of items per page
+            digit_filter: Optional filter for specific digit
+            min_confidence: Minimum confidence threshold
 
         Returns:
-            List of prediction entries for the requested page
+            Tuple of (predictions list, total count, total pages)
         """
         cls.initialize()
-        history = SessionState.get(cls.HISTORY_KEY)
-
+        
+        # Try to get from database first
+        try:
+            from services.data.database_service import database_service
+            predictions, total_count, total_pages = database_service.get_prediction_history(
+                page=page,
+                page_size=page_size,
+                digit_filter=digit_filter,
+                min_confidence=min_confidence
+            )
+            
+            if predictions:  # If we got results from the database
+                return predictions, total_count, total_pages
+        except Exception as e:
+            cls._logger.warning(f"Failed to get history from database: {str(e)}")
+        
+        # Fallback to session state if database fails
+        history = SessionState.get(cls.HISTORY_KEY, [])
+        
+        # Apply filters
+        filtered_history = history
+        if digit_filter is not None:
+            filtered_history = [p for p in filtered_history if p.get('digit') == digit_filter]
+        if min_confidence > 0:
+            filtered_history = [p for p in filtered_history if p.get('confidence', 0) >= min_confidence]
+        
+        # Sort by timestamp (newest first)
+        sorted_history = sorted(filtered_history, 
+                            key=lambda x: x.get('timestamp', datetime.now()), 
+                            reverse=True)
+        
+        # Calculate pagination
+        total_count = len(sorted_history)
+        total_pages = (total_count + page_size - 1) // page_size if total_count > 0 else 1
+        
+        # Get page items
         start_idx = (page - 1) * page_size
-        end_idx = start_idx + page_size
+        end_idx = min(start_idx + page_size, total_count)
+        page_items = sorted_history[start_idx:end_idx]
+        
+        return page_items, total_count, total_pages
 
-        return history[start_idx:end_idx]
 
     @classmethod
     @AspectUtils.catch_errors
@@ -188,7 +252,8 @@ class HistoryState:
         """
         cls.initialize()
 
-        history = SessionState.get(cls.HISTORY_KEY)
+        # Update in session state
+        history = SessionState.get(cls.HISTORY_KEY, [])
         for entry in history:
             if entry["id"] == entry_id:
                 entry["user_correction"] = correct_digit
@@ -201,3 +266,10 @@ class HistoryState:
         if current and current["id"] == entry_id:
             current["user_correction"] = correct_digit
             SessionState.set(cls.CURRENT_PREDICTION_KEY, current)
+        
+        # Update in database if available
+        try:
+            from services.data.database_service import database_service
+            database_service.update_true_label(entry_id, correct_digit)
+        except Exception as e:
+            cls._logger.warning(f"Failed to update true label in database: {str(e)}")
