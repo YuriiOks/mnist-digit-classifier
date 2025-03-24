@@ -48,9 +48,22 @@ def load_core_css():
         "global/base.css", 
         "global/reset.css",
 
+        # Cards
+        "components/cards/cards.css",
+
+        # Controls
+        "components/controls/bb8-toggle.css",
+        "components/controls/buttons.css",
+        "components/controls/pagination.css",
+
         # Layout
         "components/layout/header.css",        
         "components/layout/footer.css",
+
+        # Inputs
+        "components/inputs/canvas.css",
+        "components/inputs/file-upload.css",
+
 
         # Theme system
         "themes/theme-system.css",
