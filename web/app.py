@@ -3,6 +3,7 @@
 # File: app.py
 # Description: Main application entry point with view-based architecture
 # Created: 2025-03-17
+# Updated: 2025-03-24
 
 import streamlit as st
 import logging
@@ -23,6 +24,11 @@ logger = logging.getLogger("mnist_app")
 
 # Set environment variable for development mode
 os.environ["MNIST_ENV"] = os.environ.get("MNIST_ENV", "development")
+
+# Import database components first to ensure initialization before app state
+from core.database import initialize_database
+db = initialize_database()
+logger.info("Database initialized successfully")
 
 # Import core components
 from core.app_state import initialize_app_state
