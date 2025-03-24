@@ -196,7 +196,7 @@ class ResourceManager:
         """Load a CSS file with improved debugging for BB8."""
         # Debug log for BB8 toggle
         if "bb8" in css_path.lower():
-            self._logger.info(f"Attempting to load BB8 CSS: {css_path}")
+            # self._logger.info(f"Attempting to load BB8 CSS: {css_path}")
             
             # Try direct path under assets/css
             direct_path = self._project_root / "assets" / "css" / css_path
@@ -210,17 +210,7 @@ class ResourceManager:
         
         # Continue with regular CSS loading logic
         content = self.load_text_resource(ResourceType.CSS, css_path)
-        
-        # If BB8 CSS wasn't found, log more details
-        if "bb8" in css_path.lower() and not content:
-            css_dir = self._project_root / "assets" / "css"
-            if css_dir.exists():
-                self._logger.info("Listing CSS directory contents:")
-                for root, dirs, files in os.walk(css_dir):
-                    for file in files:
-                        if file.endswith('.css'):
-                            self._logger.info(f"  - {os.path.join(os.path.relpath(root, css_dir), file)}")
-        
+                
         return content
 
     def load_template(self, template_path: str) -> Optional[str]:
