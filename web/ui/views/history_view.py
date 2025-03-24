@@ -84,10 +84,7 @@ class HistoryView(View):
                 <span class="card-icon">{icon}</span> {title}
             </div>
             <div class="card-content">
-                {content}
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+                {content}""", unsafe_allow_html=True)
     
     def _render_filters(self) -> None:
         """Render filter controls for the history view."""
@@ -193,10 +190,7 @@ class HistoryView(View):
                 <span class="card-icon">📄</span> Prediction Pages
             </div>
             <div class="card-content">
-                {pagination_content}
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+                {pagination_content}""", unsafe_allow_html=True)
         
         # Pagination controls
         if total_pages > 1:
@@ -241,8 +235,7 @@ class HistoryView(View):
         
         if not st.session_state.clear_all_confirm:
             # Show the clear all button
-            action_content = """
-            <div style="text-align: center; padding: 1rem 0;">
+            action_content = """<div style="text-align: center; padding: 1rem 0;">
                 <p style="color: #64748b; margin-bottom: 1rem;">
                     Want to start fresh? You can clear your entire prediction history.
                 </p>
@@ -446,16 +439,14 @@ class HistoryView(View):
             # Use Streamlit container to maintain proper card structure
             with st.container():
                 # Define all HTML parts first
-                card_header_html = f"""
-                <div class="card card-elevated content-card feature-card small animate-fade-in">
+                card_header_html = f"""<div class="card card-elevated content-card feature-card small animate-fade-in">
                     <div class="card-title">
                         <span class="card-icon">{card_icon}</span> {card_title}
                     </div>
                     <div class="card-content">
                 """
                 
-                input_type_html = f"""---
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; padding: 0 0.5rem;">
+                input_type_html = f"""<div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; padding: 0 0.5rem;">
                         <span style="font-weight: 500;"><b>Input method:</b> {input_icon} {input_type.capitalize()}</span>
                         <span style="color: {confidence_color}; font-weight: 500;">{confidence_pct}</span>
                     </div>
@@ -463,8 +454,7 @@ class HistoryView(View):
                 
                 # Different HTML for corrected vs. regular digits
                 if corrected_digit is not None:
-                    digit_content_html = f"""---
-                    <div style="display: flex; justify-content: center; align-items: center; 
+                    digit_content_html = f"""<div style="display: flex; justify-content: center; align-items: center; 
                                 margin: 1rem 0; padding: 0.5rem; background-color: #f8fafc; border-radius: 0.5rem;">
                         <div style="text-align: center; font-size: 2.5rem; color: #94a3b8; margin-right: 0.75rem;">
                             {digit_value}
@@ -478,8 +468,7 @@ class HistoryView(View):
                     </div>
                     """
                 else:
-                    digit_content_html = f"""---
-                    <div style="text-align: center; margin: 1rem 0; padding: 1rem 0.5rem;
+                    digit_content_html = f"""<div style="text-align: center; margin: 1rem 0; padding: 1rem 0.5rem;
                                 background-color: #f8fafc; border-radius: 0.5rem;">
                         <div style="font-size: 3.5rem; font-weight: 500; color: #334155;">
                             {digit_value}
@@ -487,19 +476,13 @@ class HistoryView(View):
                     </div>
                     """
                 
-                timestamp_html = f"""---
-                    <div style="text-align: center; color: #111212; font-size: 0.875rem; padding: 0 0.5rem 0.5rem 0.5rem;">
+                timestamp_html = f"""<div style="text-align: center; color: #111212; font-size: 0.875rem; padding: 0 0.5rem 0.5rem 0.5rem;">
                         {timestamp_str}
                     </div>
                 """
                 
-                # Important: Close all divs properly
-                card_footer_html = """
-                   
-                """
-
                 # Combine and render all HTML parts in a single markdown call
-                full_card_html = f"{card_header_html}{input_type_html}{digit_content_html}{timestamp_html}{card_footer_html}"
+                full_card_html = f"{card_header_html}{input_type_html}{digit_content_html}{timestamp_html}"
                 st.markdown(full_card_html, unsafe_allow_html=True)
                 
                 # Delete button outside the card but within the container
