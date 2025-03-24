@@ -29,18 +29,18 @@ class HistoryView(View):
         
     def _initialize_session_state(self) -> None:
         """Initialize session state variables for history filtering and pagination."""
-        if not hasattr(st.session_state, 'history_filter_date'):
+        if 'history_filter_date' not in st.session_state:
             st.session_state.history_filter_date = None
-        if not hasattr(st.session_state, 'history_filter_digit'):
+        if 'history_filter_digit' not in st.session_state:
             st.session_state.history_filter_digit = None
-        if not hasattr(st.session_state, 'history_filter_min_confidence'):
+        if 'history_filter_min_confidence' not in st.session_state:
             st.session_state.history_filter_min_confidence = 0.0
-        if not hasattr(st.session_state, 'history_sort_by'):
+        if 'history_sort_by' not in st.session_state:
             st.session_state.history_sort_by = "newest"
-        if not hasattr(st.session_state, 'history_page'):
+        if 'history_page' not in st.session_state:
             st.session_state.history_page = 1
-        if not hasattr(st.session_state, 'history_items_per_page'):
-            st.session_state.history_items_per_page = 12
+        if 'history_items_per_page' not in st.session_state:
+            st.session_state.history_items_per_page = 9
 
     def _load_view_data(self):
         """
@@ -134,8 +134,12 @@ class HistoryView(View):
             filtered_df = filtered_df.sort_values('confidence', ascending=True)
         
         # Reset page number if filters changed
-        if (st.session_state.get('prev_digit_filter') != st.session_state.history_filter_digit or
-            st.session_state.get('prev_confidence_filter') != st.session_state.history_filter_min_confidence):
+        if ('prev_digit_filter' in st.session_state and 
+            st.session_state.prev_digit_filter != st.session_state.history_filter_digit) or \
+        ('prev_confidence_filter' in st.session_state and 
+            st.session_state.prev_confidence_filter != st.session_state.history_filter_min_confidence) or \
+        ('prev_sort_by' in st.session_state and 
+            st.session_state.prev_sort_by != st.session_state.history_sort_by):
             st.session_state.history_page = 1
         
         # Update previous filter values
@@ -191,10 +195,15 @@ class HistoryView(View):
                                 </div>
                             </div>
                             """, unsafe_allow_html=True)
-# Replace the _render_pagination method in history_view.py with this version
 
-    def _render_pagination(self, total_items: int, total_pages: int) -> None:
-        """Render pagination controls using streamlit-pagination."""
+    def _render_pagination(self, total_items: int, total_pages: int, position="top") -> None:
+        """Render pagination controls.
+        
+        Args:
+            total_items: Total number of items in the dataset
+            total_pages: Total number of pages
+            position: Either "top" or "bottom" to create unique keys
+        """
         # Calculate start and end indices
         items_per_page = st.session_state.history_items_per_page
         start_idx = (st.session_state.history_page - 1) * items_per_page
@@ -212,57 +221,47 @@ class HistoryView(View):
         </div>
         """, unsafe_allow_html=True)
         
-        # Generate a unique key for this specific instance
-        import time
-        import random
-        unique_key = f"history_pagination_{int(time.time())}_{random.randint(1000, 9999)}"
+        # Simple pagination with position-based unique keys
+        pagination_cols = st.columns([1, 3, 1])
         
-        # Simple manual pagination - more reliable than the library
-        col1, col2, col3 = st.columns([1, 4, 1])
-        
-        with col1:
-            if st.button("← Previous", 
-                        key=f"prev_page_{unique_key}", 
-                        disabled=st.session_state.history_page <= 1,
-                        use_container_width=True):
-                st.session_state.history_page = max(1, st.session_state.history_page - 1)
+        with pagination_cols[0]:
+            # Use position in key name to make it unique
+            if st.button("← Previous", key=f"history_prev_page_{position}", 
+                        disabled=st.session_state.history_page <= 1):
+                st.session_state.history_page -= 1
                 st.rerun()
         
-        with col2:
-            # Create page number buttons for reasonable number of pages
-            if total_pages <= 10:
-                page_cols = st.columns(min(total_pages, 10))
-                for i, col in enumerate(page_cols):
-                    page_num = i + 1
-                    with col:
-                        if st.button(f"{page_num}", 
-                                    key=f"page_{page_num}_{unique_key}",
-                                    type="primary" if page_num == st.session_state.history_page else "secondary"):
-                            st.session_state.history_page = page_num
-                            st.rerun()
-            else:
-                # For many pages, use a number input
-                page_num = st.number_input(
-                    "Page",
-                    min_value=1,
-                    max_value=max(1, total_pages),
-                    value=st.session_state.history_page,
-                    step=1,
-                    key=f"page_number_{unique_key}",
-                    label_visibility="collapsed"
-                )
-                
-                if page_num != st.session_state.history_page:
-                    st.session_state.history_page = page_num
-                    st.rerun()
+        with pagination_cols[1]:
+            # Simplified page selection
+            current_page = min(st.session_state.history_page, max(1, total_pages))
+            
+            # Display page numbers as a row of buttons
+            page_buttons = st.columns(min(5, total_pages))
+            
+            # Calculate page range to show (e.g., show 5 pages centered on current page)
+            pages_to_show = min(5, total_pages)
+            start_page = max(1, current_page - pages_to_show // 2)
+            end_page = min(total_pages, start_page + pages_to_show - 1)
+            
+            # Adjust start_page if we're near the end
+            if end_page == total_pages:
+                start_page = max(1, end_page - pages_to_show + 1)
+            
+            # Display page buttons with position-based unique keys
+            for i, col in enumerate(page_buttons):
+                page_num = start_page + i
+                if page_num <= total_pages:
+                    button_style = "primary" if page_num == current_page else "secondary"
+                    if col.button(str(page_num), key=f"page_{page_num}_{position}", type=button_style):
+                        st.session_state.history_page = page_num
+                        st.rerun()
         
-        with col3:
-            if st.button("Next →", 
-                        key=f"next_page_{unique_key}", 
-                        disabled=st.session_state.history_page >= total_pages,
-                        use_container_width=True):
-                st.session_state.history_page = min(total_pages, st.session_state.history_page + 1)
+        with pagination_cols[2]:
+            if st.button("Next →", key=f"history_next_page_{position}", 
+                        disabled=st.session_state.history_page >= total_pages):
+                st.session_state.history_page += 1
                 st.rerun()
+
     def _render_clear_all_button(self) -> None:
         """Render the clear history button."""
         st.markdown("<hr>", unsafe_allow_html=True)
@@ -380,16 +379,16 @@ class HistoryView(View):
         start_idx = (st.session_state.history_page - 1) * items_per_page
         end_idx = min(start_idx + items_per_page, total_items)
         page_items = filtered_df.iloc[start_idx:end_idx]
-        
-        # Render pagination
-        self._render_pagination(total_items, total_pages)
-        
+
+        # Top pagination
+        self._render_pagination(total_items, total_pages, "top")
+
         # Render history entries
         self._render_history_entries(page_items)
-        
-        # Render pagination again at the bottom
-        self._render_pagination(total_items, total_pages)
-        
+
+        # Bottom pagination
+        self._render_pagination(total_items, total_pages, "bottom")
+
         # Render clear all button
         self._render_clear_all_button()
         
