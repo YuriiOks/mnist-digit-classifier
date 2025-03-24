@@ -185,16 +185,15 @@ class HistoryView(View):
                                         <div style="font-size: 0.9rem; color: var(--color-text);">Input: {item["input_type"].capitalize()}</div>
                                     </div>
                                 </div>
-                                <div style="display: flex; justify-content: flex-end; margin-top: 0.5rem;">
-                                    <button
-                                        onclick="Streamlit.setComponentValue({{action: 'delete', id: '{item['id']}'}});"
-                                        style="background: none; border: none; cursor: pointer; color: var(--color-error); font-size: 0.8rem;"
-                                    >
-                                        Delete
-                                    </button>
-                                </div>
                             </div>
                             """, unsafe_allow_html=True)
+                            
+                            # Add a delete button for each entry
+                            if st.button("Delete", key=f"delete_btn_{item['id']}", type="secondary"):
+                                # Call the delete method from HistoryState
+                                HistoryState.delete_entry(item['id'])
+                                st.success(f"Entry deleted successfully!")
+                                st.rerun()
 
     def _render_pagination(self, total_items: int, total_pages: int, position="top") -> None:
         """Render pagination controls.
