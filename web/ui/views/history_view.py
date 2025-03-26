@@ -61,8 +61,7 @@ class HistoryView(View):
         """Render the empty state when no history is available."""
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
-            empty_state_content = """
-            <div style="text-align: center; padding: 2rem 1rem;">
+            empty_state_content = """<div style="text-align: center; padding: 2rem 1rem;">
                 <div style="font-size: 3.5rem; margin-bottom: 1rem;">📊</div>
                 <h3 style="margin-bottom: 0.75rem; color: #334155; font-weight: 600;">No Prediction History Yet</h3>
                 <p style="color: #64748b; margin-bottom: 1.5rem;">Your prediction history will appear here once you make some predictions.</p>
@@ -349,7 +348,7 @@ class HistoryView(View):
         if corrected_digit is not None:
             # This was a corrected prediction
             title = f"Corrected {digit_value}→{corrected_digit}"
-            icon = "🔄"  # Recycling symbol for correction
+            icon = "❌"  # Recycling symbol for correction
         elif confidence >= 0.9:
             # High confidence prediction
             title = f"Strong Prediction: {digit_value}"
