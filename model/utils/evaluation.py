@@ -2,7 +2,8 @@ import torch
 import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix, classification_report
+import pandas as pd
 import seaborn as sns
 import time
 import logging
@@ -79,55 +80,108 @@ def plot_training_history(history):
     plt.savefig('training_history.png')
     plt.close()
 
-def get_confusion_matrix(model, data_loader, device):
+# Rename and modify the function to return more info
+def get_predictions_and_labels(model, data_loader, device):
     """
-    Generate confusion matrix for the model.
-    
+    Get model predictions and true labels for a dataset.
+
     Args:
         model: PyTorch model
         data_loader: DataLoader for evaluation
         device: Device to run evaluation on
-        
+
     Returns:
-        numpy.ndarray: Confusion matrix
+        tuple: (all_predicted_labels, all_true_labels)
     """
     model.eval()
     all_predicted = []
     all_labels = []
-    
+    print("\n🔍 Getting predictions for evaluation...") # Add user feedback
     with torch.no_grad():
-        for images, labels in tqdm(data_loader, desc='Generating Confusion Matrix'):
+        for images, labels in tqdm(data_loader, desc='Evaluating Batches'): # Keep tqdm
             images, labels = images.to(device), labels.to(device)
             outputs = model(images)
             _, predicted = torch.max(outputs.data, 1)
-            
+
             all_predicted.extend(predicted.cpu().numpy())
             all_labels.extend(labels.cpu().numpy())
-    
-    # Create confusion matrix
-    cm = confusion_matrix(all_labels, all_predicted)
-    
-    return cm
 
-def plot_confusion_matrix(cm, class_names=None):
+    print("✅ Predictions collected.")
+    return all_predicted, all_labels
+
+# Add a new function to generate and display reports
+def generate_evaluation_report(model, data_loader, device, class_names=None, save_cm_path='confusion_matrix.png', save_report_path='classification_report.txt'):
+    """
+    Generates and saves confusion matrix and classification report.
+
+    Args:
+        model: PyTorch model
+        data_loader: DataLoader for evaluation
+        device: Device to run evaluation on
+        class_names: List of class names for plotting
+        save_cm_path: Path to save the confusion matrix plot
+        save_report_path: Path to save the classification report text
+    """
+    if class_names is None:
+        class_names = [str(i) for i in range(10)] # Default MNIST classes
+
+    # 1. Get predictions and labels
+    all_preds, all_labels = get_predictions_and_labels(model, data_loader, device)
+
+    # 2. Compute Confusion Matrix
+    print("📊 Computing Confusion Matrix...")
+    cm = confusion_matrix(all_labels, all_preds)
+    print("Confusion Matrix computed.")
+
+    # 3. Plot Confusion Matrix
+    print(f"🎨 Plotting Confusion Matrix (saving to {save_cm_path})...")
+    plot_confusion_matrix(cm, class_names, save_path=save_cm_path) # Add save_path argument to plot function if needed
+    print("Confusion Matrix plot saved.")
+
+    # 4. Compute and Print Classification Report
+    print("\n📋 Computing Classification Report...")
+    report = classification_report(all_labels, all_preds, target_names=class_names, digits=4)
+    print("--- Classification Report ---")
+    print(report)
+    print("-----------------------------")
+
+    # 5. Save Classification Report to file
+    try:
+        with open(save_report_path, 'w') as f:
+            f.write("--- Classification Report ---\n")
+            f.write(report)
+        print(f"Classification Report saved to {save_report_path}")
+    except Exception as e:
+        print(f"⚠️ Error saving classification report: {e}")
+
+    # Optional: Return the report and CM if needed elsewhere
+    return cm, report
+
+# You might need to slightly modify plot_confusion_matrix to accept a save_path
+def plot_confusion_matrix(cm, class_names=None, save_path='confusion_matrix.png'): # Added save_path
     """
     Plot confusion matrix as a heatmap.
-    
+
     Args:
         cm: Confusion matrix
         class_names: List of class names
+        save_path: Path to save the figure
     """
     if class_names is None:
         class_names = [str(i) for i in range(10)]
-    
+
     plt.figure(figsize=(10, 8))
     sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=class_names, yticklabels=class_names)
     plt.xlabel('Predicted')
     plt.ylabel('True')
     plt.title('Confusion Matrix')
     plt.tight_layout()
-    plt.savefig('confusion_matrix.png')
-    plt.show()
+    try:
+        plt.savefig(save_path) # Use save_path
+        # plt.show() # Optionally comment out or remove plt.show() for non-interactive runs
+        plt.close() # Close the figure
+    except Exception as e:
+        print(f"⚠️ Error saving confusion matrix plot: {e}")
 
 def visualize_model_predictions(model, data_loader, device, num_images=25):
     """
