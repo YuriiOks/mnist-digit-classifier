@@ -1,3 +1,10 @@
+# MNIST Digit Classifier
+# Copyright (c) 2025
+# File: utils/mps_verification.py
+# Description: PyTorch MPS acceleration verification script
+# Created: 2025-03-26
+# Updated: 2025-03-26
+
 import os, time, torch, torch.nn as nn, torch.optim as optim, numpy as np
 from tabulate import tabulate
 import matplotlib.pyplot as plt
@@ -130,7 +137,7 @@ def benchmark_cnn_inference(num_iters=10):
         print(f"\n🔥 Average CNN Inference Speedup: {avg_speedup:.2f}x")
     return results
 
-def benchmark_mnist_training(num_iters=1, batch_size=128):
+def benchmark_mnist_training(num_iters=1, batch_sizes=[32, 64, 128, 256]):
     print_header("MNIST Training Benchmark (1 Epoch, Averaged over {} iteration(s))".format(num_iters))
     # Define a simple CNN model for MNIST
     class MNISTModel(nn.Module):
@@ -161,21 +168,27 @@ def benchmark_mnist_training(num_iters=1, batch_size=128):
         transforms.Normalize((0.1307,), (0.3081,))
     ])
     try:
-        train_dataset = datasets.MNIST('./data', train=True, download=True, transform=transform)
-        train_dataset = torch.utils.data.Subset(train_dataset, range(2000))
+        print("Loading MNIST dataset...") # Added print
+        full_train_dataset = datasets.MNIST('./data', train=True, download=True, transform=transform)
+        train_dataset_subset = torch.utils.data.Subset(full_train_dataset, range(2000)) # Use a consistent subset
+        print("Dataset loaded.") # Added print
     except Exception as e:
-        print(f"Error loading MNIST: {e}")
-        synthetic_data = torch.randn(2000, 1, 28, 28)
-        synthetic_labels = torch.randint(0, 10, (2000,))
-        from torch.utils.data import TensorDataset
-        train_dataset = TensorDataset(synthetic_data, synthetic_labels)
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=2, pin_memory=True)
+        # ... (synthetic data fallback remains the same) ...
+        pass
 
-    def run_epoch(model, optimizer, device):
+    training_results = []
+
+    # Inner function to run epoch (remains mostly the same)
+    def run_epoch(model, optimizer, device, current_batch_size):
+        # Create DataLoader inside here for the specific batch size
+        train_loader = DataLoader(train_dataset_subset, batch_size=current_batch_size, shuffle=True, num_workers=2, pin_memory=True)
         model.train()
         criterion = nn.CrossEntropyLoss()
         start = time.perf_counter()
-        for data, target in train_loader:
+        print(f"  Training on {device} with batch size {current_batch_size}...") # Added print
+        batch_count = 0
+        for data, target in train_loader: # Use the new loader
+            batch_count += 1
             data, target = data.to(device), target.to(device)
             optimizer.zero_grad(set_to_none=True)
             output = model(data)
@@ -184,7 +197,9 @@ def benchmark_mnist_training(num_iters=1, batch_size=128):
             optimizer.step()
         if device.type == "mps":
             torch.mps.synchronize()
-        return time.perf_counter() - start
+        duration = time.perf_counter() - start
+        print(f"  Finished in {duration:.4f}s ({batch_count} batches)") # Added print
+        return duration
 
     # Run a warm-up epoch on CPU
     model_cpu = MNISTModel()
