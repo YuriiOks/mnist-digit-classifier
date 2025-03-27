@@ -47,12 +47,13 @@ def evaluate_model(model, data_loader, criterion, device):
     
     return avg_loss, accuracy
 
-def plot_training_history(history):
+def plot_training_history(history, save_path='training_history.png'):
     """
     Plot training and validation loss/accuracy curves.
     
     Args:
         history: Dictionary containing training history
+        save_path: Path to save the figure
     """
     plt.figure(figsize=(12, 5))
     
@@ -77,10 +78,17 @@ def plot_training_history(history):
     plt.grid(True)
     
     plt.tight_layout()
-    plt.savefig('training_history.png')
-    plt.close()
+    try: 
+        plt.savefig(save_path)
+        plt.close()
+        logging.info(f"Training history plot saved to {save_path}")
+    except Exception as e:
+        try:
+            import logging
+            logging.warning(f"Failed to save training history plot: {e}")
+        except ImportError:
+            print(f"Warning: Failed to save training history plot: {e}")
 
-# Rename and modify the function to return more info
 def get_predictions_and_labels(model, data_loader, device):
     """
     Get model predictions and true labels for a dataset.
