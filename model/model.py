@@ -1,51 +1,105 @@
+# MNIST Digit Classifier
+# Copyright (c) 2025
+# File: model/model.py
+# Description: Defines the CNN architecture for MNIST classification.
+# Created: Earlier Date
+# Updated: 2025-03-28 (Added BatchNorm layers to match saved model)
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
 class MNISTClassifier(nn.Module):
-    def __init__(self):
-        super(MNISTClassifier, self).__init__()
-        self.conv1 = nn.Conv2d(1, 32, 3, 1, padding=1)
-        # Add BatchNorm after conv1
-        self.bn1 = nn.BatchNorm2d(32) # Match num_features from conv1 output
-        self.conv2 = nn.Conv2d(32, 64, 3, 1, padding=1)
-        # Add BatchNorm after conv2
-        self.bn2 = nn.BatchNorm2d(64) # Match num_features from conv2 output
-        self.dropout1 = nn.Dropout2d(0.25) # Original Dropout uses Dropout2d
-        self.dropout2 = nn.Dropout(0.5)    # Original Dropout uses Dropout (for FC layers)
-        # Calculate the input size for fc1 carefully after pooling
-        # If input is 28x28 -> conv1 -> bn1 -> relu -> conv2 -> bn2 -> relu -> pool -> dropout -> pool
-        # 28x28 -> 28x28 -> 28x28 -> 14x14 -> 14x14 -> 7x7
-        # So the flattened size is 64 * 7 * 7
-        self.fc1 = nn.Linear(64 * 7 * 7, 128)
-        self.fc2 = nn.Linear(128, 10)
+    """
+    CNN model for MNIST digit classification.
 
-    def forward(self, x):
+    Architecture includes Convolutional layers, Batch Normalization,
+    Max Pooling, Dropout, and Fully Connected layers.
+    """
+    def __init__(self):
+        """Initializes the layers of the CNN."""
+        super(MNISTClassifier, self).__init__()
+
+        print("!!! Initializing MNISTClassifier with BatchNorm Layers (Version 2) !!!")
+
+
+        # Convolutional Block 1
+        self.conv1 = nn.Conv2d(
+            in_channels=1,    # Input channels (grayscale image)
+            out_channels=32,  # Number of filters
+            kernel_size=3,    # Filter size
+            stride=1,
+            padding=1         # Keep spatial dimension same (28x28)
+        )
+        # --- Add BatchNorm layer after conv1 ---
+        self.bn1 = nn.BatchNorm2d(num_features=32) # Match out_channels
+
+        # Convolutional Block 2
+        self.conv2 = nn.Conv2d(
+            in_channels=32,   # Input channels from previous layer
+            out_channels=64,  # Number of filters
+            kernel_size=3,
+            stride=1,
+            padding=1
+        )
+        # --- Add BatchNorm layer after conv2 ---
+        self.bn2 = nn.BatchNorm2d(num_features=64) # Match out_channels
+
+        # Dropout Layers
+        # Dropout2d for feature maps (after conv/pool)
+        self.dropout1 = nn.Dropout2d(p=0.25)
+        # Regular Dropout for flattened features (in FC layers)
+        self.dropout2 = nn.Dropout(p=0.5)
+
+        # Fully Connected Layers
+        # Input features: 64 channels * 7 height * 7 width
+        # Calculation: 28x28 -> Pool(2) -> 14x14 -> Pool(2) -> 7x7
+        fc1_input_features = 64 * 7 * 7 # Should be 3136
+        self.fc1 = nn.Linear(
+            in_features=fc1_input_features,
+            out_features=128
+        )
+        self.fc2 = nn.Linear(
+            in_features=128,
+            out_features=10  # 10 output classes for digits 0-9
+        )
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """
+        Defines the forward pass of the model.
+
+        Args:
+            x (torch.Tensor): Input tensor of shape (batch_size, 1, 28, 28).
+
+        Returns:
+            torch.Tensor: Output tensor of raw logits
+                          (batch_size, 10).
+        """
+        # Input shape: (batch_size, 1, 28, 28)
+
         # Conv Block 1
-        x = self.conv1(x)
-        x = self.bn1(x)
-        x = F.relu(x)
-        x = F.max_pool2d(x, 2) # Pool 1: 28x28 -> 14x14
+        x = self.conv1(x)     # -> (batch, 32, 28, 28)
+        x = self.bn1(x)       # -> (batch, 32, 28, 28) Apply BatchNorm
+        x = F.relu(x)         # -> (batch, 32, 28, 28) Apply activation
+        x = F.max_pool2d(x, 2) # -> (batch, 32, 14, 14) Pool 1
 
         # Conv Block 2
-        x = self.conv2(x)
-        x = self.bn2(x)
-        x = F.relu(x)
-        x = F.max_pool2d(x, 2) # Pool 2: 14x14 -> 7x7
+        x = self.conv2(x)     # -> (batch, 64, 14, 14)
+        x = self.bn2(x)       # -> (batch, 64, 14, 14) Apply BatchNorm
+        x = F.relu(x)         # -> (batch, 64, 14, 14) Apply activation
+        x = F.max_pool2d(x, 2) # -> (batch, 64, 7, 7)  Pool 2
 
-        # Apply Dropout *after* convolutions and pooling
-        # Dropout2d is suitable here as it works on feature maps
-        x = self.dropout1(x)
+        # Dropout on feature map
+        x = self.dropout1(x)  # -> (batch, 64, 7, 7)
 
-        # Flatten for FC layers
-        # Now the shape should be Batch x 64 x 7 x 7
-        x = torch.flatten(x, 1) # Shape: Batch x 3136
+        # Flatten feature maps for Fully Connected layers
+        # Start flattening from dimension 1 (keep batch dimension 0)
+        x = torch.flatten(x, 1) # -> (batch, 64*7*7) = (batch, 3136)
 
-        # FC Block
-        x = self.fc1(x) # Should work now: Input is 3136, fc1 expects 3136
-        x = F.relu(x)
-        # Use regular Dropout for FC layers
-        x = self.dropout2(x)
-        x = self.fc2(x)
+        # Fully Connected Block
+        x = self.fc1(x)       # -> (batch, 128)
+        x = F.relu(x)         # Apply activation
+        x = self.dropout2(x)  # Apply dropout
+        x = self.fc2(x)       # -> (batch, 10) Output logits
 
-        return x # Return raw logits
+        return x
