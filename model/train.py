@@ -3,7 +3,7 @@
 # File: model/train.py
 # Description: Script for training the MNIST digit classifier model.
 # Created: Earlier Date
-# Updated: 2025-03-28 (PEP8/Flake8 formatting, improved logging/docs)
+# Updated: 2025-03-28 (Added reliability diagram plotting)
 
 import os
 import argparse
@@ -13,7 +13,7 @@ import torch.optim as optim
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
 from torchvision import datasets
-import torchvision.utils  # For saving debug images
+import torchvision.utils
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 import numpy as np
@@ -34,6 +34,10 @@ try:
     )
     logger = logging.getLogger(__name__) # Use logger after imports
     logger.info("✅ Successfully imported project modules.")
+    from model.utils.calibration import (
+        get_probabilities_labels,
+        plot_reliability_diagram
+    )
 except ImportError as e:
     # Use print before logging might be configured
     print(f"🔥 CRITICAL ERROR importing project modules: {e}")
@@ -56,6 +60,8 @@ FINAL_CM_FILENAME = "final_confusion_matrix.png"
 FINAL_REPORT_FILENAME = "final_classification_report.txt"
 DEBUG_TEST_NORM_FILENAME = "dbg_test_input_normalized.png"
 DEBUG_TEST_UNNORM_FILENAME = "dbg_test_input_unnormalized.png"
+RELIABILITY_PLOT_BEFORE_FILENAME = "reliability_diagram_before_calib.png"
+RELIABILITY_PLOT_AFTER_FILENAME = "reliability_diagram_after_calib.png" 
 # MNIST stats needed for un-normalization in debug save
 MNIST_MEAN = (0.1307,)
 MNIST_STD = (0.3081,)
@@ -321,7 +327,7 @@ def final_evaluation(model_path: str, device: torch.device,
                      batch_size: int) -> None:
     """Performs final evaluation on the test set using the best model.
 
-    Saves evaluation reports and debug images.
+    Generates reports, saves debug images, and plots reliability diagram.
 
     Args:
         model_path: Path to the saved best model state_dict.
@@ -378,24 +384,47 @@ def final_evaluation(model_path: str, device: torch.device,
     except Exception as e_save:
         logger.error(f"⚠️ Failed to save debug input images: {e_save}")
 
-    # --- Generate Reports ---
+    # --- Generate Classification Report & Confusion Matrix ---
     cm_path = os.path.join(OUTPUT_FIG_DIR, FINAL_CM_FILENAME)
-    report_path = FINAL_REPORT_FILENAME # Save report in root dir
+    report_path = FINAL_REPORT_FILENAME
     os.makedirs(OUTPUT_FIG_DIR, exist_ok=True)
     try:
-        logger.info("⏳ Generating final evaluation reports...")
+        logger.info("⏳ Generating classification report & CM...")
         generate_evaluation_report(
-            model=model,
-            data_loader=test_loader,
-            device=device,
-            save_cm_path=cm_path,
-            save_report_path=report_path
+            model=model, data_loader=test_loader, device=device,
+            save_cm_path=cm_path, save_report_path=report_path
         )
-        logger.info(f"📊 Final evaluation reports saved: "
-                     f"{cm_path}, {report_path}")
+        logger.info(f"📊 Classification reports saved: {cm_path}, {report_path}")
     except Exception as e_eval:
-        logger.error(f"🔥 Failed during final evaluation report generation: "
-                     f"{e_eval}")
+        logger.error(f"🔥 Failed during report generation: {e_eval}")
+
+    # --- Generate Reliability Diagram (Before Calibration) ---
+    reliability_plot_path = os.path.join(OUTPUT_FIG_DIR,
+                                         RELIABILITY_PLOT_BEFORE_FILENAME)
+    try:
+        logger.info("⏳ Generating reliability diagram (before calibration)...")
+        # 1. Get probabilities and labels from the test set
+        confidences, predictions, true_labels = get_probabilities_labels(
+            model=model, data_loader=test_loader, device=device
+        )
+        # 2. Plot the diagram
+        if confidences is not None: # Check if data was obtained
+            ece = plot_reliability_diagram(
+                confidences=confidences,
+                predictions=predictions,
+                true_labels=true_labels,
+                num_bins=15, # Use 15 bins for finer granularity
+                save_path=reliability_plot_path
+            )
+            logger.info(f"📉 Reliability diagram saved to "
+                        f"{reliability_plot_path} | ECE={ece:.4f}")
+        else:
+             logger.warning("⚠️ Skipping reliability diagram: failed to get "
+                            "probabilities/labels.")
+    except Exception as e_calib:
+        logger.error(f"🔥 Failed during reliability diagram generation: "
+                     f"{e_calib}", exc_info=True) # Log traceback too
+    # -------------------------------------------------------
 
 
 # --- Main Execution ---
@@ -420,7 +449,7 @@ if __name__ == "__main__":
     selected_device = get_device()
 
     # Train
-    best_model_file_path, _ = train_model(
+    best_model_file_path, _ = train_model( # Ignore history return for now
         num_epochs=args.epochs,
         batch_size=args.batch_size,
         learning_rate=args.lr,
@@ -429,11 +458,11 @@ if __name__ == "__main__":
         log_dir=args.log_dir
     )
 
-    # Evaluate
+    # Evaluate (includes reliability plot now)
     final_evaluation(
         model_path=best_model_file_path,
         device=selected_device,
-        batch_size=args.batch_size # Use same BS for consistency in test loader
+        batch_size=args.batch_size
     )
 
     logger.info("✅ Training script finished.")
