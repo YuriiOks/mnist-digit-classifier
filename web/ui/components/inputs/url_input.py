@@ -150,7 +150,7 @@ class ImageUrlInput(Component):
                     
                 self.logger.debug("Successfully loaded image from URL")
                 st.success("Image loaded successfully!")
-                st.experimental_rerun()
+                st.rerun() 
             else:
                 st.error(f"Failed to load image. Status code: {response.status_code}")
         except requests.exceptions.RequestException as e:
