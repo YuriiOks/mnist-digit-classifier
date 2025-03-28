@@ -143,7 +143,7 @@ def main():
             if clear_button:
                 # This doesn't directly clear the canvas, but forces a rerun
                 # which effectively resets the canvas
-                st.experimental_rerun()
+                st.rerun() 
         
         with col2:
             st.header("Results")
@@ -224,7 +224,7 @@ def main():
                 if auto_refresh:
                     st.empty()
                     time.sleep(5)
-                    st.experimental_rerun()
+                    st.rerun() 
             else:
                 st.warning("No metrics available. Make a few predictions first.")
         else:
