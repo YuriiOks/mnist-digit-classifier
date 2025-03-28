@@ -1,163 +1,233 @@
+# MNIST Digit Classifier
+# Copyright (c) 2025
+# File: model/app.py
+# Description: Flask API for serving the MNIST classifier model.
+# Created: Earlier Date
+# Updated: 2025-03-28 (Corrected preprocessing for W-on-B input)
+
 import os
 import base64
 import io
 import json
+import sys
+import inspect
+import logging
+import time
+
 from flask import Flask, request, jsonify
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageOps
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torchvision import transforms
+import torchvision.utils
+
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
+try:
+    from model.model import MNISTClassifier
+    logger.info("✅ Successfully imported MNISTClassifier from model.model")
+except ImportError as e:
+    logger.critical(f"🔥 CRITICAL ERROR importing MNISTClassifier: {e}")
+    sys.exit(1)
+
+try:
+    from utils.preprocessing import center_digit
+    logger.info("✅ Successfully imported center_digit from utils.preprocessing")
+except ImportError:
+    logger.error("🔥 Failed to import center_digit. Centering disabled.")
+    center_digit = None
+except Exception as e_import_center:
+     logger.error(f"🔥 Error during center_digit import: {e_import_center}")
+     center_digit = None
 
 app = Flask(__name__)
 
-# Define the model architecture
-class MNISTClassifier(nn.Module):
-    def __init__(self):
-        super(MNISTClassifier, self).__init__()
-        self.conv1 = nn.Conv2d(1, 32, 3, 1, padding=1)
-        self.conv2 = nn.Conv2d(32, 64, 3, 1, padding=1)
-        self.dropout1 = nn.Dropout2d(0.25)
-        self.dropout2 = nn.Dropout2d(0.5)
-        self.fc1 = nn.Linear(7*7*64, 128)
-        self.fc2 = nn.Linear(128, 10)
-
-    def forward(self, x):
-        x = self.conv1(x)
-        x = F.relu(x)
-        x = self.conv2(x)
-        x = F.relu(x)
-        x = F.max_pool2d(x, 2)
-        x = self.dropout1(x)
-        x = F.max_pool2d(x, 2)
-        x = torch.flatten(x, 1)
-        x = self.fc1(x)
-        x = F.relu(x)
-        x = self.dropout2(x)
-        x = self.fc2(x)
-        return x
-
-# Load or initialize the model
-model_path = os.environ.get('MODEL_PATH', 'saved_models/mnist_classifier.pt')
-
-model = MNISTClassifier()
 try:
-    model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
-    print(f"Loaded model from {model_path}")
+    classifier_file_path = inspect.getfile(MNISTClassifier)
+    logger.info(f"🧬 MNISTClassifier class loaded from: {classifier_file_path}")
 except Exception as e:
-    print(f"Could not load model: {e}")
-    print("Using untrained model (predictions will be random)")
+    logger.error(f"⚠️ Error inspecting MNISTClassifier: {e}")
 
-model.eval()
+script_dir = os.path.dirname(os.path.abspath(__file__))
+model_dir = os.path.join(script_dir, 'saved_models')
+default_model_path = os.path.join(model_dir, 'mnist_classifier.pt')
+model_path = os.environ.get('MODEL_PATH', default_model_path)
+MNIST_MEAN = (0.1307,)
+MNIST_STD = (0.3081,)
+DEBUG_IMG_DIR = 'outputs/debug_images'
 
-# Image preprocessing
-def preprocess_image(image_data):
-    # Convert base64 to PIL Image
+model_instance = MNISTClassifier()
+MODEL_LOADED = False
+try:
+    logger.info(f"💾 Attempting to load model from: {model_path}")
+    model_instance.load_state_dict(
+        torch.load(model_path, map_location=torch.device('cpu'))
+    )
+    model_instance.eval()
+    MODEL_LOADED = True
+    logger.info(f"✅ Loaded model successfully from {model_path}")
+except FileNotFoundError:
+    logger.error(f"🔥 ERROR: Model file not found at: {model_path}")
+    logger.error("🔥 Using untrained model.")
+except Exception as e:
+    logger.error(f"⚠️ Could not load model state_dict: {e}")
+    logger.error("🔥 Using untrained model.")
+
+
+def preprocess_image(base64_image_data: str) -> torch.Tensor | None:
+    """Decodes, pads, centers, preprocesses image, saves debug steps."""
     try:
-        image_bytes = base64.b64decode(image_data)
-        image = Image.open(io.BytesIO(image_bytes)).convert('L')
-        
-        # Center the digit
-        # Find bounding box of non-zero pixels
-        bbox = Image.eval(image, lambda px: 255 if px < 200 else 0).getbbox()
-        
-        if bbox is not None:
-            # Crop to bounding box
-            image = image.crop(bbox)
-        
-        # Resize and pad to get a square image
-        size = max(image.size)
-        new_im = Image.new('L', (size, size), 255)
-        new_im.paste(image, ((size - image.size[0]) // 2, (size - image.size[1]) // 2))
-        
-        # Resize to 28x28
-        image = new_im.resize((28, 28))
-        
-        # Convert to tensor and normalize
-        transform = transforms.Compose([
-            transforms.ToTensor(),
-            transforms.Normalize((0.1307,), (0.3081,))
+        # 1. Decode base64 -> PIL Image (expect W-on-B)
+        if ',' in base64_image_data:
+            _, encoded = base64_image_data.split(",", 1)
+        else:
+            encoded = base64_image_data
+        image_bytes = base64.b64decode(encoded)
+        image_w_on_b = Image.open(io.BytesIO(image_bytes)).convert('L')
+        fill_color = 0 # Black background for padding
+
+        # 2. Add Padding
+        try:
+            padding = 30
+            image_padded = ImageOps.expand(image_w_on_b, border=padding,
+                                           fill=fill_color)
+            logger.debug(f"✅ Added {padding}px padding (black).")
+        except Exception as pad_err:
+            logger.error(f"⚠️ Padding failed: {pad_err}. Using unpadded.")
+            image_padded = image_w_on_b
+
+        # 3. Apply Centering (expects W-on-B input)
+        centered_image_pil = image_padded # Default if centering fails/disabled
+        if center_digit:
+            try:
+                logger.debug("📐 Attempting centering (expecting W-on-B)...")
+                centered_image_pil = center_digit(image_padded)
+                logger.debug("✅ Applied center_digit")
+
+                # --- DEBUG SAVE: AFTER Centering ---
+                try:
+                    os.makedirs(DEBUG_IMG_DIR, exist_ok=True)
+                    save_path = os.path.join(
+                        DEBUG_IMG_DIR, 'dbg_canvas_intermediate_centered.png'
+                    )
+                    centered_image_pil.save(save_path)
+                    logger.info(f"🎯 Saved centered PIL: {save_path}")
+                except Exception as e_save:
+                    logger.error(f"Error saving centered PIL: {e_save}")
+
+            except Exception as center_err:
+                 logger.error(f"⚠️ Centering failed: {center_err}. "
+                              "Using padded image.")
+        else:
+            logger.warning("⚠️ center_digit function unavailable.")
+
+        image_to_process = centered_image_pil # Should be W-on-B PIL
+
+        # 4. Resize and Convert to Tensor
+        resize_totensor = transforms.Compose([
+            transforms.Resize((28, 28)),
+            transforms.ToTensor(),  # White(255)->1.0; Black(0)->0.0
         ])
-        
-        tensor = transform(image).unsqueeze(0)  # Add batch dimension
-        return tensor
+        tensor_unnormalized = resize_totensor(image_to_process)
+        # Tensor: High values=digit, Low values=background
+
+        # 5. Save Unnormalized Debug Image
+        try:
+            save_path_unnorm = os.path.join(DEBUG_IMG_DIR,
+                                  'dbg_canvas_input_unnormalized.png')
+            if tensor_unnormalized is not None and tensor_unnormalized.dim()==3:
+                torchvision.utils.save_image(
+                    torch.clamp(tensor_unnormalized.clone(), 0, 1),
+                    save_path_unnorm
+                )
+                logger.info(f"📸 Saved unnormalized tensor: {save_path_unnorm}")
+        except Exception as e_save:
+            logger.error(f"Error saving unnormalized tensor img: {e_save}")
+
+        # 6. Apply Normalization
+        normalize_transform = transforms.Normalize(MNIST_MEAN, MNIST_STD)
+        tensor_normalized = normalize_transform(tensor_unnormalized)
+        # Tensor: High values (digit) -> Positive; Low (bg) -> Negative
+
+        # 7. Save Normalized Debug Image
+        try:
+            save_path_norm = os.path.join(DEBUG_IMG_DIR,
+                                'dbg_canvas_input_normalized.png')
+            if tensor_normalized is not None and tensor_normalized.dim() == 3:
+                torchvision.utils.save_image(tensor_normalized.clone(),
+                                             save_path_norm)
+                logger.info(f"💾 Saved normalized tensor: {save_path_norm}")
+        except Exception as e_save:
+            logger.error(f"Error saving normalized tensor img: {e_save}")
+
+        # 8. Add batch dimension
+        return tensor_normalized.unsqueeze(0)
+
     except Exception as e:
-        print(f"Error preprocessing image: {e}")
+        logger.error(f"💥 Error in image preprocessing: {e}", exc_info=True)
         return None
+
 
 @app.route('/health', methods=['GET'])
 def health_check():
-    """Endpoint to check if the service is running."""
-    return jsonify({"status": "healthy"})
+    """Endpoint checking API status."""
+    status = "healthy" if MODEL_LOADED else "warning_model_not_loaded"
+    return jsonify({"status": status, "model_loaded": MODEL_LOADED})
+
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    """
-    Endpoint for digit prediction.
-    
-    Accepts:
-    - JSON with base64 encoded image
-    - Binary image data
-    - Multipart form with image file
-    
-    Returns:
-    - JSON with prediction and confidence
-    """
+    """Endpoint for digit prediction."""
+    predict_start_time = time.time()
+    if not request.is_json:
+        return jsonify({"error": "Request must be JSON"}), 415
+    data = request.get_json()
+    if 'image' not in data:
+        return jsonify({"error": "Missing 'image' key"}), 400
+
+    preprocess_start_time = time.time()
+    image_tensor = preprocess_image(data['image'])
+    preprocess_time_ms = (time.time() - preprocess_start_time) * 1000
+
+    if image_tensor is None:
+        return jsonify({"error": "Preprocessing failed"}), 400
+
+    device = torch.device('cpu') # Use CPU for inference
+    image_tensor = image_tensor.to(device)
+    model_instance.to(device)
+
+    inference_start_time = time.time()
     try:
-        image = None
-        
-        # Handle different input methods
-        if request.content_type == 'application/json':
-            # Extract base64 encoded image from JSON
-            data = request.get_json()
-            if 'image' not in data:
-                return jsonify({"error": "No image provided in JSON"}), 400
-            
-            # Preprocess image
-            image_tensor = preprocess_image(data['image'])
-            if image_tensor is None:
-                return jsonify({"error": "Invalid image data"}), 400
-            
-        elif request.content_type.startswith('multipart/form-data'):
-            # Handle form upload
-            if 'image' not in request.files:
-                return jsonify({"error": "No image file in request"}), 400
-            
-            file = request.files['image']
-            image_tensor = preprocess_image(file.read())
-            
-        elif request.content_type.startswith('image/'):
-            # Handle binary image data
-            image_data = request.data
-            image_tensor = preprocess_image(base64.b64encode(image_data).decode('utf-8'))
-        
-        else:
-            return jsonify({"error": "Unsupported content type"}), 415
-        
-        if image_tensor is None:
-            return jsonify({"error": "Failed to process image"}), 400
-        
-        # Make prediction
         with torch.no_grad():
-            outputs = model(image_tensor)
+            outputs = model_instance(image_tensor)
             probabilities = F.softmax(outputs, dim=1)
-            predicted_class = torch.argmax(probabilities, dim=1).item()
-            confidence = probabilities[0][predicted_class].item()
-        
-        # Return prediction
+            confidence, predicted_class = torch.max(probabilities, 1)
+            predicted_digit = predicted_class.item()
+            confidence_score = confidence.item()
+        inference_time_ms = (time.time() - inference_start_time) * 1000
+        total_predict_time_ms = (time.time() - predict_start_time) * 1000
+
+        logger.info(f"✅ Prediction: {predicted_digit}, "
+                    f"Conf: {confidence_score:.4f}, "
+                    f"Proc: {preprocess_time_ms:.1f}ms, "
+                    f"Infer: {inference_time_ms:.1f}ms, "
+                    f"Total: {total_predict_time_ms:.1f}ms")
         return jsonify({
-            "prediction": predicted_class,
-            "confidence": confidence
+            "prediction": predicted_digit, "confidence": confidence_score,
+            "preprocessing_time_ms": preprocess_time_ms,
+            "inference_time_ms": inference_time_ms,
+            "total_time_ms": total_predict_time_ms
         })
-        
     except Exception as e:
-        app.logger.error(f"Error processing request: {str(e)}")
-        return jsonify({"error": str(e)}), 500
+        logger.error(f"💥 Error during inference: {e}", exc_info=True)
+        return jsonify({"error": "Inference failed"}), 500
+
 
 if __name__ == '__main__':
-    # Get port from environment or use default
     port = int(os.environ.get('PORT', 5000))
-    
-    # Run the application
+    logger.info(f"🚀 Starting Flask server on port {port}")
     app.run(host='0.0.0.0', port=port, debug=False)
