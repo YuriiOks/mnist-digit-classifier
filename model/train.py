@@ -2,8 +2,8 @@
 # Copyright (c) 2025
 # File: model/train.py
 # Description: Script for training the MNIST digit classifier model.
-# Created: Earlier Date (based on file listing)
-# Updated: 2025-03-27 (Integrated evaluation, updated batch size, formatting)
+# Created: Earlier Date
+# Updated: 2025-03-28 (PEP8/Flake8 formatting, improved logging/docs)
 
 import os
 import argparse
@@ -12,7 +12,8 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
-from torchvision import datasets  # Removed 'transforms' as it's unused directly
+from torchvision import datasets
+import torchvision.utils  # For saving debug images
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 import numpy as np
@@ -20,189 +21,186 @@ import logging
 import time
 import datetime
 import json
+import sys  # Keep sys for exit on import error
 
-# Project-specific imports
+# Project-specific imports with error handling
 try:
     from model.model import MNISTClassifier
     from model.utils.augmentation import get_train_transforms, get_test_transforms
     from model.utils.evaluation import (
         evaluate_model,
         plot_training_history,
-        generate_evaluation_report  # Import the new function
+        generate_evaluation_report
     )
+    logger = logging.getLogger(__name__) # Use logger after imports
+    logger.info("✅ Successfully imported project modules.")
 except ImportError as e:
-    print(f"Error importing project modules: {e}")
-    print("Ensure this script is run correctly relative to the project root"
-          " or the PYTHONPATH is set.")
-    import sys
+    # Use print before logging might be configured
+    print(f"🔥 CRITICAL ERROR importing project modules: {e}")
+    print("Ensure script is run relative to project root "
+          "(e.g., python -m model.train) or PYTHONPATH is set.")
     sys.exit(1)
 
-# Constants
+# --- Constants ---
 RANDOM_SEED = 42
-# Updated BATCH_SIZE based on MPS benchmark results
-BATCH_SIZE = 512
-NUM_EPOCHS = 15  # Default epochs, can be overridden by args
+BATCH_SIZE = 512       # Optimal for MPS based on benchmarks
+NUM_EPOCHS = 15        # Default epochs (override via args)
 LEARNING_RATE = 0.001
-SAVE_PATH = "model/saved_models/mnist_classifier.pt"
-LOG_DIR = "model/logs"  # Log within the model directory
-HISTORY_PLOT_PATH = 'training_history.png'  # Plot saved in root for easy access
-FINAL_CM_PATH = 'final_confusion_matrix.png'
-FINAL_REPORT_PATH = 'final_classification_report.txt'
+SAVE_PATH = "model/saved_models/mnist_classifier.pt" # Model save location
+LOG_DIR = "model/logs" # Training logs directory
+# Output paths (relative to project root)
+OUTPUT_FIG_DIR = "outputs/figures"
+OUTPUT_DEBUG_DIR = "outputs/debug_images"
+HISTORY_PLOT_FILENAME = "training_history.png"
+FINAL_CM_FILENAME = "final_confusion_matrix.png"
+FINAL_REPORT_FILENAME = "final_classification_report.txt"
+DEBUG_TEST_NORM_FILENAME = "dbg_test_input_normalized.png"
+DEBUG_TEST_UNNORM_FILENAME = "dbg_test_input_unnormalized.png"
+# MNIST stats needed for un-normalization in debug save
+MNIST_MEAN = (0.1307,)
+MNIST_STD = (0.3081,)
+# -----------------
 
-
-def setup_logging(log_dir=LOG_DIR):
-    """Set up logging to file and console with timestamps.
+def setup_logging(log_dir=LOG_DIR) -> str:
+    """Sets up logging to file and console with timestamps.
 
     Args:
-        log_dir (str): Directory to save log files.
+        log_dir: Directory to save log files.
 
     Returns:
-        str: Path to the created log file.
+        Path to the created log file.
     """
     os.makedirs(log_dir, exist_ok=True)
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     log_file = os.path.join(log_dir, f"training_{timestamp}.log")
 
-    # Configure logging
+    # Use basicConfig for initial setup
     logging.basicConfig(
         level=logging.INFO,
-        format='%(asctime)s - %(levelname)s - %(message)s',
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         handlers=[
             logging.FileHandler(log_file),
-            logging.StreamHandler()  # Also log to console
-        ]
+            logging.StreamHandler()
+        ],
+        # Force setup even if already configured by other imports
+        force=True
     )
-
-    logging.info(f"Logging setup complete. Log file: {log_file}")
+    # Get logger instance *after* basicConfig
+    logger = logging.getLogger(__name__)
+    logger.info(f"📝 Logging setup complete. Log file: {log_file}")
     return log_file
 
 
-def set_seed(seed):
-    """Set random seeds for reproducibility across libraries.
+def set_seed(seed: int) -> None:
+    """Sets random seeds for torch and numpy for reproducibility.
 
     Args:
-        seed (int): The seed value to use.
+        seed: The seed value.
     """
     torch.manual_seed(seed)
-    torch.cuda.manual_seed_all(seed)  # if using CUDA
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+        # Optional: For full determinism on CUDA (can slow down)
+        # torch.backends.cudnn.deterministic = True
+        # torch.backends.cudnn.benchmark = False
     np.random.seed(seed)
-    # random.seed(seed) # Consider if stdlib random is used elsewhere
-    # Ensure deterministic algorithms are used where possible
-    # Note: MPS backend might not have full deterministic support
-    # torch.backends.cudnn.deterministic = True (if using CUDA)
-    # torch.backends.cudnn.benchmark = False (if using CUDA)
-    logging.info(f"Set random seed to {seed}")
+    logger.info(f"🌱 Set random seed to {seed}")
 
 
-def get_device():
-    """Determine and return the optimal device for PyTorch operations.
-
-    Prioritizes MPS (Apple Silicon GPU), then CUDA, then CPU.
-
-    Returns:
-        torch.device: The selected device.
-    """
-    if torch.backends.mps.is_available():
+def get_device() -> torch.device:
+    """Determines and returns the optimal torch device (MPS > CUDA > CPU)."""
+    if torch.backends.mps.is_available() and torch.backends.mps.is_built():
         device = torch.device("mps")
-        logging.info("Using Apple Silicon MPS (Metal Performance Shaders)")
+        logger.info("🚀 Using Apple Silicon MPS device.")
     elif torch.cuda.is_available():
         device = torch.device("cuda")
-        logging.info(f"Using CUDA GPU: {torch.cuda.get_device_name(0)}")
+        logger.info(f"🚀 Using CUDA device: {torch.cuda.get_device_name(0)}")
     else:
         device = torch.device("cpu")
-        # Consider logging thread count if relevant: torch.get_num_threads()
-        logging.info("Using CPU")
+        logger.info("🐌 Using CPU device.")
     return device
 
 
-def get_data_loaders(batch_size, num_workers=4, pin_memory=True, data_dir='./data'):
-    """Create train and test data loaders for MNIST.
+def get_data_loaders(batch_size: int, data_dir='./model/data') -> tuple:
+    """Creates MNIST train/test DataLoaders with appropriate transforms.
 
-    Applies appropriate transformations (including augmentation for training).
+    Adjusts num_workers and pin_memory for MPS compatibility.
 
     Args:
-        batch_size (int): Number of samples per batch.
-        num_workers (int): Number of subprocesses for data loading.
-            Recommended to set to 0 for MPS.
-        pin_memory (bool): If True, copies Tensors into device/CUDA pinned
-                           memory before returning them. Often False for MPS.
-        data_dir (str): Directory where MNIST data is stored/downloaded.
+        batch_size: Number of samples per batch.
+        data_dir: Directory for MNIST data.
 
     Returns:
-        tuple: (train_loader, test_loader)
+        Tuple containing (train_loader, test_loader).
     """
-    # Adjust num_workers and pin_memory for MPS compatibility
-    if get_device().type == 'mps':
-        num_workers = 0
-        pin_memory = False
-        logging.info("Adjusted DataLoader: num_workers=0, pin_memory=False "
-                     "for MPS.")
+    num_workers = 4
+    pin_memory = True
+    # Adjust based on the actual device being used for training
+    current_device_type = get_device().type
+    if current_device_type == 'mps':
+        num_workers = 0  # Recommended for MPS stability
+        pin_memory = False # Recommended for MPS
+        logger.info("⚙️ Adjusted DataLoader for MPS: num_workers=0, "
+                     "pin_memory=False.")
+    elif current_device_type == 'cpu':
+        pin_memory = False # pin_memory only benefits GPU copies
 
-    train_transform = get_train_transforms()
+    train_transform = get_train_transforms() # Uses strong augmentation
     test_transform = get_test_transforms()
 
     try:
-        train_dataset = datasets.MNIST(
-            root=data_dir,
-            train=True,
-            download=True,
-            transform=train_transform
-        )
-        test_dataset = datasets.MNIST(
-            root=data_dir,
-            train=False,
-            download=True,
-            transform=test_transform
-        )
+        logger.info(f"💾 Loading MNIST dataset from/to: {data_dir}")
+        os.makedirs(data_dir, exist_ok=True) # Ensure directory exists
+        train_dataset = datasets.MNIST(root=data_dir, train=True,
+                                       download=True, transform=train_transform)
+        test_dataset = datasets.MNIST(root=data_dir, train=False,
+                                      download=True, transform=test_transform)
+        logger.info("✅ MNIST dataset loaded.")
     except Exception as e:
-        logging.error(f"Failed to load MNIST dataset from {data_dir}: {e}")
-        raise
+        logger.critical(f"🔥 Failed to load MNIST dataset from {data_dir}: {e}")
+        raise  # Re-raise critical error
 
-    train_loader = DataLoader(
-        train_dataset,
-        batch_size=batch_size,
-        shuffle=True,
-        num_workers=num_workers,
-        pin_memory=pin_memory
-    )
-    test_loader = DataLoader(
-        test_dataset,
-        batch_size=batch_size,
-        shuffle=False,
-        num_workers=num_workers,
-        pin_memory=pin_memory
-    )
-    logging.info(f"Data loaders created with batch size {batch_size}.")
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True,
+                              num_workers=num_workers, pin_memory=pin_memory)
+    test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False,
+                             num_workers=num_workers, pin_memory=pin_memory)
+    logger.info(f"📦 DataLoaders created with batch size {batch_size}.")
     return train_loader, test_loader
 
 
-def train_model(num_epochs, batch_size, learning_rate, device,
-                save_path, log_dir):
-    """Trains the MNIST classifier model.
+def train_model(num_epochs: int, batch_size: int, learning_rate: float,
+                device: torch.device, save_path: str, log_dir: str) -> tuple:
+    """Trains the MNIST classifier, saves the best model, returns path/history.
 
     Args:
-        num_epochs (int): Number of epochs to train for.
-        batch_size (int): Training batch size.
-        learning_rate (float): Optimizer learning rate.
-        device (torch.device): Device to train on (CPU, CUDA, MPS).
-        save_path (str): Path to save the best model checkpoint.
-        log_dir (str): Directory to save training logs and history.
+        num_epochs: Number of epochs to train.
+        batch_size: Training batch size.
+        learning_rate: Optimizer learning rate.
+        device: Device for training (mps, cuda, cpu).
+        save_path: Path to save the best performing model checkpoint.
+        log_dir: Directory to save training history JSON.
 
     Returns:
-        tuple: (path_to_best_model, training_history)
+        Tuple: (path_to_best_model, training_history_dict).
     """
-    start_time = time.time()
+    train_start_time = time.time()
+    logger.info(f"🏋️ Starting training for {num_epochs} epochs...")
 
     # --- Setup ---
-    train_loader, test_loader = get_data_loaders(batch_size)
+    try:
+        train_loader, test_loader = get_data_loaders(batch_size)
+    except Exception:
+        logger.critical("🔥 Aborting training due to DataLoader failure.")
+        # Return dummy values or re-raise
+        return None, {}
+
     model = MNISTClassifier().to(device)
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
-    # Learning rate scheduler reduces LR on plateauing validation loss
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(
-        optimizer, 'min', patience=2, factor=0.5, verbose=True
+        optimizer, 'min', patience=3, factor=0.5, verbose=False # Less verbose
     )
-    logging.info(f"Model, Loss, Optimizer, Scheduler initialized on {device}.")
+    logger.info("✅ Model, Loss, Optimizer, Scheduler initialized.")
 
     # --- Training Loop ---
     history = {'train_loss': [], 'train_acc': [], 'val_loss': [],
@@ -210,17 +208,13 @@ def train_model(num_epochs, batch_size, learning_rate, device,
     best_val_loss = float('inf')
     best_epoch = -1
 
-    logging.info(f"Starting training for {num_epochs} epochs...")
     for epoch in range(num_epochs):
         epoch_start_time = time.time()
-        model.train()  # Set model to training mode
-        running_loss = 0.0
-        correct_train = 0
-        total_train = 0
+        model.train()
+        running_loss, correct_train, total_train = 0.0, 0, 0
 
-        # Use tqdm for progress bar
-        train_pbar = tqdm(train_loader,
-                          desc=f'Epoch {epoch+1}/{num_epochs} [Train]')
+        train_pbar = tqdm(train_loader, desc=f'Epoch {epoch+1}/{num_epochs} '
+                          '[Train]', leave=False)
         for images, labels in train_pbar:
             images, labels = images.to(device), labels.to(device)
 
@@ -235,123 +229,180 @@ def train_model(num_epochs, batch_size, learning_rate, device,
             total_train += labels.size(0)
             correct_train += (predicted == labels).sum().item()
 
-            # Update progress bar postfix
             current_loss = loss.item()
             current_acc = correct_train / total_train if total_train > 0 else 0.0
-            train_pbar.set_postfix({
-                'Loss': f"{current_loss:.4f}",
-                'Acc': f"{current_acc:.4f}"
-            })
+            train_pbar.set_postfix({'Loss': f"{current_loss:.4f}",
+                                    'Acc': f"{current_acc:.4f}"})
 
-        # Calculate epoch statistics for training
         epoch_train_loss = running_loss / len(train_loader.dataset)
         epoch_train_acc = correct_train / total_train
 
-        # Validation phase
-        model.eval()  # Set model to evaluation mode
+        # Validation
+        model.eval()
+        # Use context manager for evaluation if evaluate_model supports it
+        # or ensure evaluate_model uses torch.no_grad() internally
         epoch_val_loss, epoch_val_acc = evaluate_model(
             model, test_loader, criterion, device
         )
 
-        # Update learning rate scheduler
+        # Scheduler Step + Logging LR change
+        current_lr = optimizer.param_groups[0]['lr']
         scheduler.step(epoch_val_loss)
+        new_lr = optimizer.param_groups[0]['lr']
+        if new_lr < current_lr:
+             logger.info(f"📉 Learning rate reduced to {new_lr:.6f} "
+                         f"at epoch {epoch+1}")
 
-        # Log epoch results
         epoch_duration = time.time() - epoch_start_time
-        logging.info(
+        logger.info(
             f"Epoch {epoch+1}/{num_epochs} | "
-            f"Train Loss: {epoch_train_loss:.4f} | "
-            f"Train Acc: {epoch_train_acc:.4f} | "
-            f"Val Loss: {epoch_val_loss:.4f} | "
-            f"Val Acc: {epoch_val_acc:.4f} | "
-            f"Duration: {epoch_duration:.2f}s"
+            f"T_Loss={epoch_train_loss:.4f} | T_Acc={epoch_train_acc:.4f} | "
+            f"V_Loss={epoch_val_loss:.4f} | V_Acc={epoch_val_acc:.4f} | "
+            f"🕒 {epoch_duration:.2f}s"
         )
 
-        # Store history
         history['train_loss'].append(epoch_train_loss)
         history['train_acc'].append(epoch_train_acc)
         history['val_loss'].append(epoch_val_loss)
         history['val_acc'].append(epoch_val_acc)
 
-        # Save the best model based on validation loss
+        # Save Best Model
         if epoch_val_loss < best_val_loss:
             best_val_loss = epoch_val_loss
             best_epoch = epoch + 1
-            # Ensure directory exists before saving
             os.makedirs(os.path.dirname(save_path), exist_ok=True)
-            torch.save(model.state_dict(), save_path)
-            logging.info(
-                f"🎉 New best model saved at Epoch {best_epoch} "
-                f"with Val Loss: {best_val_loss:.4f}"
-            )
+            try:
+                torch.save(model.state_dict(), save_path)
+                logger.info(
+                    f"💾 Epoch {best_epoch}: New best model saved "
+                    f"(Val Loss: {best_val_loss:.4f})"
+                )
+            except Exception as e_save:
+                logger.error(f"🔥 Error saving model at epoch {epoch+1}: "
+                             f"{e_save}")
 
     # --- Post-Training ---
-    total_training_time = time.time() - start_time
-    logging.info(f"🏁 Training finished in {total_training_time:.2f} seconds.")
-    logging.info(f"🏆 Best model saved from Epoch {best_epoch} "
-                 f"at {save_path}")
+    total_training_time = time.time() - train_start_time
+    logger.info(f"🏁 Training finished in {total_training_time:.2f} seconds.")
+    if best_epoch != -1:
+        logger.info(f"🏆 Best model from Epoch {best_epoch} saved to "
+                     f"{save_path}")
+    else:
+        logger.warning("⚠️ No best model was saved (validation loss might "
+                       "not have improved).")
 
-    # Plot training history
+    # Plot History
+    history_plot_path = os.path.join(OUTPUT_FIG_DIR, HISTORY_PLOT_FILENAME)
+    os.makedirs(OUTPUT_FIG_DIR, exist_ok=True)
     try:
-        plot_training_history(history, save_path=HISTORY_PLOT_PATH)
-        logging.info(f"📈 Training history plot saved to {HISTORY_PLOT_PATH}")
-    except Exception as e:
-        logging.warning(f"Could not plot training history: {e}")
+        # Ensure plot_training_history accepts save_path argument
+        plot_training_history(history, save_path=history_plot_path)
+        logger.info(f"📈 Training history plot saved to {history_plot_path}")
+    except TypeError as e_plot:
+        logger.warning(f"⚠️ Plotting failed (check function signature): {e_plot}")
+    except Exception as e_plot_other:
+        logger.warning(f"⚠️ Could not plot training history: {e_plot_other}")
 
-    # Save history dictionary
+
+    # Save History Data
     history_file_name = f"training_history_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
     history_file_path = os.path.join(log_dir, history_file_name)
     try:
         with open(history_file_path, 'w') as f:
             json.dump(history, f, indent=4)
-        logging.info(f"💾 Training history data saved to {history_file_path}")
-    except Exception as e:
-        logging.warning(f"Could not save training history JSON: {e}")
+        logger.info(f"📜 Training history data saved to {history_file_path}")
+    except Exception as e_hist:
+        logger.warning(f"⚠️ Could not save training history JSON: {e_hist}")
 
-    return save_path, history
+    return save_path if best_epoch != -1 else None, history
 
 
-def final_evaluation(model_path, device, test_loader):
-    """Performs final evaluation using the best saved model.
+def final_evaluation(model_path: str, device: torch.device,
+                     batch_size: int) -> None:
+    """Performs final evaluation on the test set using the best model.
 
-    Generates and saves the confusion matrix and classification report.
+    Saves evaluation reports and debug images.
 
     Args:
-        model_path (str): Path to the saved best model state_dict.
-        device (torch.device): Device to run evaluation on.
-        test_loader (DataLoader): DataLoader for the test dataset.
+        model_path: Path to the saved best model state_dict.
+        device: Device for evaluation (mps, cuda, cpu).
+        batch_size: Batch size for the test DataLoader.
     """
-    logging.info("\n" + "="*30 + "\n🔬 Performing Final Evaluation 🔬\n" + "="*30)
-    model = MNISTClassifier().to(device)
+    if not model_path or not os.path.exists(model_path):
+         logger.error("🔥 Final Evaluation Failed: Invalid or missing "
+                      f"model path '{model_path}'")
+         return
+
+    logger.info("\n" + "="*30 + "\n🔬 Performing Final Evaluation 🔬\n" + "="*30)
+
+    # Create Test Loader for final evaluation
     try:
-        # Load the best model weights
-        model.load_state_dict(torch.load(model_path, map_location=device))
-        model.eval()
-        logging.info(f"Loaded best model from {model_path} for final eval.")
-    except Exception as e:
-        logging.error(f"Failed to load best model for final evaluation: {e}")
+        _, test_loader = get_data_loaders(batch_size)
+    except Exception:
+        logger.error("🔥 Final Evaluation Failed: Cannot create test loader.")
         return
 
-    # Generate the report and confusion matrix
+    model = MNISTClassifier().to(device)
     try:
+        model.load_state_dict(torch.load(model_path, map_location=device))
+        model.eval()
+        logger.info(f"✅ Loaded best model from {model_path} for final eval.")
+    except Exception as e:
+        logger.error(f"🔥 Failed to load best model for final evaluation: {e}")
+        return
+
+    # --- Save Debug Test Images ---
+    try:
+        os.makedirs(OUTPUT_DEBUG_DIR, exist_ok=True)
+        dataiter = iter(test_loader)
+        images, _ = next(dataiter)
+        img_to_save = images[0].clone().cpu() # Process on CPU
+
+        # Save Normalized Version
+        norm_save_path = os.path.join(OUTPUT_DEBUG_DIR,
+                                      DEBUG_TEST_NORM_FILENAME)
+        torchvision.utils.save_image(img_to_save, norm_save_path)
+        logger.info(f"📸 Saved example normalized test input to "
+                    f"{norm_save_path}")
+
+        # Save Un-normalized Version
+        mean = torch.tensor(MNIST_MEAN).view(-1, 1, 1)
+        std = torch.tensor(MNIST_STD).view(-1, 1, 1)
+        img_unnorm = img_to_save * std + mean
+        img_unnorm = torch.clamp(img_unnorm, 0, 1)
+        unnorm_save_path = os.path.join(OUTPUT_DEBUG_DIR,
+                                        DEBUG_TEST_UNNORM_FILENAME)
+        torchvision.utils.save_image(img_unnorm, unnorm_save_path)
+        logger.info(f"🖼️ Saved example un-normalized test input to "
+                    f"{unnorm_save_path}")
+    except Exception as e_save:
+        logger.error(f"⚠️ Failed to save debug input images: {e_save}")
+
+    # --- Generate Reports ---
+    cm_path = os.path.join(OUTPUT_FIG_DIR, FINAL_CM_FILENAME)
+    report_path = FINAL_REPORT_FILENAME # Save report in root dir
+    os.makedirs(OUTPUT_FIG_DIR, exist_ok=True)
+    try:
+        logger.info("⏳ Generating final evaluation reports...")
         generate_evaluation_report(
             model=model,
             data_loader=test_loader,
             device=device,
-            save_cm_path=FINAL_CM_PATH,
-            save_report_path=FINAL_REPORT_PATH
+            save_cm_path=cm_path,
+            save_report_path=report_path
         )
-        logging.info(f"📊 Final evaluation reports saved: "
-                     f"{FINAL_CM_PATH}, {FINAL_REPORT_PATH}")
-    except Exception as e:
-        logging.error(f"Failed during final evaluation report generation: {e}")
+        logger.info(f"📊 Final evaluation reports saved: "
+                     f"{cm_path}, {report_path}")
+    except Exception as e_eval:
+        logger.error(f"🔥 Failed during final evaluation report generation: "
+                     f"{e_eval}")
 
 
+# --- Main Execution ---
 if __name__ == "__main__":
-    # --- Argument Parsing ---
-    parser = argparse.ArgumentParser(description="Train MNIST Classifier Model")
+    parser = argparse.ArgumentParser(description="Train MNIST Classifier")
     parser.add_argument('--epochs', type=int, default=NUM_EPOCHS,
-                        help=f"Number of training epochs (default: {NUM_EPOCHS})")
+                        help=f"Num epochs (default: {NUM_EPOCHS})")
     parser.add_argument('--batch_size', type=int, default=BATCH_SIZE,
                         help=f"Batch size (default: {BATCH_SIZE})")
     parser.add_argument('--lr', type=float, default=LEARNING_RATE,
@@ -364,13 +415,12 @@ if __name__ == "__main__":
                         help=f"Random seed (default: {RANDOM_SEED})")
     args = parser.parse_args()
 
-    # --- Main Execution ---
-    log_file = setup_logging(args.log_dir)
+    log_file_path = setup_logging(args.log_dir)
     set_seed(args.seed)
     selected_device = get_device()
 
-    # Start Training
-    best_model_path, training_history = train_model(
+    # Train
+    best_model_file_path, _ = train_model(
         num_epochs=args.epochs,
         batch_size=args.batch_size,
         learning_rate=args.lr,
@@ -379,9 +429,11 @@ if __name__ == "__main__":
         log_dir=args.log_dir
     )
 
-    # Perform Final Evaluation (using the best model saved during training)
-    # Re-create test loader just for final eval if needed, or reuse
-    _, final_test_loader = get_data_loaders(args.batch_size) # Use trained BS
-    final_evaluation(best_model_path, selected_device, final_test_loader)
+    # Evaluate
+    final_evaluation(
+        model_path=best_model_file_path,
+        device=selected_device,
+        batch_size=args.batch_size # Use same BS for consistency in test loader
+    )
 
-    logging.info("✅ Training script finished.")
+    logger.info("✅ Training script finished.")
