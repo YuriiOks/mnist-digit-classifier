@@ -162,7 +162,7 @@ class PredictionResult(Component):
                                             if entry_id:
                                                 HistoryState.set_user_correction(entry_id, i)
                                                 st.success(f"Corrected to {i}. Thank you!")
-                                                st.experimental_rerun()
+                                                st.rerun()
                             st.markdown("</div>", unsafe_allow_html=True)
                     
                     st.markdown("</div>", unsafe_allow_html=True)
