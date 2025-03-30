@@ -1,5 +1,5 @@
 # MNIST Digit Classifier
-# Copyright (c) 2025
+# Copyright (c) 2025 YuriODev (YuriiOks)
 # File: core/__init__.py
 # Description: Core package initialization
 # Created: 2025-03-16
@@ -25,5 +25,5 @@ __all__ = [
     "ComponentError",
     "DatabaseManager",
     "db_manager",
-    "initialize_database"
+    "initialize_database",
 ]
