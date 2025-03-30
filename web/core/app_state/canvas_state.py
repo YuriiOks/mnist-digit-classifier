@@ -121,9 +121,7 @@ class CanvasState:
     @classmethod
     @AspectUtils.catch_errors
     @AspectUtils.log_method
-    def set_image_data(
-        cls, image_data: Union[bytes, np.ndarray, Image.Image]
-    ) -> None:
+    def set_image_data(cls, image_data: Union[bytes, np.ndarray, Image.Image]) -> None:
         """Set image data with enhanced error handling and verification.
 
         Args:
@@ -148,9 +146,7 @@ class CanvasState:
 
             # Verify it's valid image data
             if not isinstance(image_data, bytes):
-                raise ValueError(
-                    f"Invalid image data type: {type(image_data)}"
-                )
+                raise ValueError(f"Invalid image data type: {type(image_data)}")
 
             # Check if data is empty
             if len(image_data) == 0:
@@ -170,18 +166,14 @@ class CanvasState:
             # Store as base64 string
             encoded = base64.b64encode(image_data).decode("utf-8")
             SessionState.set(cls.IMAGE_DATA_KEY, encoded)
-            cls._logger.info(
-                f"Image data stored: {len(encoded)} chars (base64)"
-            )
+            cls._logger.info(f"Image data stored: {len(encoded)} chars (base64)")
 
             # Store timestamp for debugging
             import time
 
             SessionState.set("last_image_update", time.time())
         except Exception as e:
-            cls._logger.error(
-                f"Error setting image data: {str(e)}", exc_info=True
-            )
+            cls._logger.error(f"Error setting image data: {str(e)}", exc_info=True)
             raise
 
     @classmethod
@@ -198,14 +190,10 @@ class CanvasState:
         if encoded:
             try:
                 decoded = base64.b64decode(encoded)
-                cls._logger.debug(
-                    f"Retrieved image data: {len(decoded)} bytes"
-                )
+                cls._logger.debug(f"Retrieved image data: {len(decoded)} bytes")
                 return decoded
             except Exception as e:
-                cls._logger.error(
-                    f"Error decoding image data: {str(e)}", exc_info=True
-                )
+                cls._logger.error(f"Error decoding image data: {str(e)}", exc_info=True)
                 return None
         else:
             cls._logger.debug("No image data found in session state")
