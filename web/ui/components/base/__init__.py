@@ -1,5 +1,5 @@
 # MNIST Digit Classifier
-# Copyright (c) 2025
+# Copyright (c) 2025 YuriODev (YuriiOks)
 # File: ui/components/base/__init__.py
 # Description: Base components package initialization
 # Created: 2025-03-16
@@ -8,6 +8,4 @@
 
 from ui.components.base.component import Component
 
-__all__ = [
-    "Component"
-]
+__all__ = ["Component"]
