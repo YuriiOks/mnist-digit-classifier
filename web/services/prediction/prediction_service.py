@@ -1,18 +1,15 @@
 # MNIST Digit Classifier
 # Copyright (c) 2025 YuriODev (YuriiOks)
 # File: services/prediction/prediction_service.py
-# Description: Service for handling predictions and database logging
+# Description: Service handling direct DB interaction for prediction logs.
 # Created: 2025-03-17
+# Updated: 2025-03-29 (Refined ID handling, cleanup)
 
 import logging
 import os
-import json
-import requests
-import time
 from typing import Dict, Any, Tuple, Optional, List
 from datetime import datetime
 
-# We'll conditionally import psycopg2 to handle the case where it's not installed
 try:
     import psycopg2
     import psycopg2.extras
@@ -20,32 +17,28 @@ try:
     PSYCOPG2_AVAILABLE = True
 except ImportError:
     PSYCOPG2_AVAILABLE = False
-    logging.warning(
-        "psycopg2 not available. Database functionality will be disabled."
-    )
+    logging.warning("psycopg2 not found. DB functionality disabled.")
+
+logger = logging.getLogger(__name__)
 
 
 class PredictionService:
-    """Service for handling digit predictions and logging to database."""
+    """Service for direct DB operations on prediction_logs."""
 
+    # (Keep Singleton pattern __new__ if desired)
     _instance = None
 
     def __new__(cls):
-        """Create a singleton instance."""
         if cls._instance is None:
             cls._instance = super(PredictionService, cls).__new__(cls)
             cls._instance._initialized = False
         return cls._instance
 
     def __init__(self):
-        """Initialize the prediction service."""
-        # Skip initialization if already done
         if getattr(self, "_initialized", False):
             return
 
-        self.logger = logging.getLogger(__name__)
-
-        # Database connection parameters from environment variables
+        self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         self.db_config = {
             "host": os.environ.get("DB_HOST", "db"),
             "database": os.environ.get("DB_NAME", "digit_predictions"),
@@ -53,97 +46,68 @@ class PredictionService:
             "password": os.environ.get("DB_PASSWORD", "secure_password"),
             "port": os.environ.get("DB_PORT", "5432"),
         }
-
-        self.model_url = os.environ.get("MODEL_URL", "http://model:5000")
         self.log_to_db = os.environ.get("LOG_TO_DB", "true").lower() == "true"
 
-        # Check if database is available
         if PSYCOPG2_AVAILABLE and self.log_to_db:
             self._check_and_setup_database()
         else:
-            self.logger.warning(
-                "Database logging is disabled or psycopg2 is not available"
-            )
+            self.logger.warning("DB logging disabled or psycopg2 unavailable.")
 
         self._initialized = True
-        self.logger.info("PredictionService initialized")
+        self.logger.info(f"{self.__class__.__name__} initialized.")
 
     def _check_and_setup_database(self) -> None:
-        """Check database connection and set up tables if needed."""
+        """Check DB connection and ensure prediction_logs table exists."""
         if not PSYCOPG2_AVAILABLE:
-            self.logger.warning(
-                "psycopg2 not available. Cannot set up database."
-            )
             return
-
         conn = None
         try:
-            # Log connection attempt
             self.logger.info(
-                f"Attempting to connect to database at {self.db_config['host']}:{self.db_config['port']}"
+                f"DB Check: Connecting to "
+                f"{self.db_config['host']}:{self.db_config['port']}"
             )
-
-            # Try to connect with a timeout
             conn = psycopg2.connect(**self.db_config, connect_timeout=5)
-
-            # Create tables if they don't exist
             cursor = conn.cursor()
-
-            # Create prediction_logs table if not exists
+            # Added image_data TEXT field if it's missing
             cursor.execute(
                 """
-            CREATE TABLE IF NOT EXISTS prediction_logs (
-                id SERIAL PRIMARY KEY,
-                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                prediction INTEGER NOT NULL,
-                true_label INTEGER,
-                confidence FLOAT NOT NULL,
-                input_type VARCHAR(20)
-            )
+                CREATE TABLE IF NOT EXISTS prediction_logs (
+                    id SERIAL PRIMARY KEY,
+                    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    prediction INTEGER NOT NULL,
+                    true_label INTEGER,
+                    confidence FLOAT NOT NULL,
+                    input_type VARCHAR(20),
+                    image_data TEXT
+                );
+                -- Optional: Add column if it doesn't exist (less disruptive)
+                -- ALTER TABLE prediction_logs ADD COLUMN IF NOT EXISTS image_data TEXT;
             """
             )
-
-            # Create index on timestamp for faster retrieval
             cursor.execute(
-                """
-            CREATE INDEX IF NOT EXISTS idx_timestamp 
-            ON prediction_logs (timestamp DESC)
-            """
+                "CREATE INDEX IF NOT EXISTS idx_timestamp "
+                "ON prediction_logs (timestamp DESC);"
             )
-
             conn.commit()
             cursor.close()
-
-            self.logger.info(
-                "Database connection successful and tables verified"
-            )
-
+            self.logger.info("DB Check: Connection successful, table verified.")
         except Exception as e:
-            self.logger.error(f"Database setup error: {str(e)}")
+            self.logger.error(f"🔥 DB Check/Setup error: {e}")
             if conn:
                 conn.rollback()
         finally:
             if conn:
                 conn.close()
 
-    def get_db_connection(self) -> Optional[Any]:
-        """
-        Get a connection to the database.
-
-        Returns:
-            Database connection or None if connection fails
-        """
+    def get_db_connection(self) -> Optional[psycopg2.extensions.connection]:
+        """Establishes and returns a database connection."""
         if not PSYCOPG2_AVAILABLE:
-            self.logger.warning(
-                "psycopg2 not available. Cannot connect to database."
-            )
             return None
-
         try:
-            conn = psycopg2.connect(**self.db_config)
+            conn = psycopg2.connect(**self.db_config, connect_timeout=5)
             return conn
         except Exception as e:
-            self.logger.error(f"Database connection failed: {str(e)}")
+            self.logger.error(f"🔥 Database connection failed: {e}")
             return None
 
     def log_prediction(
@@ -152,60 +116,42 @@ class PredictionService:
         confidence: float,
         input_type: Optional[str] = None,
         true_label: Optional[int] = None,
+        image_data: Optional[str] = None,  # Expecting base64 string if logged
     ) -> Optional[int]:
-        """
-        Log a prediction to the database.
-
-        Args:
-            prediction: The predicted digit
-            confidence: Confidence score (0-1)
-            input_type: Type of input (canvas, upload, url)
-            true_label: Optional true label for the digit
-
-        Returns:
-            int: ID of the logged prediction, or None if logging failed
-        """
+        """Logs a prediction, returns the integer database ID."""
         if not self.log_to_db or not PSYCOPG2_AVAILABLE:
-            self.logger.info("Database logging is disabled or not available")
             return None
-
         conn = self.get_db_connection()
         if not conn:
             return None
 
+        db_id = None
         try:
             cursor = conn.cursor()
-
-            # Insert into prediction_logs table
             query = """
-            INSERT INTO prediction_logs 
-            (prediction, confidence, true_label, input_type)
-            VALUES (%s, %s, %s, %s)
-            RETURNING id;
+                INSERT INTO prediction_logs
+                (prediction, confidence, true_label, input_type, image_data)
+                VALUES (%s, %s, %s, %s, %s)
+                RETURNING id;
             """
-
             cursor.execute(
-                query, (prediction, confidence, true_label, input_type)
+                query, (prediction, confidence, true_label, input_type, image_data)
             )
-            prediction_id = cursor.fetchone()[0]
-
+            result = cursor.fetchone()
+            if result:
+                db_id = result[0]  # Get the integer ID
             conn.commit()
-            cursor.close()
-            conn.close()
-
-            self.logger.info(
-                f"Prediction logged to database with ID: {prediction_id}"
-            )
-            return prediction_id
-
+            self.logger.info(f"✅ Prediction logged to DB with ID: {db_id}")
         except Exception as e:
-            self.logger.error(
-                f"Error logging prediction to database: {str(e)}"
-            )
+            self.logger.error(f"🔥 Error logging prediction: {e}", exc_info=True)
             if conn:
                 conn.rollback()
+        finally:
+            if cursor:
+                cursor.close()
+            if conn:
                 conn.close()
-            return None
+        return db_id  # Return integer ID or None
 
     def get_prediction_history(
         self,
@@ -213,238 +159,116 @@ class PredictionService:
         offset: int = 0,
         sort_by: str = "timestamp",
         sort_order: str = "desc",
+        # Add filters if needed by db_manager/direct query
+        digit_filter: Optional[int] = None,
+        min_confidence: float = 0.0,
     ) -> Tuple[List[Dict[str, Any]], int]:
-        """
-        Get prediction history from the database.
-
-        Args:
-            limit: Maximum number of results to return
-            offset: Offset for pagination
-            sort_by: Column to sort by (timestamp, prediction, confidence)
-            sort_order: Sort order (asc, desc)
-
-        Returns:
-            Tuple of (list of predictions, total count)
-        """
+        """Gets prediction history from the database (paginated)."""
         if not PSYCOPG2_AVAILABLE:
-            self.logger.warning(
-                "psycopg2 not available. Cannot retrieve history."
-            )
             return [], 0
-
         conn = self.get_db_connection()
         if not conn:
             return [], 0
 
+        predictions = []
+        total_count = 0
         try:
-            # Use DictCursor to get results as dictionaries
             cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+            # Basic Sanitization
+            valid_sort_cols = ["id", "timestamp", "prediction", "confidence"]
+            sort_by = sort_by if sort_by in valid_sort_cols else "timestamp"
+            sort_order = "ASC" if sort_order.lower() == "asc" else "DESC"
 
-            # Validate and sanitize sort parameters to prevent SQL injection
-            valid_sort_columns = [
-                "timestamp",
-                "prediction",
-                "confidence",
-                "id",
-            ]
-            if sort_by not in valid_sort_columns:
-                sort_by = "timestamp"
+            # Build WHERE clause (Example - adjust as needed)
+            where_clauses = []
+            params = []
+            if digit_filter is not None:
+                where_clauses.append("prediction = %s")
+                params.append(digit_filter)
+            if min_confidence > 0:
+                where_clauses.append("confidence >= %s")
+                params.append(min_confidence)
+            where_sql = (
+                ("WHERE " + " AND ".join(where_clauses)) if where_clauses else ""
+            )
 
-            valid_sort_orders = ["asc", "desc"]
-            if sort_order.lower() not in valid_sort_orders:
-                sort_order = "desc"
-
-            # Get total count
-            cursor.execute("SELECT COUNT(*) FROM prediction_logs")
+            # Count Query
+            count_query = f"SELECT COUNT(*) FROM prediction_logs {where_sql}"
+            cursor.execute(count_query, tuple(params))
             total_count = cursor.fetchone()[0]
 
-            # Get predictions with pagination
-            query = f"""
-            SELECT id, timestamp, prediction, true_label, confidence, input_type
-            FROM prediction_logs
-            ORDER BY {sort_by} {sort_order}
-            LIMIT %s OFFSET %s
+            # Data Query
+            params.extend([limit, offset])
+            data_query = f"""
+                SELECT id, timestamp, prediction, true_label, confidence,
+                       input_type, image_data
+                FROM prediction_logs
+                {where_sql}
+                ORDER BY {sort_by} {sort_order}
+                LIMIT %s OFFSET %s
             """
-
-            cursor.execute(query, (limit, offset))
+            cursor.execute(data_query, tuple(params))
             rows = cursor.fetchall()
-
-            # Convert to list of dictionaries
-            predictions = []
             for row in rows:
-                # Convert datetime to string for JSON serialization
                 row_dict = dict(row)
-                if isinstance(row_dict["timestamp"], datetime):
+                # Ensure timestamp is serializable
+                if isinstance(row_dict.get("timestamp"), datetime):
                     row_dict["timestamp"] = row_dict["timestamp"].isoformat()
+                # Decode image if needed? Usually done in UI.
+                # if row_dict.get("image_data"):
+                #     row_dict["image_data"] = base64.b64decode(...)
                 predictions.append(row_dict)
 
-            cursor.close()
-            conn.close()
-
-            return predictions, total_count
-
         except Exception as e:
-            self.logger.error(f"Error getting prediction history: {str(e)}")
+            self.logger.error(
+                f"🔥 Error getting prediction history: {e}", exc_info=True
+            )
+        finally:
+            if cursor:
+                cursor.close()
             if conn:
                 conn.close()
-            return [], 0
+        return predictions, total_count
 
-    def update_true_label(self, prediction_id: int, true_label: int) -> bool:
-        """
-        Update the true label for a prediction.
-
-        Args:
-            prediction_id: ID of the prediction
-            true_label: Correct digit value
-
-        Returns:
-            bool: True if update was successful, False otherwise
-        """
-        if not PSYCOPG2_AVAILABLE:
-            self.logger.warning(
-                "psycopg2 not available. Cannot update true label."
-            )
+    def update_true_label(self, prediction_db_id: int, true_label: int) -> bool:
+        """Updates the true label for a specific prediction log entry by its integer ID."""
+        if not self.log_to_db or not PSYCOPG2_AVAILABLE:
             return False
-
         conn = self.get_db_connection()
         if not conn:
             return False
 
+        success = False
         try:
             cursor = conn.cursor()
-
-            # Update true_label in prediction_logs table
-            query = """
-            UPDATE prediction_logs
-            SET true_label = %s
-            WHERE id = %s
-            """
-
-            cursor.execute(query, (true_label, prediction_id))
+            query = "UPDATE prediction_logs SET true_label = %s WHERE id = %s"
+            # Execute with INTEGER prediction_db_id
+            cursor.execute(query, (true_label, prediction_db_id))
             rows_affected = cursor.rowcount
-
             conn.commit()
-            cursor.close()
-            conn.close()
-
             success = rows_affected > 0
             if success:
                 self.logger.info(
-                    f"Updated true label for prediction {prediction_id} to {true_label}"
+                    f"✅ Updated true_label for DB ID "
+                    f"{prediction_db_id} to {true_label}"
                 )
             else:
                 self.logger.warning(
-                    f"No prediction found with ID {prediction_id}"
+                    f"⚠️ No row found with DB ID " f"{prediction_db_id} to update."
                 )
-
-            return success
-
         except Exception as e:
-            self.logger.error(f"Error updating true label: {str(e)}")
+            self.logger.error(
+                f"🔥 Error updating true_label for DB ID " f"{prediction_db_id}: {e}",
+                exc_info=True,
+            )
             if conn:
                 conn.rollback()
-                conn.close()
-            return False
-
-    def delete_prediction(self, prediction_id: int) -> bool:
-        """
-        Delete a prediction from the database.
-
-        Args:
-            prediction_id: ID of the prediction to delete
-
-        Returns:
-            bool: True if deletion was successful, False otherwise
-        """
-        if not PSYCOPG2_AVAILABLE:
-            self.logger.warning(
-                "psycopg2 not available. Cannot delete prediction."
-            )
-            return False
-
-        conn = self.get_db_connection()
-        if not conn:
-            return False
-
-        try:
-            cursor = conn.cursor()
-
-            # Delete from prediction_logs table
-            query = """
-            DELETE FROM prediction_logs
-            WHERE id = %s
-            """
-
-            cursor.execute(query, (prediction_id,))
-            rows_affected = cursor.rowcount
-
-            conn.commit()
-            cursor.close()
-            conn.close()
-
-            success = rows_affected > 0
-            if success:
-                self.logger.info(
-                    f"Deleted prediction with ID {prediction_id}"
-                )
-            else:
-                self.logger.warning(
-                    f"No prediction found with ID {prediction_id}"
-                )
-
-            return success
-
-        except Exception as e:
-            self.logger.error(f"Error deleting prediction: {str(e)}")
+        finally:
+            if cursor:
+                cursor.close()
             if conn:
-                conn.rollback()
                 conn.close()
-            return False
-
-    def clear_history(self) -> bool:
-        """
-        Clear all prediction history from the database.
-
-        Returns:
-            bool: True if clearing was successful, False otherwise
-        """
-        if not PSYCOPG2_AVAILABLE:
-            self.logger.warning(
-                "psycopg2 not available. Cannot clear history."
-            )
-            return False
-
-        conn = self.get_db_connection()
-        if not conn:
-            return False
-
-        try:
-            cursor = conn.cursor()
-
-            # Delete all records from prediction_logs table
-            query = """
-            DELETE FROM prediction_logs
-            """
-
-            cursor.execute(query)
-            rows_affected = cursor.rowcount
-
-            conn.commit()
-            cursor.close()
-            conn.close()
-
-            self.logger.info(
-                f"Cleared prediction history. {rows_affected} records deleted."
-            )
-            return True
-
-        except Exception as e:
-            self.logger.error(f"Error clearing prediction history: {str(e)}")
-            if conn:
-                conn.rollback()
-                conn.close()
-            return False
+        return success
 
 
-# Create a singleton instance
 prediction_service = PredictionService()
