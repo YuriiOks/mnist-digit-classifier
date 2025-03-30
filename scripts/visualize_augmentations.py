@@ -18,9 +18,7 @@ from typing import Tuple, Any
 # Dynamically add project root to sys.path to ensure imports work correctly
 # when run directly or as a module from the project root.
 try:
-    project_root = os.path.abspath(
-        os.path.join(os.path.dirname(__file__), "..")
-    )
+    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
     if project_root not in sys.path:
         print(f"Adding project root to sys.path: {project_root}")
         sys.path.insert(0, project_root)
@@ -40,9 +38,7 @@ except ImportError as e:
     )
     print("Please ensure:", file=sys.stderr)
     print(f"  - Project Root: '{project_root}' is correct.", file=sys.stderr)
-    print(
-        "  - 'utils' directory exists at the project root.", file=sys.stderr
-    )
+    print("  - 'utils' directory exists at the project root.", file=sys.stderr)
     print(
         "  - 'utils' contains '__init__.py' and 'augmentation.py'.",
         file=sys.stderr,
@@ -96,9 +92,7 @@ def get_transform_pipeline(transform_type: str) -> Tuple[Any, str]:
     elif transform_type == "test":
         return get_test_transforms(), "Test/Validation (No Augmentation)"
     else:
-        raise ValueError(
-            f"Unknown transform_type specified: {transform_type}"
-        )
+        raise ValueError(f"Unknown transform_type specified: {transform_type}")
 
 
 def unnormalize_image(img_tensor: torch.Tensor) -> torch.Tensor:
@@ -145,9 +139,7 @@ def visualize_augmentations(transform_type: str, num_samples: int, seed: int):
 
     # Get the selected transform pipeline and descriptive title
     try:
-        transform_pipeline, title_suffix = get_transform_pipeline(
-            transform_type
-        )
+        transform_pipeline, title_suffix = get_transform_pipeline(transform_type)
     except ValueError as e:
         print(f"Error: {e}", file=sys.stderr)
         sys.exit(1)
@@ -156,9 +148,7 @@ def visualize_augmentations(transform_type: str, num_samples: int, seed: int):
     try:
         # Ensure parent directory exists for download if needed
         os.makedirs(os.path.dirname(MNIST_DATA_PATH), exist_ok=True)
-        raw_train_dataset = MNIST(
-            root=MNIST_DATA_PATH, train=True, download=True
-        )
+        raw_train_dataset = MNIST(root=MNIST_DATA_PATH, train=True, download=True)
         print(f"Loaded MNIST data from/to: {MNIST_DATA_PATH}")
         if len(raw_train_dataset) == 0:
             print(
@@ -232,9 +222,7 @@ def visualize_augmentations(transform_type: str, num_samples: int, seed: int):
         ax_aug.axis("off")
 
     # Adjust layout and save
-    plt.tight_layout(
-        rect=[0, 0.03, 1, 0.96]
-    )  # Adjust rect to prevent title overlap
+    plt.tight_layout(rect=[0, 0.03, 1, 0.96])  # Adjust rect to prevent title overlap
     try:
         plt.savefig(output_path)
         print(f"✅ Visualization saved successfully to: {output_path}")
