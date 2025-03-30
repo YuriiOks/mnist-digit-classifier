@@ -1,5 +1,5 @@
 # MNIST Digit Classifier
-# Copyright (c) 2025
+# Copyright (c) 2025 YuriODev (YuriiOks)
 # File: core/app_state/__init__.py
 # Description: App state package initialization
 # Created: 2025-03-16
@@ -18,21 +18,22 @@ __all__ = [
     "SessionState",
     "ThemeState",
     "NavigationState",
-    "initialize_app_state"
+    "initialize_app_state",
 ]
+
 
 def initialize_app_state():
     """Initialize the application state."""
     logger.info("Initializing app state")
-    
+
     # Initialize all state components
     SessionState.initialize()
-    
+
     try:
         ThemeState.initialize()
     except Exception as e:
         logger.warning(f"Failed to initialize ThemeState: {e}")
-    
+
     try:
         NavigationState.initialize()
     except Exception as e:
