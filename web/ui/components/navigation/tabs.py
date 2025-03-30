@@ -111,9 +111,7 @@ class Tabs(Component):
         self.__active_tab = active_tab or tabs[0].id
         self.__on_change = on_change
         self.__state_key = f"tabs_state_{comp_id}"
-        self.logger.debug(
-            f"Tabs initialized with active tab: {self.__active_tab}"
-        )
+        self.logger.debug(f"Tabs initialized with active tab: {self.__active_tab}")
 
     @property
     def active_tab(self) -> str:
@@ -272,11 +270,7 @@ class InputTabs(Tabs):
             options=[tab.label for tab in self.__tabs],
             key=self.component_id,
             index=next(
-                (
-                    i
-                    for i, tab in enumerate(self.__tabs)
-                    if tab.id == self.__active_tab
-                ),
+                (i for i, tab in enumerate(self.__tabs) if tab.id == self.__active_tab),
                 0,
             ),
             horizontal=True,
