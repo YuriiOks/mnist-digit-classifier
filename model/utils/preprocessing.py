@@ -2,7 +2,7 @@
 # Copyright (c) 2025 YuriODev (YuriiOks)
 # File: model/utils/preprocessing.py
 # Description: Preprocessing utilities for MNIST images, like centering.
-# Created: 2025-03-30
+# Created: 2025-03-06
 # Updated: 2025-03-30
 
 import logging

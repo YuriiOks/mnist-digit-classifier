@@ -2,7 +2,7 @@
 # Copyright (c) 2025 YuriODev (YuriiOks)
 # File: model/train.py
 # Description: Script for training the MNIST digit classifier model.
-# Created: 2025-03-30
+# Created: 2025-03-06
 # Updated: 2025-03-30
 
 import os

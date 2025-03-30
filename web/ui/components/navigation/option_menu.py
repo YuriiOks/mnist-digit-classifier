@@ -2,7 +2,7 @@
 # Copyright (c) 2025 YuriODev (YuriiOks)
 # File: web/ui/components/navigation/option_menu.py
 # Description: [Brief description of the file's purpose]
-# Created: 2025-03-30
+# Created: 2025-03-10
 # Updated: 2025-03-30
 
 import streamlit as st

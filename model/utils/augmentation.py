@@ -2,7 +2,7 @@
 # Copyright (c) 2025 YuriODev (YuriiOks)
 # File: model/utils/augmentation.py
 # Description: Data augmentation pipelines for MNIST.
-# Created: 2025-03-30
+# Created: 2025-03-06
 # Updated: 2025-03-30
 
 from torchvision import transforms

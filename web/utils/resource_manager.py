@@ -2,7 +2,7 @@
 # Copyright (c) 2025 YuriODev (YuriiOks)
 # File: web/utils/resource_manager.py
 # Description: [Brief description of the file's purpose]
-# Created: 2025-03-30
+# Created: 2025-03-16
 # Updated: 2025-03-30
 
 import json

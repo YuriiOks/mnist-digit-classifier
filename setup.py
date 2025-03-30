@@ -2,7 +2,7 @@
 # Copyright (c) 2025 YuriODev (YuriiOks)
 # File: setup.py
 # Description: [Brief description of the file's purpose]
-# Created: 2025-03-30
+# Created: 2025-03-28
 # Updated: 2025-03-30
 
 from setuptools import setup, find_packages
