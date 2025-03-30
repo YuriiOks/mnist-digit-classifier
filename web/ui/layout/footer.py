@@ -1,5 +1,5 @@
 # MNIST Digit Classifier
-# Copyright (c) 2025
+# Copyright (c) 2025 YuriODev (YuriiOks)
 # File: ui/layout/footer.py
 # Description: Footer component for the application
 # Created: 2025-03-16
@@ -16,7 +16,7 @@ from utils.aspects import AspectUtils
 
 class Footer(Component[None]):
     """Footer component for the application."""
-    
+
     def __init__(
         self,
         content: Optional[str] = None,
@@ -25,11 +25,11 @@ class Footer(Component[None]):
         classes: Optional[List[str]] = None,
         attributes: Optional[Dict[str, str]] = None,
         key: Optional[str] = None,
-        **kwargs
+        **kwargs,
     ):
         """
         Initialize the footer component.
-        
+
         Args:
             content: Footer content (HTML).
             id: HTML ID attribute for the component.
@@ -46,27 +46,27 @@ class Footer(Component[None]):
             classes=classes or [],
             attributes=attributes or {},
             key=key or "app_footer",
-            **kwargs
+            **kwargs,
         )
-        
+
         # Set default content if none provided
         self.__content = content or self.__get_default_content()
         self._logger.debug("Footer component initialized successfully")
-    
+
     @property
     def content(self) -> str:
         """Get the footer content."""
         return self.__content
-    
+
     @content.setter
     def content(self, value: str) -> None:
         """Set the footer content."""
         self.__content = value
-    
+
     def __get_default_content(self) -> str:
         """
         Get default footer content.
-        
+
         Returns:
             Default footer content with current year.
         """
@@ -88,28 +88,25 @@ class Footer(Component[None]):
         8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
         </svg>GitHub</span></a>
         """
-    
+
     @AspectUtils.catch_errors
     @AspectUtils.log_method
     def render(self) -> str:
         """
         Render the footer component.
-        
+
         Returns:
             HTML representation of the footer.
         """
         # Try to render using template
         template_content = self.render_template(
             "components/layout/footer.html",
-            {
-                "CONTENT": self.__content,
-                "YEAR": datetime.now().year
-            }
+            {"CONTENT": self.__content, "YEAR": datetime.now().year},
         )
-        
+
         if template_content:
             return template_content
-        
+
         # Fallback to direct HTML generation
         return f"""
         <footer class="app-footer">
@@ -118,20 +115,20 @@ class Footer(Component[None]):
             </div>
         </footer>
         """
-    
+
     @AspectUtils.catch_errors
     @AspectUtils.log_method
     def display(self) -> None:
         """Display the footer component in Streamlit."""
         # Load CSS for footer
         self._load_component_css()
-        
+
         # Render the HTML
         footer_html = self.render()
-        
+
         # Display in Streamlit
         st.markdown(footer_html, unsafe_allow_html=True)
-    
+
     def _load_component_css(self) -> None:
         """Load CSS specific to this component."""
         css_path = "components/layout/footer.css"
