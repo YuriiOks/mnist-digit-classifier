@@ -45,9 +45,7 @@ try:
     logger.info("✅ Successfully imported project modules.")
 except ImportError as e:
     print(f"🔥 CRITICAL ERROR importing project modules: {e}")
-    print(
-        "Ensure script is run relative to project root or PYTHONPATH is set."
-    )
+    print("Ensure script is run relative to project root or PYTHONPATH is set.")
     sys.exit(1)
 
 # --- Constants ---
@@ -122,9 +120,7 @@ def get_data_loaders(
     num_workers = 0 if get_device().type == "mps" else 4
     pin_memory = False if get_device().type != "cuda" else True
     if get_device().type == "mps":
-        logger.info(
-            "⚙️ Adjusted DataLoader for MPS: num_workers=0, pin_memory=False."
-        )
+        logger.info("⚙️ Adjusted DataLoader for MPS: num_workers=0, pin_memory=False.")
 
     train_transform = get_train_transforms()
     test_transform = get_test_transforms()  # Validation uses test transforms
@@ -156,8 +152,7 @@ def get_data_loaders(
         num_train -= num_val
         if num_train <= 0 or num_val <= 0:
             raise ValueError(
-                "Train/Validation split resulted in zero samples "
-                "for one set."
+                "Train/Validation split resulted in zero samples " "for one set."
             )
 
         generator = torch.Generator().manual_seed(seed)
@@ -208,9 +203,7 @@ def get_data_loaders(
         return train_loader, val_loader, test_loader
 
     except Exception as e:
-        logger.critical(
-            f"🔥 Failed to load/split dataset: {e}", exc_info=True
-        )
+        logger.critical(f"🔥 Failed to load/split dataset: {e}", exc_info=True)
         raise
 
 
@@ -227,9 +220,7 @@ def train_model(
     logger.info(f"🏋️ Starting training for {num_epochs} epochs...")
 
     try:
-        train_loader, val_loader, _ = get_data_loaders(
-            batch_size
-        )  # Use val_loader
+        train_loader, val_loader, _ = get_data_loaders(batch_size)  # Use val_loader
     except Exception:
         logger.critical("🔥 Aborting: DataLoader failure.")
         return None, {}
@@ -293,9 +284,7 @@ def train_model(
         current_lr = optimizer.param_groups[0]["lr"]
         scheduler.step(epoch_val_loss)
         if optimizer.param_groups[0]["lr"] < current_lr:
-            logger.info(
-                f"📉 LR reduced to {optimizer.param_groups[0]['lr']:.6f}"
-            )
+            logger.info(f"📉 LR reduced to {optimizer.param_groups[0]['lr']:.6f}")
 
         epoch_duration = time.time() - epoch_start_time
         logger.info(
@@ -340,9 +329,7 @@ def train_model(
         logger.warning(f"⚠️ Failed to plot training history: {e_plot}")
 
     # Save History Data
-    history_file_name = (
-        f"train_hist_{datetime.datetime.now():%Y%m%d_%H%M%S}.json"
-    )
+    history_file_name = f"train_hist_{datetime.datetime.now():%Y%m%d_%H%M%S}.json"
     history_file_path = os.path.join(log_dir, history_file_name)
     try:
         with open(history_file_path, "w") as f:
@@ -384,9 +371,7 @@ def optimize_temperature(
     try:
         optimal_temp = temp_model.set_temperature(val_loader, device)
     except Exception as e_tune:
-        logger.error(
-            f"🔥 Error during temperature tuning: {e_tune}", exc_info=True
-        )
+        logger.error(f"🔥 Error during temperature tuning: {e_tune}", exc_info=True)
         optimal_temp = temp_model.temperature.item()  # Use current T
 
     # Save optimal temperature
@@ -414,9 +399,7 @@ def final_evaluation(
     if not model_path or not os.path.exists(model_path):
         logger.error("🔥 Final Eval Failed: Invalid model path.")
         return
-    logger.info(
-        "\n" + "=" * 30 + "\n🔬 Performing Final Evaluation \n" + "=" * 30
-    )
+    logger.info("\n" + "=" * 30 + "\n🔬 Performing Final Evaluation \n" + "=" * 30)
 
     try:
         _, _, test_loader = get_data_loaders(batch_size)  # Get test loader
@@ -444,9 +427,7 @@ def final_evaluation(
         mean = torch.tensor(MNIST_MEAN).view(-1, 1, 1)
         std = torch.tensor(MNIST_STD).view(-1, 1, 1)
         img_unnorm = torch.clamp(img_norm * std + mean, 0, 1)
-        unnorm_path = os.path.join(
-            OUTPUT_DEBUG_DIR, DEBUG_TEST_UNNORM_FILENAME
-        )
+        unnorm_path = os.path.join(OUTPUT_DEBUG_DIR, DEBUG_TEST_UNNORM_FILENAME)
         torchvision.utils.save_image(img_unnorm, unnorm_path)
         logger.info(f"🖼️ Saved unnorm test input: {unnorm_path}")
     except Exception as e_save:
@@ -474,9 +455,7 @@ def final_evaluation(
         OUTPUT_FIG_DIR, f"reliability_diagram_T_{temperature:.2f}.png"
     )
     try:
-        logger.info(
-            f"⏳ Generating reliability diagram (T={temperature:.3f})..."
-        )
+        logger.info(f"⏳ Generating reliability diagram (T={temperature:.3f})...")
         model.eval()
         all_logits, all_labels = [], []
         with torch.no_grad():
