@@ -13,12 +13,8 @@ import torchvision
 from torch.utils.data import DataLoader, Subset, TensorDataset
 
 # Set recommended environment variables for MPS on Apple Silicon
-os.environ["PYTORCH_MPS_HIGH_WATERMARK_RATIO"] = (
-    "0.0"  # Use maximum available memory
-)
-os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = (
-    "1"  # Enable fallback for unsupported ops
-)
+os.environ["PYTORCH_MPS_HIGH_WATERMARK_RATIO"] = "0.0"  # Use maximum available memory
+os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"  # Enable fallback for unsupported ops
 
 
 def print_header(title):
@@ -41,9 +37,7 @@ def check_mps_availability():
     print_header("MPS Availability Check")
     mps_available = torch.backends.mps.is_available()
     mps_built = (
-        torch.backends.mps.is_built()
-        if hasattr(torch.backends, "mps")
-        else False
+        torch.backends.mps.is_built() if hasattr(torch.backends, "mps") else False
     )
     cpu_threads = os.cpu_count()
     current_device = "MPS" if mps_available else "CPU"
@@ -63,13 +57,9 @@ def check_mps_availability():
     )
 
     if mps_available:
-        print(
-            "\n✨ Great! Your system supports MPS acceleration for PyTorch."
-        )
+        print("\n✨ Great! Your system supports MPS acceleration for PyTorch.")
     else:
-        print(
-            "\n⚠️ MPS acceleration not detected. Benchmarks will primarily use CPU."
-        )
+        print("\n⚠️ MPS acceleration not detected. Benchmarks will primarily use CPU.")
     return mps_available
 
 
@@ -115,12 +105,8 @@ def benchmark_matrix_operations(num_iters=10, use_mps=True):
                     torch.mps.synchronize()  # Ensure completion
                     mps_times.append(time.perf_counter() - start)
                 mps_time = sum(mps_times) / num_iters
-                speedup = (
-                    cpu_time / mps_time if mps_time > 0 else float("inf")
-                )
-                print(
-                    f"  MPS Time: {mps_time:.4f}s (Speedup: {speedup:.2f}x)"
-                )
+                speedup = cpu_time / mps_time if mps_time > 0 else float("inf")
+                print(f"  MPS Time: {mps_time:.4f}s (Speedup: {speedup:.2f}x)")
                 if not np.isnan(speedup):
                     speedups.append(speedup)
             except Exception as e:
@@ -149,9 +135,7 @@ def benchmark_matrix_operations(num_iters=10, use_mps=True):
     )
     if speedups:
         avg_speedup = sum(speedups) / len(speedups)
-        print(
-            f"\n🔥 Average Matrix Multiplication Speedup: {avg_speedup:.2f}x"
-        )
+        print(f"\n🔥 Average Matrix Multiplication Speedup: {avg_speedup:.2f}x")
     return results
 
 
@@ -222,12 +206,8 @@ def benchmark_cnn_inference(num_iters=10, use_mps=True):
                         torch.mps.synchronize()  # Ensure completion
                         mps_times.append(time.perf_counter() - start)
                 mps_time = sum(mps_times) / num_iters
-                speedup = (
-                    cpu_time / mps_time if mps_time > 0 else float("inf")
-                )
-                print(
-                    f"  MPS Time: {mps_time:.4f}s (Speedup: {speedup:.2f}x)"
-                )
+                speedup = cpu_time / mps_time if mps_time > 0 else float("inf")
+                print(f"  MPS Time: {mps_time:.4f}s (Speedup: {speedup:.2f}x)")
                 if not np.isnan(speedup):
                     speedups.append(speedup)
             except Exception as e:
@@ -343,9 +323,7 @@ def benchmark_mnist_training(
         model.train()  # Set model to training mode
         criterion = nn.CrossEntropyLoss()
         start = time.perf_counter()
-        print(
-            f"  Training on {device} with batch size {current_batch_size}..."
-        )
+        print(f"  Training on {device} with batch size {current_batch_size}...")
         batch_count = 0
         total_loss = 0
         # Watch for fallback warnings here in the console output!
@@ -399,9 +377,7 @@ def benchmark_mnist_training(
         cpu_imgs_per_sec = (
             actual_num_images / cpu_time if cpu_time > 0 else float("inf")
         )
-        print(
-            f"  CPU Avg Time: {cpu_time:.4f}s ({cpu_imgs_per_sec:.1f} Img/s)"
-        )
+        print(f"  CPU Avg Time: {cpu_time:.4f}s ({cpu_imgs_per_sec:.1f} Img/s)")
 
         # --- MPS Benchmark ---
         mps_time = float("nan")
@@ -442,9 +418,7 @@ def benchmark_mnist_training(
                 ]
                 mps_time = sum(mps_times) / num_iters
                 mps_imgs_per_sec = (
-                    actual_num_images / mps_time
-                    if mps_time > 0
-                    else float("inf")
+                    actual_num_images / mps_time if mps_time > 0 else float("inf")
                 )
                 speedup = (
                     cpu_time / mps_time
@@ -515,9 +489,7 @@ def benchmark_mnist_training(
     )  # Return best BS only if MPS was faster
 
 
-def visualize_speedups(
-    matrix_results, inference_results, training_results=None
-):
+def visualize_speedups(matrix_results, inference_results, training_results=None):
     """Visualizes speedup results."""
     print_header("Performance Visualization")
     if not plt:
@@ -553,9 +525,7 @@ def visualize_speedups(
             ax.bar(labels, speedups, color="skyblue")
             ax.set_ylabel("Speedup (x times)")
             ax.set_title("Matrix Multiplication Speedup")
-            ax.axhline(
-                1, color="grey", linestyle="--", linewidth=0.8
-            )  # Add 1x line
+            ax.axhline(1, color="grey", linestyle="--", linewidth=0.8)  # Add 1x line
             for i, v in enumerate(speedups):
                 ax.text(
                     i,
@@ -578,9 +548,7 @@ def visualize_speedups(
             ax.bar(labels, speedups, color="lightgreen")
             ax.set_ylabel("Speedup (x times)")
             ax.set_title("CNN Inference Speedup")
-            ax.axhline(
-                1, color="grey", linestyle="--", linewidth=0.8
-            )  # Add 1x line
+            ax.axhline(1, color="grey", linestyle="--", linewidth=0.8)  # Add 1x line
             for i, v in enumerate(speedups):
                 ax.text(
                     i,
@@ -632,12 +600,8 @@ def main():
 
     mps_available = check_mps_availability()
 
-    matrix_results = benchmark_matrix_operations(
-        num_iters=10, use_mps=mps_available
-    )
-    inference_results = benchmark_cnn_inference(
-        num_iters=10, use_mps=mps_available
-    )
+    matrix_results = benchmark_matrix_operations(num_iters=10, use_mps=mps_available)
+    inference_results = benchmark_cnn_inference(num_iters=10, use_mps=mps_available)
     # Run training benchmark with a range of batch sizes
     best_training_batch_size = benchmark_mnist_training(
         num_iters=1,
@@ -647,9 +611,7 @@ def main():
     )
 
     # Visualize results
-    visualize_speedups(
-        matrix_results, inference_results
-    )  # Pass the actual results
+    visualize_speedups(matrix_results, inference_results)  # Pass the actual results
 
     # --- Final Summary ---
     print_header("Verification Summary")
@@ -661,13 +623,9 @@ def main():
             print(
                 f"🚀 MPS Training was faster than CPU. Best performance at batch size: {best_training_batch_size}."
             )
-            print(
-                f"👉 Recommended batch size for training: {best_training_batch_size}"
-            )
+            print(f"👉 Recommended batch size for training: {best_training_batch_size}")
         else:
-            print(
-                "⚠️ MPS Training was NOT faster than CPU for any tested batch size."
-            )
+            print("⚠️ MPS Training was NOT faster than CPU for any tested batch size.")
             print(
                 "👉 Consider using CPU for training unless further optimization is done (e.g., different model/optimizer)."
             )
