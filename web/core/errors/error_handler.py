@@ -1,5 +1,5 @@
 # MNIST Digit Classifier
-# Copyright (c) 2025
+# Copyright (c) 2025 YuriODev (YuriiOks)
 # File: core/errors/error_handler.py
 # Description: Base error handling classes and utilities
 # Created: 2025-03-16
@@ -12,23 +12,24 @@ import streamlit as st
 
 logger = logging.getLogger(__name__)
 
+
 class ErrorHandler:
     """
     Base error handler class.
-    
+
     Provides common error handling functionality for the application.
     """
-    
+
     # Error levels
     LEVEL_INFO = "info"
     LEVEL_WARNING = "warning"
     LEVEL_ERROR = "error"
     LEVEL_CRITICAL = "critical"
-    
+
     # Default error messages
     DEFAULT_ERROR_MESSAGE = "An unexpected error occurred."
     DEFAULT_USER_MESSAGE = "Something went wrong. Please try again later."
-    
+
     @classmethod
     def handle_error(
         cls,
@@ -39,11 +40,11 @@ class ErrorHandler:
         user_message: Optional[str] = None,
         log_exception: bool = True,
         show_user_message: bool = True,
-        context: Optional[Dict[str, Any]] = None
+        context: Optional[Dict[str, Any]] = None,
     ) -> None:
         """
         Handle an error with appropriate logging and user feedback.
-        
+
         Args:
             error: The exception to handle
             level: Error level (info, warning, error, critical)
@@ -56,19 +57,23 @@ class ErrorHandler:
         try:
             # Prepare messages
             log_message = message or str(error) or cls.DEFAULT_ERROR_MESSAGE
-            display_message = user_message or str(error) or cls.DEFAULT_USER_MESSAGE
-            
+            display_message = (
+                user_message or str(error) or cls.DEFAULT_USER_MESSAGE
+            )
+
             # Add context to log message if provided
             if context:
-                context_str = ", ".join(f"{k}={v}" for k, v in context.items())
+                context_str = ", ".join(
+                    f"{k}={v}" for k, v in context.items()
+                )
                 log_message = f"{log_message} [Context: {context_str}]"
-            
+
             # Log according to level
             log_function = cls._get_log_function(level)
             exc_info = sys.exc_info() if log_exception else None
-            
+
             log_function(log_message, exc_info=exc_info)
-            
+
             # Show user message if requested
             if show_user_message:
                 cls._show_user_message(level, display_message)
@@ -81,15 +86,15 @@ class ErrorHandler:
             except:
                 # Last resort if st is not available
                 print(fallback_message, file=sys.stderr)
-    
+
     @staticmethod
     def _get_log_function(level: str) -> Callable:
         """
         Get the appropriate logging function based on level.
-        
+
         Args:
             level: Error level
-            
+
         Returns:
             Logging function to use
         """
@@ -102,12 +107,12 @@ class ErrorHandler:
         else:
             # Default to error level
             return logger.error
-    
+
     @staticmethod
     def _show_user_message(level: str, message: str) -> None:
         """
         Show a message to the user via Streamlit.
-        
+
         Args:
             level: Error level
             message: Message to display
@@ -125,15 +130,15 @@ class ErrorHandler:
         except Exception as e:
             # If Streamlit is not available, fallback to print
             logger.error(f"Could not display message to user: {str(e)}")
-    
+
     @classmethod
     def format_exception(cls, exc: Exception) -> str:
         """
         Format an exception into a readable string with traceback.
-        
+
         Args:
             exc: Exception to format
-            
+
         Returns:
             str: Formatted exception string
         """
