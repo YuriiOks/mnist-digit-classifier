@@ -43,9 +43,7 @@ class DatabaseManager:
         if getattr(self, "_initialized", False):
             return
 
-        self._logger = logging.getLogger(
-            f"{__name__}.{self.__class__.__name__}"
-        )
+        self._logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
 
         # Initialize database path
         self._db_dir = self._get_db_directory()
@@ -59,9 +57,7 @@ class DatabaseManager:
         self._create_tables()
 
         self._initialized = True
-        self._logger.info(
-            f"DatabaseManager initialized with DB path: {self._db_path}"
-        )
+        self._logger.info(f"DatabaseManager initialized with DB path: {self._db_path}")
 
     def _get_db_directory(self) -> str:
         """
@@ -158,9 +154,7 @@ class DatabaseManager:
         if hasattr(self._local, "conn") and self._local.conn:
             self._local.conn.close()
             self._local.conn = None
-            self._logger.debug(
-                f"Closed connection for thread {threading.get_ident()}"
-            )
+            self._logger.debug(f"Closed connection for thread {threading.get_ident()}")
 
     def add_prediction(self, prediction_data: Dict[str, Any]) -> str:
         """
@@ -250,17 +244,13 @@ class DatabaseManager:
             # Parse metadata JSON if present
             if prediction.get("metadata"):
                 try:
-                    prediction["metadata"] = json.loads(
-                        prediction["metadata"]
-                    )
+                    prediction["metadata"] = json.loads(prediction["metadata"])
                 except json.JSONDecodeError:
                     pass
 
             return prediction
         except sqlite3.Error as e:
-            self._logger.error(
-                f"Error getting prediction {prediction_id}: {e}"
-            )
+            self._logger.error(f"Error getting prediction {prediction_id}: {e}")
             return None
 
     def get_predictions(
@@ -324,9 +314,7 @@ class DatabaseManager:
                 # Parse metadata JSON if present
                 if prediction.get("metadata"):
                     try:
-                        prediction["metadata"] = json.loads(
-                            prediction["metadata"]
-                        )
+                        prediction["metadata"] = json.loads(prediction["metadata"])
                     except json.JSONDecodeError:
                         pass
 
@@ -368,9 +356,7 @@ class DatabaseManager:
             self._logger.error(f"Error counting predictions: {e}")
             return 0
 
-    def update_prediction(
-        self, prediction_id: str, updates: Dict[str, Any]
-    ) -> bool:
+    def update_prediction(self, prediction_id: str, updates: Dict[str, Any]) -> bool:
         """
         Update a prediction by ID.
 
@@ -413,9 +399,7 @@ class DatabaseManager:
 
             return cursor.rowcount > 0
         except sqlite3.Error as e:
-            self._logger.error(
-                f"Error updating prediction {prediction_id}: {e}"
-            )
+            self._logger.error(f"Error updating prediction {prediction_id}: {e}")
             self._get_connection().rollback()
             return False
 
@@ -431,26 +415,18 @@ class DatabaseManager:
         """
         cursor = self._get_cursor()
         try:
-            cursor.execute(
-                "DELETE FROM predictions WHERE id = ?", (prediction_id,)
-            )
+            cursor.execute("DELETE FROM predictions WHERE id = ?", (prediction_id,))
             self._get_connection().commit()
 
             success = cursor.rowcount > 0
             if success:
-                self._logger.debug(
-                    f"Deleted prediction with ID: {prediction_id}"
-                )
+                self._logger.debug(f"Deleted prediction with ID: {prediction_id}")
             else:
-                self._logger.warning(
-                    f"No prediction found with ID: {prediction_id}"
-                )
+                self._logger.warning(f"No prediction found with ID: {prediction_id}")
 
             return success
         except sqlite3.Error as e:
-            self._logger.error(
-                f"Error deleting prediction {prediction_id}: {e}"
-            )
+            self._logger.error(f"Error deleting prediction {prediction_id}: {e}")
             self._get_connection().rollback()
             return False
 
@@ -475,9 +451,7 @@ class DatabaseManager:
             self._get_connection().rollback()
             return False
 
-    def get_setting(
-        self, category: str, key: str, default: Any = None
-    ) -> Any:
+    def get_setting(self, category: str, key: str, default: Any = None) -> Any:
         """
         Get a setting value.
 
@@ -574,9 +548,7 @@ class DatabaseManager:
             self._get_connection().commit()
             return cursor.rowcount > 0
         except sqlite3.Error as e:
-            self._logger.error(
-                f"Error deleting setting {category}.{key}: {e}"
-            )
+            self._logger.error(f"Error deleting setting {category}.{key}: {e}")
             self._get_connection().rollback()
             return False
 
@@ -621,9 +593,7 @@ class DatabaseManager:
 
             # Get database file size
             if os.path.exists(self._db_path):
-                stats["database_size_kb"] = (
-                    os.path.getsize(self._db_path) / 1024
-                )
+                stats["database_size_kb"] = os.path.getsize(self._db_path) / 1024
 
             return stats
         except sqlite3.Error as e:
