@@ -55,9 +55,7 @@ def main():
     print(f"💾 Loading model from: {MODEL_PATH}")
     if not os.path.exists(MODEL_PATH):
         print(f"❌ Error: Model file not found at {MODEL_PATH}")
-        print(
-            "👉 Please train a model first or create a dummy one for testing."
-        )
+        print("👉 Please train a model first or create a dummy one for testing.")
         # Option: Create dummy model here if needed
         # print("Creating dummy model...")
         # model = MNISTClassifier()
@@ -81,9 +79,7 @@ def main():
     test_transform = transforms.Compose(
         [
             transforms.ToTensor(),
-            transforms.Normalize(
-                (0.1307,), (0.3081,)
-            ),  # Standard MNIST normalization
+            transforms.Normalize((0.1307,), (0.3081,)),  # Standard MNIST normalization
         ]
     )
     try:
@@ -93,9 +89,7 @@ def main():
             download=True,
             transform=test_transform,
         )
-        test_loader = DataLoader(
-            test_dataset, batch_size=BATCH_SIZE, shuffle=False
-        )
+        test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False)
         print(f"✅ Test data loaded ({len(test_dataset)} samples).")
     except Exception as e:
         print(f"❌ Error loading MNIST data: {e}")
@@ -132,9 +126,7 @@ def main():
                 print("    ⚠️ Warning: Report file is empty.")
                 # success = False # Decide if empty file is failure
         else:
-            print(
-                f"❌ Classification Report file NOT found: {OUTPUT_REPORT_PATH}"
-            )
+            print(f"❌ Classification Report file NOT found: {OUTPUT_REPORT_PATH}")
             success = False
 
         if success:
