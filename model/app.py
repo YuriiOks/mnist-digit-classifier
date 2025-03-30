@@ -219,12 +219,25 @@ def preprocess_image(base64_image_data: str) -> Optional[torch.Tensor]:
 # --- Flask Routes ---
 @app.route("/health", methods=["GET"])
 def health_check():
+    """
+    Health check endpoint to verify the API is running.
+
+    Returns:
+        - JSON response with status and model loaded status.
+    """
     status = "healthy" if MODEL_LOADED else "warning_model_not_loaded"
     return jsonify({"status": status, "model_loaded": MODEL_LOADED})
 
 
 @app.route("/predict", methods=["POST"])
 def predict():
+    """
+    Predict the digit from the provided image.
+    Expects a JSON payload with a base64-encoded image.
+
+    Returns:
+        - JSON response with prediction, confidence, and timing info.
+    """
     predict_start_time = time.time()
     if not request.is_json:
         return jsonify({"error": "Request must be JSON"}), 415
