@@ -438,14 +438,9 @@ class HistoryView(View):
 
     def _extract_digit_value(self, item: Dict[str, Any]) -> str:
         """Extract the digit value from a prediction item."""
-        digit_value = item.get("digit", "?")
-        if isinstance(digit_value, str) and "<" in digit_value:
-            import re
+        digit_value = item.get('prediction')
 
-            digit_match = re.search(r">(\d)<", digit_value)
-            if digit_match:
-                digit_value = digit_match.group(1)
-        return digit_value
+        return str(digit_value) if digit_value is not None else "?"
 
     def _parse_timestamp(self, timestamp) -> datetime.datetime:
         """Parse timestamp string to datetime object."""
@@ -484,174 +479,266 @@ class HistoryView(View):
                         self._render_history_card(page_items[idx])
 
     def _render_history_card(self, item: Dict[str, Any]) -> None:
-        """Render a single history card with prediction visualization inside."""
-        # Format timestamp
-        timestamp = self._parse_timestamp(item.get("timestamp"))
+        """Render a single history card using st components and markdown."""
+        db_id = item.get('id')
+        if db_id is None: self._logger.warning("Skipping card: Missing ID."); return
+
+        timestamp = self._parse_timestamp(item.get('timestamp'))
+        # Must be in format of like March 30, 2025
+        date_str = (
+            timestamp.strftime("%b %d")
+            if isinstance(timestamp, datetime.datetime)
+            else ""
+        )
+        # Must be in format of like 12:34
         timestamp_str = (
             timestamp.strftime("%H:%M")
             if isinstance(timestamp, datetime.datetime)
             else ""
         )
+        confidence = item.get('confidence', 0.0)
+        confidence_pct = f"{confidence * 100:.1f}%"; confidence_color = self._get_confidence_color(confidence)
 
-        # Format confidence
-        confidence = item.get("confidence", 0.0)
-        confidence_pct = f"{confidence * 100:.1f}%"
-        confidence_color = self._get_confidence_color(confidence)
+        predicted_digit = item.get('prediction') # Original prediction
+        true_label = item.get('true_label') # Corrected value (might be None)
 
-        # Extract digit and correction status
-        digit_value = self._extract_digit_value(item)
-        corrected_digit = item.get("user_correction")
+        # Determine the primary digit to display and if it was corrected
+        is_corrected = true_label is not None
+        # The originally predicted digit, always shown
+        original_display_digit = str(predicted_digit) if predicted_digit is not None else "?"
+        # The final confirmed/corrected digit
+        final_digit = str(true_label) if is_corrected else original_display_digit
 
-        # Determine input type
-        input_type = item.get("input_type", "canvas")
-        input_icon = (
-            "✏️" if input_type == "canvas" else "📷" if input_type == "upload" else "🔗"
-        )
+        input_type = item.get("input_type", "unknown").capitalize()
+        input_icon = "✏️" if input_type == "Canvas" else "📷" if input_type == "Upload" else "🔗" if input_type == "Url" else "❓"
 
-        # Get dynamic card title and icon
-        card_title, card_icon = self._get_card_title_and_icon(item)
+        # --- Card Header Logic ---
+        status_icon = ""
+        header_detail = ""
+        if is_corrected:
+            status_icon = "❌" # Icon for corrected entries
+            # Show Original -> Corrected format only if they differ
+            if str(true_label) != str(predicted_digit):
+                 header_detail = f"<span style='color: var(--color-text);'>(Corrected: {original_display_digit} → {final_digit})</span>"
+            else: # User confirmed the original prediction was correct
+                 status_icon = "✅" # Use checkmark for confirmed correct
+                 header_detail = f"<span style='color: var(--color-success);'>(Confirmed: {final_digit})</span>"
+        else: # No feedback given yet
+            status_icon = "🎯" if confidence > 0.9 else "✅" if confidence > 0.6 else "⚠️"
+            header_detail = f"<span style='color: var(--color-primary);'>(Pred: {original_display_digit})</span>"
 
-        # Use Streamlit container to maintain proper card structure
+        header_text = f"{date_str} {header_detail}"
+        # --- End Card Header Logic ---
+
+        # --- Main Digit Display Logic ---
+        if is_corrected and str(true_label) != str(predicted_digit):
+            # Show strikethrough original + arrow + corrected
+            digit_display_html = f"""<div style="display: flex; justify-content: center; align-items: center; gap: 0.75rem;">
+                    <span style="font-size: 2rem; text-decoration: line-through; color: var(--color-text-muted);">{original_display_digit}</span>
+                    <span style="font-size: 1.5rem; color: var(--color-text-light);">→</span>
+                    <span style="font-size: 2.5rem; font-weight: bold; color: var(--color-info);">{final_digit}</span>
+                </div>
+            """
+        else:
+            # Show just the final/predicted digit (could be confirmed correct or unconfirmed)
+            digit_display_html = f"""<span style="font-size: 2.5rem; font-weight: bold; color: var(--color-primary);">{final_digit}</span>
+            """
+
+        timestamp_html = f"""<div style="text-align: center; color: #111111; font-size: 0.875rem; padding: 0 0.5rem 0.5rem 0.5rem;">
+                {timestamp_str}
+            </div>
+        """
+        # --- End Main Digit Display Logic ---
+
+
+        # Use st.container for better isolation and potential borders
         with st.container():
-            # Define all HTML parts first
-            card_header_html = f"""<div class="card card-elevated content-card feature-card small animate-fade-in">
-                    <div class="card-title">
-                        <span class="card-icon">{card_icon}</span> {card_title}
-                    </div>
-                    <div class="card-content">
-                """
+             # Use markdown for layout within the container
+             st.markdown(f"""<div class="history-card" style="border: 1px solid var(--color-border); border-radius: var(--border-radius-md); padding: 0.8rem; margin-bottom: 1rem; background-color: var(--color-card); box-shadow: var(--shadow-sm);">
+                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; padding-bottom: 0.4rem; border-bottom: 1px dashed var(--color-border);">
+                     <span style="font-weight: 500; font-size: 0.95rem; color: var(--color-text)">{status_icon} {header_text}</span>
+                 </div>
+                 <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; margin-bottom: 0.75rem;">
+                     <span style="color: var(--color-text);">{input_icon} {input_type}</span>
+                     <span style="font-weight: 600; color: {confidence_color};">{confidence_pct}</span>
+                 </div>
+                 <div style="text-align: center; padding: 0.5rem 0; background-color: var(--color-background-alt); border-radius: var(--border-radius-md); margin-bottom: 0.75rem;">
+                     {digit_display_html}{timestamp_html}
+             """, unsafe_allow_html=True)
 
-            input_type_html = f"""<div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; padding: 0 0.5rem;">
-                        <span style="font-weight: 500;"><b>Input method:</b> {input_icon} {input_type.capitalize()}</span>
-                        <span style="color: {confidence_color}; font-weight: 500;">{confidence_pct}</span>
-                    </div>
-                """
-
-            # Different HTML for corrected vs. regular digits
-            if corrected_digit is not None:
-                digit_content_html = f"""<div style="display: flex; justify-content: center; align-items: center; 
-                                margin: 1rem 0; padding: 0.5rem; background-color: #f8fafc; border-radius: 0.5rem;">
-                        <div style="text-align: center; font-size: 2.5rem; color: #94a3b8; margin-right: 0.75rem;">
-                            {digit_value}
-                        </div>
-                        <div style="margin: 0 0.75rem; color: #64748b; font-size: 1.5rem;">
-                            →
-                        </div>
-                        <div style="text-align: center; font-size: 2.5rem; color: #0ea5e9; font-weight: 500; margin-left: 0.75rem;">
-                            {corrected_digit}
-                        </div>
-                    </div>
-                    """
-            else:
-                digit_content_html = f"""<div style="text-align: center; margin: 1rem 0; padding: 1rem 0.5rem;
-                                background-color: #f8fafc; border-radius: 0.5rem;">
-                        <div style="font-size: 3.5rem; font-weight: 500; color: #334155;">
-                            {digit_value}
-                        </div>
-                    </div>
-                    """
-
-            timestamp_html = f"""<div style="text-align: center; color: #111212; font-size: 0.875rem; padding: 0 0.5rem 0.5rem 0.5rem;">
-                        {timestamp_str}
-                    </div>
-                """
-
-            # Combine and render all HTML parts in a single markdown call
-            full_card_html = f"{card_header_html}{input_type_html}{digit_content_html}{timestamp_html}"
-            st.markdown(full_card_html, unsafe_allow_html=True)
-
-            # Delete button outside the card but within the container
-            entry_id = item.get("id")
-            if st.button(
-                "Delete",
-                key=f"delete_{entry_id}",
-                type="secondary",
-                use_container_width=True,
-            ):
-                st.session_state.delete_id = entry_id
-                st.session_state.show_delete_confirm = True
-                st.rerun()
+             # Delete button associated with this card
+             if db_id is not None:
+                  if st.button("🗑️ Delete", key=f"delete_{db_id}", type="secondary", help="Delete this record", use_container_width=True):
+                       st.session_state.delete_db_id = db_id
+                       st.session_state.show_delete_confirm = True
+                       st.rerun() # Rerun to show confirmation
 
     def render(self) -> None:
         """Render the history view content."""
-        # Initialize session state variables
         self._initialize_session_state()
-
-        # Load view configuration data
         data = self._load_view_data()
 
-        # Render welcome card if it exists in the data
         welcome = data.get("welcome_card", {})
         if welcome:
-            welcome_card = WelcomeCard(
-                title=welcome.get("title", "Your Prediction History"),
-                content=welcome.get(
-                    "content",
-                    "Browse, filter, and manage your past predictions.",
-                ),
-                icon=welcome.get("icon", "📊"),
+            WelcomeCard(
+                title=welcome.get("title", "Prediction History"),
+                content=welcome.get("content", "Browse predictions."),
+                icon=welcome.get("icon", "📊")
+            ).display()
+            st.markdown("<hr style='margin: 1rem 0;'>", unsafe_allow_html=True)
+
+        self._render_filters()
+        self._handle_delete() # Render confirmation dialog if needed
+
+        # Fetch paginated data directly using HistoryState (which calls db_manager)
+        try:
+            current_page = st.session_state.get("history_page", 1)
+            items_per_page = st.session_state.get("history_items_per_page", 12)
+            current_digit_filter = st.session_state.get("history_filter_digit")
+            current_min_confidence = st.session_state.get("history_filter_min_confidence", 0.0)
+            current_sort_by = st.session_state.get("history_sort_by", "timestamp")
+            current_sort_order = st.session_state.get("history_sort_order", "desc")
+
+            # Call the static method on HistoryState
+            page_items, total_items = HistoryState.get_paginated_history(
+                page=current_page,
+                page_size=items_per_page,
+                digit_filter=current_digit_filter,
+                min_confidence=current_min_confidence,
+                sort_by=current_sort_by,
+                sort_order=current_sort_order,
             )
-            welcome_card.display()
 
-        # Create two columns for filters and display options
-        filter_col, options_col = st.columns([3, 1])
+            if total_items == 0:
+                 if current_digit_filter is not None or current_min_confidence > 0:
+                      self._render_empty_state("No predictions match your filters.")
+                 else:
+                      self._render_empty_state()
+                 return
 
-        with filter_col:
-            # Render filters
-            self._render_filters()
+            total_pages = max(1, (total_items + items_per_page - 1) // items_per_page)
 
-        # Handle any pending deletions - place this after filters but before content
-        self._handle_delete()
+            if current_page > total_pages:
+                 st.session_state.history_page = total_pages
+                 self._logger.info(f"Adjusted current page to {total_pages}. Rerunning.")
+                 st.rerun()
+                 return
 
-        # Get total count with filters applied
-        total_items = HistoryState.get_history_size(
-            digit_filter=st.session_state.history_filter_digit,
-            min_confidence=st.session_state.history_filter_min_confidence,
-        )
+            self._render_pagination(total_items, total_pages, position="top")
+            st.markdown("<div style='margin-top: 1rem;'></div>", unsafe_allow_html=True)
+            self._render_history_entries(page_items)
+            st.markdown("<div style='margin-top: 1rem;'></div>", unsafe_allow_html=True)
+            self._render_pagination(total_items, total_pages, position="bottom")
+            self._render_clear_all_button()
 
-        # If no items, show empty state
-        if total_items == 0:
-            self._render_empty_state()
-            return
+        except Exception as e:
+             self._logger.error(f"Failed to fetch or render history: {e}", exc_info=True)
+             st.error("🚨 Could not load prediction history. Please check logs.")
 
-        # Calculate pagination
-        items_per_page = st.session_state.history_items_per_page
-        total_pages = max(1, (total_items + items_per_page - 1) // items_per_page)
+        tips_data = data.get("tips", {})
+        if tips_data and tips_data.get("items"):
+            st.markdown("<hr style='margin: 2rem 0 1rem 0;'>", unsafe_allow_html=True)
+            list_items = "".join([f"<li>{tip}</li>" for tip in tips_data.get("items", [])])
+            content = f"<ul style='padding-left: 20px; margin: 0;'>{list_items}</ul>"
+            FeatureCard(title=tips_data.get("title", "💡 Tips"), content=content, icon="").display()
 
-        # Ensure current page is valid
-        st.session_state.history_page = min(
-            max(1, st.session_state.history_page), total_pages
-        )
+    def render(self) -> None:
+        """Render the history view content."""
+        self._initialize_session_state()  # Ensure state keys are attempted to be initialized
+        data = self._load_view_data()
 
-        # Get items for current page with filters
-        page_items = HistoryState.get_paginated_history(
-            page=st.session_state.history_page,
-            page_size=items_per_page,
-            digit_filter=st.session_state.history_filter_digit,
-            min_confidence=st.session_state.history_filter_min_confidence,
-            sort_by=st.session_state.history_sort_by,
-        )
+        welcome = data.get("welcome_card", {})
+        if welcome:
+            WelcomeCard(
+                title=welcome.get("title", "Prediction History"),
+                content=welcome.get("content", "Browse predictions."),
+                icon=welcome.get("icon", "📊"),
+            ).display()
+            st.markdown("<hr style='margin: 1rem 0;'>", unsafe_allow_html=True)
 
-        # Render pagination controls at the top
-        self._render_pagination(total_items, total_pages, position="top")
+        self._render_filters()
+        self._handle_delete()  # Handle delete confirmation logic if active
 
-        # Render history entries
-        self._render_history_entries(page_items)
+        # Fetch paginated data directly using HistoryState (which calls db_manager)
+        try:
+            # Use .get() for robustness when accessing state for arguments
+            current_page = st.session_state.get("history_page", 1)
+            items_per_page = st.session_state.get("history_items_per_page", 12)
+            current_digit_filter = st.session_state.get(
+                "history_filter_digit"
+            )  # Can be None
+            current_min_confidence = st.session_state.get(
+                "history_filter_min_confidence", 0.0
+            )
+            current_sort_by = st.session_state.get(
+                "history_sort_by", "timestamp"
+            )  # Default sort
+            current_sort_order = st.session_state.get(
+                "history_sort_order", "desc"
+            )  # Default order
 
-        # Render pagination controls at the bottom
-        self._render_pagination(total_items, total_pages, position="bottom")
+            # Call the static method on HistoryState
+            page_items, total_items = HistoryState.get_paginated_history(
+                page=current_page,
+                page_size=items_per_page,
+                digit_filter=current_digit_filter,
+                min_confidence=current_min_confidence,
+                sort_by=current_sort_by,
+                sort_order=current_sort_order,  # Pass the safely retrieved value
+            )
 
-        # Render clear all button
-        self._render_clear_all_button()
+            if total_items == 0:
+                # Check if filters are active to show a more specific message
+                if current_digit_filter is not None or current_min_confidence > 0:
+                    self._render_empty_state("No predictions match your filters.")
+                else:
+                    self._render_empty_state()  # Default empty message
+                return  # Stop rendering if no items
+
+            total_pages = max(1, (total_items + items_per_page - 1) // items_per_page)
+
+            # Ensure current page is valid after filtering/deletion might change total pages
+            if current_page > total_pages:
+                st.session_state.history_page = total_pages  # Adjust if needed
+                # We might need to re-fetch data if the page number changed, simple approach is rerun:
+                self._logger.info(
+                    f"Adjusted current page from {current_page} to {total_pages}. Rerunning."
+                )
+                st.rerun()
+                return  # Stop current render pass after rerun request
+
+            # Render pagination controls at the top
+            self._render_pagination(total_items, total_pages, position="top")
+            st.markdown(
+                "<div style='margin-top: 1rem;'></div>", unsafe_allow_html=True
+            )  # Spacer
+
+            # Render history entries for the current page
+            self._render_history_entries(page_items)
+            st.markdown(
+                "<div style='margin-top: 1rem;'></div>", unsafe_allow_html=True
+            )  # Spacer
+
+            # Render pagination controls at the bottom
+            self._render_pagination(total_items, total_pages, position="bottom")
+
+            # Render clear all button
+            self._render_clear_all_button()
+
+        except Exception as e:
+            self._logger.error(f"Failed to fetch or render history: {e}", exc_info=True)
+            st.error(
+                "🚨 Could not load prediction history. Please check the database connection and logs."
+            )
 
         # Render tips card if available
         tips_data = data.get("tips", {})
-        if tips_data:
-            st.write("")
+        if tips_data and tips_data.get("items"):
+            st.markdown("<hr style='margin: 2rem 0 1rem 0;'>", unsafe_allow_html=True)
+            list_items = "".join(
+                [f"<li>{tip}</li>" for tip in tips_data.get("items", [])]
+            )
+            content = f"<ul style='padding-left: 20px; margin: 0;'>{list_items}</ul>"
             FeatureCard(
-                title=tips_data.get("title", "Tips"),
-                content="<ul class='tips-list'>"
-                + "".join(f"<li>{tip}</li>" for tip in tips_data.get("items", []))
-                + "</ul>",
-                icon="💡",
+                title=tips_data.get("title", "💡 Tips"), content=content, icon=""
             ).display()
