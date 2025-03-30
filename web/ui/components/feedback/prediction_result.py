@@ -33,9 +33,7 @@ class PredictionResult(Component):
             attributes: Additional HTML attributes
         """
         super().__init__(classes=classes, attributes=attributes)
-        self.logger = logging.getLogger(
-            f"{__name__}.{self.__class__.__name__}"
-        )
+        self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         self.prediction = prediction
         self.on_correction = on_correction
 
@@ -170,9 +168,7 @@ class PredictionResult(Component):
                                             self.on_correction(i)
                                         else:
                                             # Default behavior
-                                            entry_id = self.prediction.get(
-                                                "id"
-                                            )
+                                            entry_id = self.prediction.get("id")
                                             if entry_id:
                                                 HistoryState.set_user_correction(
                                                     entry_id, i
@@ -194,9 +190,7 @@ class PredictionResult(Component):
                         st.write("Probability Distribution")
 
                         # Convert to list for chart
-                        probs = [
-                            probabilities.get(str(i), 0) for i in range(10)
-                        ]
+                        probs = [probabilities.get(str(i), 0) for i in range(10)]
 
                         # Bar chart
                         st.bar_chart({"Probability": probs})
@@ -212,6 +206,4 @@ class PredictionResult(Component):
             self.logger.error(
                 f"Error rendering prediction result: {str(e)}", exc_info=True
             )
-            st.error(
-                f"An error occurred while rendering prediction results: {str(e)}"
-            )
+            st.error(f"An error occurred while rendering prediction results: {str(e)}")
