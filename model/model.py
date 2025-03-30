@@ -22,9 +22,7 @@ class MNISTClassifier(nn.Module):
         """Initializes the layers of the CNN."""
         super(MNISTClassifier, self).__init__()
 
-        print(
-            "!!! Initializing MNISTClassifier with BatchNorm Layers (Version 2) !!!"
-        )
+        print("!!! Initializing MNISTClassifier with BatchNorm Layers (Version 2) !!!")
 
         # Convolutional Block 1
         self.conv1 = nn.Conv2d(
