@@ -11,7 +11,7 @@ import re
 import argparse
 import logging
 import sys
-import datetime # For generating current year in copyright fix
+import datetime  # For generating current year in copyright fix
 
 # --- Configuration ---
 # Determine project root assuming script is in project_root/scripts/
@@ -33,25 +33,36 @@ CORRECT_COPYRIGHT_LINE = (
 
 # Directories to exclude from checking
 EXCLUDE_DIRS = {
-    '.git', '__pycache__', 'venv', 'env', '.venv', 'ENV',
-    'outputs', 'data', 'build', 'dist', 'node_modules',
-    '.vscode', '.idea',
+    ".git",
+    "__pycache__",
+    "venv",
+    "env",
+    ".venv",
+    "ENV",
+    "outputs",
+    "data",
+    "build",
+    "dist",
+    "node_modules",
+    ".vscode",
+    ".idea",
 }
 # Specific files to exclude (e.g., if managed differently)
 EXCLUDE_FILES = {
-    'docs/conf.py',
+    "docs/conf.py",
     # Add other specific files if needed, relative to project root
 }
 # -------------------
 
 # --- Logging Setup ---
-logging.basicConfig(level=logging.INFO, format='%(message)s')
+logging.basicConfig(level=logging.INFO, format="%(message)s")
 logger = logging.getLogger(__name__)
 # -------------------
 
 
-def check_and_fix_file_header(filepath: str,
-                              auto_fix_line2: bool = False) -> str | None:
+def check_and_fix_file_header(
+    filepath: str, auto_fix_line2: bool = False
+) -> str | None:
     """
     Checks headers and optionally fixes the second (Copyright) line.
 
@@ -71,7 +82,7 @@ def check_and_fix_file_header(filepath: str,
     original_content = ""
     try:
         # Read all lines first to avoid modifying while iterating
-        with open(filepath, 'r', encoding='utf-8') as f:
+        with open(filepath, "r", encoding="utf-8") as f:
             original_content = f.read()
             # Splitlines(True) keeps line endings, easier for rewriting
             lines = original_content.splitlines(True)
@@ -104,18 +115,23 @@ def check_and_fix_file_header(filepath: str,
             line2_stripped = lines[1].strip()
             # Check if the format matches (ignoring year for flexibility)
             if not COPYRIGHT_PATTERN.match(line2_stripped):
-                error_message = (f"Incorrect Line 2 Format/Content: "
-                                 f"Found '{line2_stripped[:60]}...'")
+                error_message = (
+                    f"Incorrect Line 2 Format/Content: "
+                    f"Found '{line2_stripped[:60]}...'"
+                )
                 if auto_fix_line2:
-                    logger.warning(f"Attempting to fix Line 2 in "
-                                 f"{os.path.basename(filepath)}")
+                    logger.warning(
+                        f"Attempting to fix Line 2 in " f"{os.path.basename(filepath)}"
+                    )
                     # Replace line 2 in memory (keeping original line ending)
                     original_ending = ""
-                    if lines[1].endswith("\r\n"): original_ending = "\r\n"
-                    elif lines[1].endswith("\n"): original_ending = "\n"
+                    if lines[1].endswith("\r\n"):
+                        original_ending = "\r\n"
+                    elif lines[1].endswith("\n"):
+                        original_ending = "\n"
                     lines[1] = CORRECT_COPYRIGHT_LINE + original_ending
                     needs_rewrite = True
-                    error_message = "FIXED Line 2" # Indicate fix occurred
+                    error_message = "FIXED Line 2"  # Indicate fix occurred
             # Optional: Update year even if pattern matches
             # elif str(datetime.date.today().year) not in line2_stripped \
             #      and auto_fix_line2:
@@ -129,8 +145,8 @@ def check_and_fix_file_header(filepath: str,
     # --- Write changes back if needed ---
     if needs_rewrite and auto_fix_line2:
         try:
-            new_content = "".join(lines) # Join lines preserving endings
-            with open(filepath, 'w', encoding='utf-8') as f:
+            new_content = "".join(lines)  # Join lines preserving endings
+            with open(filepath, "w", encoding="utf-8") as f:
                 f.write(new_content)
             # error_message is already set to "FIXED Line 2..."
         except Exception as e_write:
@@ -152,8 +168,7 @@ def find_python_files(root_dir: str) -> list[str]:
             filepath = os.path.join(dirpath, filename)
             relative_filepath = os.path.relpath(filepath, root_dir_abs)
             # Check file exclusions and if it's a python file
-            if filename.endswith(".py") and \
-               relative_filepath not in EXCLUDE_FILES:
+            if filename.endswith(".py") and relative_filepath not in EXCLUDE_FILES:
                 python_files.append(filepath)
 
     return python_files
@@ -191,35 +206,38 @@ def main(check_root: str, fix_l2: bool):
 
     logger.info("-" * 60)
     if fixed_files:
-         logger.info(f"✅ Automatically fixed Line 2 in "
-                     f"{len(fixed_files)} files.")
+        logger.info(f"✅ Automatically fixed Line 2 in " f"{len(fixed_files)} files.")
     if non_compliant_files:
-        logger.warning(f"🚩 Found {len(non_compliant_files)} remaining non-compliant "
-                     f"files out of {checked_count} checked:")
+        logger.warning(
+            f"🚩 Found {len(non_compliant_files)} remaining non-compliant "
+            f"files out of {checked_count} checked:"
+        )
         # Optionally print list again
         for path, issue in non_compliant_files.items():
             print(f"  - {path}: {issue}")
     else:
-        logger.info(f"✅ All {checked_count} Python files have correct headers "
-                     f"(after potential fixes)!")
+        logger.info(
+            f"✅ All {checked_count} Python files have correct headers "
+            f"(after potential fixes)!"
+        )
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Check Python file headers in a project.",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument(
-        '--dir',
+        "--dir",
         type=str,
         default=PROJECT_ROOT,
-        help='Root directory to scan for Python files.'
+        help="Root directory to scan for Python files.",
     )
     parser.add_argument(
-        '--fix-line2',
-        action='store_true',
-        help='Attempt to automatically fix incorrect Copyright lines (Line 2).'
-             ' USE WITH CAUTION - Backup first!'
+        "--fix-line2",
+        action="store_true",
+        help="Attempt to automatically fix incorrect Copyright lines (Line 2)."
+        " USE WITH CAUTION - Backup first!",
     )
     args = parser.parse_args()
 
@@ -229,10 +247,12 @@ if __name__ == "__main__":
 
     # Warn if auto-fixing is enabled
     if args.fix_line2:
-        confirm = input("⚠️ WARNING: Auto-fixing Line 2 is enabled. "
-                        "This will modify files. Ensure you have backups "
-                        "or use version control.\nProceed? (yes/no): ")
-        if confirm.lower() != 'yes':
+        confirm = input(
+            "⚠️ WARNING: Auto-fixing Line 2 is enabled. "
+            "This will modify files. Ensure you have backups "
+            "or use version control.\nProceed? (yes/no): "
+        )
+        if confirm.lower() != "yes":
             logger.info("Aborting auto-fix.")
             sys.exit(0)
 
