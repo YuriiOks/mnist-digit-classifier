@@ -14,9 +14,7 @@ import base64
 import logging
 
 # Add web directory to path for importing modules
-sys.path.insert(
-    0, os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-)
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 # Import the digit classifier
 from model.digit_classifier import DigitClassifier
@@ -32,9 +30,7 @@ class TestModelIntegration(unittest.TestCase):
         cls.test_image = Image.new("L", (28, 28), 255)  # White background
         for i in range(5, 23):
             for j in range(12, 16):
-                cls.test_image.putpixel(
-                    (j, i), 0
-                )  # Black pixels for the digit
+                cls.test_image.putpixel((j, i), 0)  # Black pixels for the digit
 
         # Convert to bytes
         buffer = io.BytesIO()
@@ -51,14 +47,10 @@ class TestModelIntegration(unittest.TestCase):
         # Check if model API is available
         try:
             # Override MODEL_API_URL for testing if specified in environment
-            cls.model_api_url = os.environ.get(
-                "TEST_MODEL_URL", "http://model:5000"
-            )
+            cls.model_api_url = os.environ.get("TEST_MODEL_URL", "http://model:5000")
             response = requests.get(f"{cls.model_api_url}/health", timeout=2)
             if response.status_code != 200:
-                cls.skip_reason = (
-                    f"Model API returned status {response.status_code}"
-                )
+                cls.skip_reason = f"Model API returned status {response.status_code}"
         except requests.RequestException as e:
             cls.skip_reason = f"Model API is not available: {str(e)}"
 
@@ -105,20 +97,12 @@ class TestModelIntegration(unittest.TestCase):
         digit, confidence = classifier.predict(self.test_image)
 
         # Basic validation of return values
-        self.assertIsInstance(
-            digit, int, "Predicted digit should be an integer"
-        )
-        self.assertIsInstance(
-            confidence, float, "Confidence should be a float"
-        )
-        self.assertTrue(
-            0 <= confidence <= 1, "Confidence should be between 0 and 1"
-        )
+        self.assertIsInstance(digit, int, "Predicted digit should be an integer")
+        self.assertIsInstance(confidence, float, "Confidence should be a float")
+        self.assertTrue(0 <= confidence <= 1, "Confidence should be between 0 and 1")
         self.assertTrue(0 <= digit <= 9, "Digit should be between 0 and 9")
 
-        self.logger.info(
-            f"Predicted digit: {digit}, confidence: {confidence:.4f}"
-        )
+        self.logger.info(f"Predicted digit: {digit}, confidence: {confidence:.4f}")
 
 
 if __name__ == "__main__":
