@@ -101,9 +101,7 @@ class TextInput(Component):
         # Initialize state
         self.error = None
         self.is_valid = True
-        self.logger = logging.getLogger(
-            f"{__name__}.{self.__class__.__name__}"
-        )
+        self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         self.logger.debug(f"TextInput initialized with value: {self.value}")
 
     def validate(self, value: str) -> bool:
@@ -146,9 +144,7 @@ class TextInput(Component):
                 return False
 
         # Type-specific validation
-        if self.type == "email" and not re.match(
-            r"[^@]+@[^@]+\.[^@]+", value
-        ):
+        if self.type == "email" and not re.match(r"[^@]+@[^@]+\.[^@]+", value):
             self.error = "Invalid email address"
             return False
 
@@ -186,9 +182,7 @@ class TextInput(Component):
             input_attrs["pattern"] = self.pattern
 
         # Convert attributes to HTML attribute string
-        input_attrs_str = " ".join(
-            [f'{k}="{v}"' for k, v in input_attrs.items()]
-        )
+        input_attrs_str = " ".join([f'{k}="{v}"' for k, v in input_attrs.items()])
 
         variables.update(
             {
