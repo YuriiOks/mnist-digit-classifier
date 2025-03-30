@@ -1,5 +1,5 @@
 # MNIST Digit Classifier
-# Copyright (c) 2025
+# Copyright (c) 2025 YuriODev (YuriiOks)
 # File: ui/components/controls/bb8_toggle.py
 # Description: Improved BB8-themed toggle component for theme switching
 # Created: 2025-03-17
@@ -16,7 +16,10 @@ from utils.resource_manager import resource_manager
 from utils.aspects import AspectUtils
 
 # Load BB8 CSS once at module level for better performance
-BB8_INLINE_CSS = resource_manager.load_css("components/controls/bb8-toggle.css")
+BB8_INLINE_CSS = resource_manager.load_css(
+    "components/controls/bb8-toggle.css"
+)
+
 
 class BB8Toggle(Component[Dict[str, Any]]):
     """BB8-themed toggle component for theme switching."""
@@ -30,11 +33,11 @@ class BB8Toggle(Component[Dict[str, Any]]):
         id: Optional[str] = None,
         classes: Optional[list] = None,
         attributes: Optional[Dict[str, str]] = None,
-        **kwargs
+        **kwargs,
     ):
         """
         Initialize the BB8Toggle component.
-        
+
         Args:
             theme_manager_instance: ThemeManager instance to use
             on_change: Callback for theme changes
@@ -51,16 +54,18 @@ class BB8Toggle(Component[Dict[str, Any]]):
             classes=classes or [],
             attributes=attributes or {},
             key=key,
-            **kwargs
+            **kwargs,
         )
 
         self.__theme_manager = theme_manager_instance or theme_manager
         self.__on_change = on_change
         self.__key = key
-        
+
         # Ensure BB8 CSS is loaded
         if not BB8_INLINE_CSS:
-            self._logger.warning("BB8 toggle CSS not found. The toggle may not display correctly.")
+            self._logger.warning(
+                "BB8 toggle CSS not found. The toggle may not display correctly."
+            )
 
     def render(self):
         return super().render()
@@ -70,47 +75,55 @@ class BB8Toggle(Component[Dict[str, Any]]):
     def display(self) -> Dict[str, Any]:
         """
         Display the BB8 toggle with inline styles and handle theme changes.
-        
+
         Returns:
             Dict containing theme state information
         """
         current_theme = self.__theme_manager.get_current_theme()
-        is_dark = (current_theme == "dark")
+        is_dark = current_theme == "dark"
 
         # Unique ID to avoid conflicts when multiple toggles exist
         wrapper_id = f"bb8-toggle-{uuid.uuid4().hex[:8]}"
-        
+
         # Define checked attribute based on current theme
         checked_attr = "checked" if is_dark else ""
 
         # If we have the BB8 CSS, use it. Otherwise, use a basic toggle.
         if BB8_INLINE_CSS:
             # Load the template
-            template = resource_manager.load_template("components/controls/bb8-toggle.html")
-            
+            template = resource_manager.load_template(
+                "components/controls/bb8-toggle.html"
+            )
+
             if template:
                 # Inject the CSS and checked state
-                full_html = template.replace("{BB8_INLINE_CSS}", BB8_INLINE_CSS)
+                full_html = template.replace(
+                    "{BB8_INLINE_CSS}", BB8_INLINE_CSS
+                )
                 full_html = full_html.replace("{checked_attr}", checked_attr)
-                
+
                 # Use click detector to handle toggle clicks
-                clicked = click_detector(full_html, key=f"{self.__key}_{current_theme}")
-                
+                clicked = click_detector(
+                    full_html, key=f"{self.__key}_{current_theme}"
+                )
+
                 if clicked == "bb8-toggle":
                     # Toggle theme
                     new_theme = "light" if is_dark else "dark"
                     self.__theme_manager.apply_theme(new_theme)
-                    
+
                     # Call change callback if provided
                     if self.__on_change:
                         self.__on_change(new_theme)
-                    
+
                     # Force rerun to update UI
                     st.rerun()
             else:
                 self._logger.error("BB8 toggle template not found")
                 # Fallback to basic toggle
-                is_dark = st.toggle("Dark Mode", value=is_dark, key=f"{self.__key}_fallback")
+                is_dark = st.toggle(
+                    "Dark Mode", value=is_dark, key=f"{self.__key}_fallback"
+                )
                 if is_dark != (current_theme == "dark"):
                     new_theme = "dark" if is_dark else "light"
                     self.__theme_manager.apply_theme(new_theme)
@@ -119,7 +132,9 @@ class BB8Toggle(Component[Dict[str, Any]]):
                     st.rerun()
         else:
             # Fallback to basic toggle if CSS not available
-            is_dark = st.toggle("Dark Mode", value=is_dark, key=f"{self.__key}_fallback")
+            is_dark = st.toggle(
+                "Dark Mode", value=is_dark, key=f"{self.__key}_fallback"
+            )
             if is_dark != (current_theme == "dark"):
                 new_theme = "dark" if is_dark else "light"
                 self.__theme_manager.apply_theme(new_theme)
@@ -128,8 +143,4 @@ class BB8Toggle(Component[Dict[str, Any]]):
                 st.rerun()
 
         # Return theme state information
-        return {
-            "theme": current_theme,
-            "is_dark": is_dark,
-            "key": self.__key
-        }
+        return {"theme": current_theme, "is_dark": is_dark, "key": self.__key}
