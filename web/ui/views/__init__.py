@@ -1,5 +1,5 @@
 # MNIST Digit Classifier
-# Copyright (c) 2025
+# Copyright (c) 2025 YuriODev (YuriiOks)
 # File: ui/views/__init__.py
 # Description: Views package initialization
 # Created: 2025-03-17
@@ -23,7 +23,7 @@ views = {
     "home": home_view,
     "draw": draw_view,
     "history": history_view,
-    "settings": settings_view
+    "settings": settings_view,
 }
 
 __all__ = [
@@ -36,5 +36,5 @@ __all__ = [
     "draw_view",
     "history_view",
     "settings_view",
-    "views"
+    "views",
 ]
