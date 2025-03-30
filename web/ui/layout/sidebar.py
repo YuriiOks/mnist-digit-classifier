@@ -39,9 +39,7 @@ class Sidebar(Component[None]):
             key=key or "app_sidebar",
             **kwargs,
         )
-        self._logger = logging.getLogger(
-            f"{__name__}.{self.__class__.__name__}"
-        )
+        self._logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
 
     @AspectUtils.catch_errors
     def render(self) -> str:
@@ -86,12 +84,8 @@ class Sidebar(Component[None]):
     def display(self) -> None:
         """Display the sidebar component in Streamlit."""
         # Load sidebar CSS
-        sidebar_css = resource_manager.load_css(
-            "components/layout/sidebar.css"
-        )
-        buttons_css = resource_manager.load_css(
-            "components/controls/buttons.css"
-        )
+        sidebar_css = resource_manager.load_css("components/layout/sidebar.css")
+        buttons_css = resource_manager.load_css("components/controls/buttons.css")
 
         # Combine and inject CSS
         if sidebar_css or buttons_css:
@@ -134,18 +128,12 @@ class Sidebar(Component[None]):
             # Create navigation buttons
             for item in nav_items:
                 # Use the exact key format expected by CSS
-                button_key = nav_key_mapping.get(
-                    item["id"], f"nav_{item['id']}_btn"
-                )
+                button_key = nav_key_mapping.get(item["id"], f"nav_{item['id']}_btn")
 
                 if st.button(
                     f"{item['icon']} {item['label']}",
                     key=button_key,
-                    type=(
-                        "primary"
-                        if active_view == item["id"]
-                        else "secondary"
-                    ),
+                    type=("primary" if active_view == item["id"] else "secondary"),
                     use_container_width=True,
                 ):
                     NavigationState.set_active_view(item["id"])
