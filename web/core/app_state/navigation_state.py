@@ -1,5 +1,5 @@
 # MNIST Digit Classifier
-# Copyright (c) 2025
+# Copyright (c) 2025 YuriODev (YuriiOks)
 # File: core/app_state/navigation_state.py
 # Description: Navigation state management
 # Created: 2025-03-16
@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 class NavigationState:
     """
     Manage application navigation state.
-    
+
     This class provides state management for navigation, tracking the current view
     and navigation history.
     """
@@ -34,7 +34,7 @@ class NavigationState:
         {"id": "home", "label": "Home", "icon": "🏠"},
         {"id": "draw", "label": "Draw", "icon": "✏️"},
         {"id": "history", "label": "History", "icon": "📊"},
-        {"id": "settings", "label": "Settings", "icon": "⚙️"}
+        {"id": "settings", "label": "Settings", "icon": "⚙️"},
     ]
 
     _logger = logging.getLogger(f"{__name__}.NavigationState")
