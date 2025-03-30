@@ -74,9 +74,7 @@ def get_metrics(api_url):
         if response.status_code == 200:
             return response.json().get("metrics", {})
         else:
-            st.error(
-                f"Error getting metrics: {response.status_code} - {response.text}"
-            )
+            st.error(f"Error getting metrics: {response.status_code} - {response.text}")
             return None
     except requests.exceptions.RequestException as e:
         st.error(f"Request failed: {str(e)}")
@@ -162,9 +160,7 @@ def main():
                 image_data = canvas_result.image_data
 
                 # Convert to PIL image
-                pil_image = Image.fromarray(
-                    image_data.astype("uint8")
-                ).convert("L")
+                pil_image = Image.fromarray(image_data.astype("uint8")).convert("L")
 
                 # Make prediction
                 with st.spinner("Predicting..."):
@@ -180,15 +176,11 @@ def main():
                     st.markdown(f"Confidence: **{confidence:.2%}**")
 
                     # Display timing information
-                    preprocessing_time = result.get(
-                        "preprocessing_time_ms", 0
-                    )
+                    preprocessing_time = result.get("preprocessing_time_ms", 0)
                     inference_time = result.get("inference_time_ms", 0)
 
                     st.markdown("### Timing:")
-                    st.markdown(
-                        f"- Preprocessing: **{preprocessing_time:.2f} ms**"
-                    )
+                    st.markdown(f"- Preprocessing: **{preprocessing_time:.2f} ms**")
                     st.markdown(f"- Inference: **{inference_time:.2f} ms**")
                     st.markdown(
                         f"- Total: **{preprocessing_time + inference_time:.2f} ms**"
@@ -214,43 +206,25 @@ def main():
                 with col1:
                     st.markdown("### Preprocessing Time (ms)")
                     preproc_metrics = metrics.get("preprocessing_time_ms", {})
-                    st.markdown(
-                        f"- Avg: **{preproc_metrics.get('avg', 0):.2f} ms**"
-                    )
-                    st.markdown(
-                        f"- Min: **{preproc_metrics.get('min', 0):.2f} ms**"
-                    )
-                    st.markdown(
-                        f"- Max: **{preproc_metrics.get('max', 0):.2f} ms**"
-                    )
-                    st.markdown(
-                        f"- P95: **{preproc_metrics.get('p95', 0):.2f} ms**"
-                    )
+                    st.markdown(f"- Avg: **{preproc_metrics.get('avg', 0):.2f} ms**")
+                    st.markdown(f"- Min: **{preproc_metrics.get('min', 0):.2f} ms**")
+                    st.markdown(f"- Max: **{preproc_metrics.get('max', 0):.2f} ms**")
+                    st.markdown(f"- P95: **{preproc_metrics.get('p95', 0):.2f} ms**")
 
                 # Inference time metrics
                 with col2:
                     st.markdown("### Inference Time (ms)")
                     inference_metrics = metrics.get("inference_time_ms", {})
-                    st.markdown(
-                        f"- Avg: **{inference_metrics.get('avg', 0):.2f} ms**"
-                    )
-                    st.markdown(
-                        f"- Min: **{inference_metrics.get('min', 0):.2f} ms**"
-                    )
-                    st.markdown(
-                        f"- Max: **{inference_metrics.get('max', 0):.2f} ms**"
-                    )
-                    st.markdown(
-                        f"- P95: **{inference_metrics.get('p95', 0):.2f} ms**"
-                    )
+                    st.markdown(f"- Avg: **{inference_metrics.get('avg', 0):.2f} ms**")
+                    st.markdown(f"- Min: **{inference_metrics.get('min', 0):.2f} ms**")
+                    st.markdown(f"- Max: **{inference_metrics.get('max', 0):.2f} ms**")
+                    st.markdown(f"- P95: **{inference_metrics.get('p95', 0):.2f} ms**")
 
                 # Total time metrics
                 with col3:
                     st.markdown("### Total Time (ms)")
                     total_metrics = metrics.get("total_time_ms", {})
-                    st.markdown(
-                        f"- Avg: **{total_metrics.get('avg', 0):.2f} ms**"
-                    )
+                    st.markdown(f"- Avg: **{total_metrics.get('avg', 0):.2f} ms**")
                     st.markdown(
                         f"- Throughput: **{1000/total_metrics.get('avg', 1):.2f} img/s**"
                     )
@@ -263,9 +237,7 @@ def main():
                     time.sleep(5)
                     st.rerun()
             else:
-                st.warning(
-                    "No metrics available. Make a few predictions first."
-                )
+                st.warning("No metrics available. Make a few predictions first.")
         else:
             st.error("API is offline. Cannot fetch metrics.")
 
