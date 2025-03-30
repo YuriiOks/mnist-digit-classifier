@@ -1,5 +1,5 @@
 # MNIST Digit Classifier
-# Copyright (c) 2025
+# Copyright (c) 2025 YuriODev (YuriiOks)
 # File: core/app_state/session_state.py
 # Description: Session state management for Streamlit
 # Created: 2025-03-16
@@ -21,6 +21,7 @@ class SessionState:
     Streamlit's session state, enabling consistent state management across
     the application.
     """
+
     _initialized = False
     _logger = logging.getLogger(f"{__name__}.SessionState")
 
@@ -31,16 +32,16 @@ class SessionState:
         """Initialize session state with defaults if needed."""
         if cls._initialized:
             return
-        
+
         # Initialize default state
         required_keys = [
             # Add required keys here if needed
         ]
-        
+
         for key in required_keys:
             if key not in st.session_state:
                 st.session_state[key] = None
-        
+
         cls._initialized = True
 
     @classmethod
