@@ -146,9 +146,7 @@ if __name__ == "__main__":
     try:
         main()
     except Exception as e:
-        logger.critical(
-            f"Application failed to start: {str(e)}", exc_info=True
-        )
+        logger.critical(f"Application failed to start: {str(e)}", exc_info=True)
         st.error(
             "The application encountered a critical error. Please check the logs for details."
         )
