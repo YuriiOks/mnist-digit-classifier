@@ -1,5 +1,5 @@
 # MNIST Digit Classifier
-# Copyright (c) 2025
+# Copyright (c) 2025 YuriODev (YuriiOks)
 # File: ui/components/text/title.py
 # Description: Title component for consistent app headers
 # Created: 2024-05-01
@@ -10,15 +10,16 @@ from typing import Optional
 
 logger = logging.getLogger(__name__)
 
+
 def display_title(
-    title: str, 
+    title: str,
     icon: Optional[str] = None,
     subtitle: Optional[str] = None,
     size: str = "large",
-    gradient: bool = False
+    gradient: bool = False,
 ):
     """Display a styled title with icon and optional subtitle.
-    
+
     Args:
         title: The title text
         icon: Optional emoji icon
@@ -27,7 +28,7 @@ def display_title(
         gradient: Whether to use gradient styling
     """
     logger.debug(f"Displaying title: {title}, size: {size}")
-    
+
     # Determine classes based on parameters
     title_class = "app-title"
     if size == "large":
@@ -36,13 +37,13 @@ def display_title(
         title_class += " text-2xl"
     else:
         title_class += " text-xl"
-        
+
     if gradient:
         title_class += " text-gradient"
-    
+
     # Create the icon part
-    icon_html = f'<span class="icon">{icon}</span>' if icon else ''
-    
+    icon_html = f'<span class="icon">{icon}</span>' if icon else ""
+
     # Create title HTML
     title_html = f"""
     <div class="{title_class}">
@@ -50,7 +51,7 @@ def display_title(
         <span>{title}</span>
     </div>
     """
-    
+
     # Add subtitle if provided
     if subtitle:
         subtitle_html = f"""
@@ -59,7 +60,7 @@ def display_title(
         </div>
         """
         title_html = title_html + subtitle_html
-    
+
     # Display with proper spacing
     st.markdown(title_html, unsafe_allow_html=True)
-    st.markdown("<br>", unsafe_allow_html=True) 
+    st.markdown("<br>", unsafe_allow_html=True)
