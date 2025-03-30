@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # MNIST Digit Classifier
 # Copyright (c) 2025 YuriODev (YuriiOks)
 # File: scripts/test_evaluation_utils.py
@@ -43,6 +42,13 @@ except ImportError as e:
 
 
 def main():
+    """
+    Main function to test evaluation utilities.
+    This function performs the following steps:
+    1. Set the device (CPU or GPU).
+    2. Load the MNIST model.
+    3. Load the MNIST test dataset.
+    """
     print("🚀 Starting Evaluation Utilities Test 🚀")
 
     # --- 1. Set Device ---
