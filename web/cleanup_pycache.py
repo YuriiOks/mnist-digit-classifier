@@ -7,18 +7,21 @@ import os
 import shutil
 import sys
 
-def cleanup_pycache(start_path='.'):
+
+def cleanup_pycache(start_path="."):
     """Recursively find and delete __pycache__ directories and .pyc files"""
     deleted_dirs = 0
     deleted_files = 0
-    
-    print(f"Searching for Python cache files starting from: {os.path.abspath(start_path)}")
-    
+
+    print(
+        f"Searching for Python cache files starting from: {os.path.abspath(start_path)}"
+    )
+
     # Walk through all directories starting from start_path
     for root, dirs, files in os.walk(start_path, topdown=False):
         # Delete .pyc files
         for file in files:
-            if file.endswith('.pyc'):
+            if file.endswith(".pyc"):
                 file_path = os.path.join(root, file)
                 try:
                     os.remove(file_path)
@@ -26,7 +29,7 @@ def cleanup_pycache(start_path='.'):
                     deleted_files += 1
                 except Exception as e:
                     print(f"Error deleting {file_path}: {e}")
-        
+
         # Delete __pycache__ directories
         for dir in dirs:
             if dir == "__pycache__":
@@ -37,11 +40,14 @@ def cleanup_pycache(start_path='.'):
                     deleted_dirs += 1
                 except Exception as e:
                     print(f"Error deleting {dir_path}: {e}")
-    
+
     print(f"\nCleanup complete!")
-    print(f"Deleted {deleted_dirs} __pycache__ directories and {deleted_files} .pyc files")
+    print(
+        f"Deleted {deleted_dirs} __pycache__ directories and {deleted_files} .pyc files"
+    )
+
 
 if __name__ == "__main__":
     # Use command line argument as start path if provided, otherwise use current directory
-    start_path = sys.argv[1] if len(sys.argv) > 1 else '.'
+    start_path = sys.argv[1] if len(sys.argv) > 1 else "."
     cleanup_pycache(start_path)
