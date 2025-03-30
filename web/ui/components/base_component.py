@@ -28,9 +28,7 @@ class BaseComponent(ABC):
         """
         self.key = key
         self.kwargs = kwargs
-        self.logger = logging.getLogger(
-            f"{__name__}.{self.__class__.__name__}"
-        )
+        self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         self.logger.debug(f"Initializing {self.__class__.__name__} component")
 
     @abstractmethod
@@ -44,9 +42,7 @@ class BaseComponent(ABC):
         Args:
             error: The exception that was raised
         """
-        error_message = (
-            f"Error in {self.__class__.__name__} component: {str(error)}"
-        )
+        error_message = f"Error in {self.__class__.__name__} component: {str(error)}"
         self.logger.error(error_message, exc_info=True)
 
         # Log the error but don't display anything to the user
