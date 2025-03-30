@@ -67,6 +67,10 @@ class BB8Toggle(Component[Dict[str, Any]]):
             )
 
     def render(self):
+        """
+        Render the BB8 toggle component.
+        This method is overridden to provide custom rendering logic.
+        """
         return super().render()
 
     @AspectUtils.catch_errors
