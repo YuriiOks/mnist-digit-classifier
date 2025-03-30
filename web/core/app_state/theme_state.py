@@ -122,15 +122,11 @@ class ThemeState:
                 if "fonts" in default_config:
                     theme_config["fonts"].update(default_config["fonts"])
                 if "settings" in default_config:
-                    theme_config["settings"].update(
-                        default_config["settings"]
-                    )
+                    theme_config["settings"].update(default_config["settings"])
 
             if light_config and "colors" in light_config:
                 cls._logger.debug("Successfully loaded light.json theme")
-                theme_config["colors"][cls.THEME_LIGHT] = light_config[
-                    "colors"
-                ]
+                theme_config["colors"][cls.THEME_LIGHT] = light_config["colors"]
 
             if dark_config and "colors" in dark_config:
                 cls._logger.debug("Successfully loaded dark.json theme")
@@ -144,9 +140,7 @@ class ThemeState:
                 cls.THEME_LIGHT
             ]
         if cls.THEME_DARK not in theme_config["colors"]:
-            theme_config["colors"][cls.THEME_DARK] = cls.DEFAULT_COLORS[
-                cls.THEME_DARK
-            ]
+            theme_config["colors"][cls.THEME_DARK] = cls.DEFAULT_COLORS[cls.THEME_DARK]
 
         return theme_config
 
@@ -232,9 +226,7 @@ class ThemeState:
             str: The new theme after toggling.
         """
         current = cls.get_current_theme()
-        new_theme = (
-            cls.THEME_DARK if current == cls.THEME_LIGHT else cls.THEME_LIGHT
-        )
+        new_theme = cls.THEME_DARK if current == cls.THEME_LIGHT else cls.THEME_LIGHT
         cls.set_theme(new_theme)
         return new_theme
 
@@ -295,9 +287,7 @@ class ThemeState:
         """
         colors = cls.get_all_colors()
         fonts = SessionState.get(cls.THEME_FONTS_KEY, cls.DEFAULT_FONTS)
-        settings = SessionState.get(
-            cls.THEME_SETTINGS_KEY, cls.DEFAULT_SETTINGS
-        )
+        settings = SessionState.get(cls.THEME_SETTINGS_KEY, cls.DEFAULT_SETTINGS)
 
         css_vars = [":root {"]
 
