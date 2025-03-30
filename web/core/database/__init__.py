@@ -1,8 +1,9 @@
 # MNIST Digit Classifier
 # Copyright (c) 2025 YuriODev (YuriiOks)
-# File: core/database/__init__.py
+# File: web/core/database/__init__.py
 # Description: Database package initialization
 # Created: 2025-03-24
+# Updated: 2025-03-30
 
 """Database management for the MNIST Digit Classifier."""
 

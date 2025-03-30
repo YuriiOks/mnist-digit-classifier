@@ -1,9 +1,9 @@
 # MNIST Digit Classifier
 # Copyright (c) 2025 YuriODev (YuriiOks)
-# File: services/prediction/prediction_service.py
+# File: web/services/prediction/prediction_service.py
 # Description: Service handling direct DB interaction for prediction logs.
 # Created: 2025-03-17
-# Updated: 2025-03-29 (Refined ID handling, cleanup)
+# Updated: 2025-03-30
 
 import logging
 import os

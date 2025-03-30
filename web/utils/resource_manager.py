@@ -1,6 +1,9 @@
 # MNIST Digit Classifier
 # Copyright (c) 2025 YuriODev (YuriiOks)
-# Complete rewrite for path resolution
+# File: web/utils/resource_manager.py
+# Description: [Brief description of the file's purpose]
+# Created: 2025-03-30
+# Updated: 2025-03-30
 
 import json
 import logging

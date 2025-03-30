@@ -1,9 +1,9 @@
 # MNIST Digit Classifier
 # Copyright (c) 2025 YuriODev (YuriiOks)
-# File: ui/views/history_view.py
+# File: web/ui/views/history_view.py
 # Description: History view implementation with database integration
 # Created: 2025-03-17
-
+# Updated: 2025-03-30
 
 import streamlit as st
 import datetime

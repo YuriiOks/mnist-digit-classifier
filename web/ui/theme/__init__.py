@@ -1,8 +1,9 @@
 # MNIST Digit Classifier
 # Copyright (c) 2025 YuriODev (YuriiOks)
-# File: ui/theme/__init__.py
+# File: web/ui/theme/__init__.py
 # Description: Theme components package initialization
 # Created: 2025-03-16
+# Updated: 2025-03-30
 
 """Theme components for the MNIST Digit Classifier."""
 

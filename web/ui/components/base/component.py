@@ -1,8 +1,9 @@
 # MNIST Digit Classifier
 # Copyright (c) 2025 YuriODev (YuriiOks)
-# File: ui/components/base/component.py
+# File: web/ui/components/base/component.py
 # Description: Base component class for all UI components
 # Created: 2025-03-16
+# Updated: 2025-03-30
 
 import streamlit as st
 import logging

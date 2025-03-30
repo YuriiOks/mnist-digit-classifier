@@ -1,8 +1,9 @@
 # MNIST Digit Classifier
 # Copyright (c) 2025 YuriODev (YuriiOks)
-# File: core/errors/ui_errors.py
+# File: web/core/errors/ui_errors.py
 # Description: UI-specific error classes
 # Created: 2025-03-16
+# Updated: 2025-03-30
 
 import logging
 from typing import Optional, Any, Dict

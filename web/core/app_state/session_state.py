@@ -1,8 +1,9 @@
 # MNIST Digit Classifier
 # Copyright (c) 2025 YuriODev (YuriiOks)
-# File: core/app_state/session_state.py
+# File: web/core/app_state/session_state.py
 # Description: Session state management for Streamlit
 # Created: 2025-03-16
+# Updated: 2025-03-30
 
 import logging
 import streamlit as st

@@ -1,8 +1,9 @@
 # MNIST Digit Classifier
 # Copyright (c) 2025 YuriODev (YuriiOks)
-# File: core/app_state/canvas_state.py
+# File: web/core/app_state/canvas_state.py
 # Description: State management for canvas and drawing
 # Created: 2024-05-01
+# Updated: 2025-03-30
 
 import logging
 import numpy as np

@@ -1,8 +1,9 @@
 # MNIST Digit Classifier
 # Copyright (c) 2025 YuriODev (YuriiOks)
-# File: ui/__init__.py
+# File: web/ui/__init__.py
 # Description: UI package initialization
 # Created: 2025-03-17
+# Updated: 2025-03-30
 
 """UI components, layouts, and views for the MNIST Digit Classifier."""
 

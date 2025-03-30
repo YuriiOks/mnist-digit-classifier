@@ -3,7 +3,7 @@
 # File: scripts/visualize_augmentations.py
 # Description: Script for visualizing the effect of different data augmentation
 # Created: 2025-03-27
-# Updated: 2025-03-27
+# Updated: 2025-03-30
 
 import os
 import sys

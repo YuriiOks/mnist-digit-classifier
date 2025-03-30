@@ -2,8 +2,8 @@
 # Copyright (c) 2025 YuriODev (YuriiOks)
 # File: model/model.py
 # Description: Defines the CNN architecture for MNIST classification.
-# Created: Earlier Date
-# Updated: 2025-03-28 (Added BatchNorm layers to match saved model)
+# Created: 2025-03-30
+# Updated: 2025-03-30
 
 import torch
 import torch.nn as nn

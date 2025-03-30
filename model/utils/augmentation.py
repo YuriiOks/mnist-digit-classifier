@@ -2,8 +2,8 @@
 # Copyright (c) 2025 YuriODev (YuriiOks)
 # File: model/utils/augmentation.py
 # Description: Data augmentation pipelines for MNIST.
-# Created: Earlier Date
-# Updated: 2025-03-27 (Implemented prioritized augmentation strategy)
+# Created: 2025-03-30
+# Updated: 2025-03-30
 
 from torchvision import transforms
 import torch  # Needed for potential custom noise transforms later

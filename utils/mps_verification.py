@@ -3,7 +3,7 @@
 # File: utils/mps_verification.py
 # Description: PyTorch MPS acceleration verification script
 # Created: 2025-03-26
-# Updated: 2025-03-27 (Refactored training benchmark for multiple batch sizes)
+# Updated: 2025-03-30
 
 import os, time, torch, torch.nn as nn, torch.optim as optim, numpy as np
 from tabulate import tabulate

@@ -1,9 +1,9 @@
 # MNIST Digit Classifier
 # Copyright (c) 2025 YuriODev (YuriiOks)
-# File: monitoring_dashboard.py
+# File: scripts/monitoring_dashboard.py
 # Description: Simple performance monitoring dashboard
 # Created: 2025-03-26
-# Updated: 2025-03-26
+# Updated: 2025-03-30
 
 import os
 import sys

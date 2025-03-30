@@ -1,8 +1,9 @@
 # MNIST Digit Classifier
 # Copyright (c) 2025 YuriODev (YuriiOks)
-# File: utils/aspects.py
+# File: web/utils/aspects.py
 # Description: Decorator utilities for cross-cutting concerns
 # Created: 2025-03-16
+# Updated: 2025-03-30
 
 import logging
 from functools import wraps

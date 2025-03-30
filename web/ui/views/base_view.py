@@ -1,8 +1,9 @@
 # MNIST Digit Classifier
 # Copyright (c) 2025 YuriODev (YuriiOks)
-# File: ui/views/base_view.py
+# File: web/ui/views/base_view.py
 # Description: Base view class for application views
 # Created: 2025-03-17
+# Updated: 2025-03-30
 
 import streamlit as st
 import logging

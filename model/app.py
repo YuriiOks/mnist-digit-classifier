@@ -2,8 +2,8 @@
 # Copyright (c) 2025 YuriODev (YuriiOks)
 # File: model/app.py
 # Description: Flask API for serving the MNIST classifier model.
-# Created: Earlier Date
-# Updated: 2025-03-29 (Robust inversion, centering, temp scaling)
+# Created: 2025-03-30
+# Updated: 2025-03-30
 
 import os
 import base64

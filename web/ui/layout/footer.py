@@ -1,8 +1,9 @@
 # MNIST Digit Classifier
 # Copyright (c) 2025 YuriODev (YuriiOks)
-# File: ui/layout/footer.py
+# File: web/ui/layout/footer.py
 # Description: Footer component for the application
 # Created: 2025-03-16
+# Updated: 2025-03-30
 
 import streamlit as st
 import logging

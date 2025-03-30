@@ -1,9 +1,9 @@
 # MNIST Digit Classifier
 # Copyright (c) 2025 YuriODev (YuriiOks)
-# File: core/__init__.py
+# File: web/core/__init__.py
 # Description: Core package initialization
 # Created: 2025-03-16
-# Updated: 2025-03-24
+# Updated: 2025-03-30
 
 """Core functionality for the MNIST Digit Classifier."""
 

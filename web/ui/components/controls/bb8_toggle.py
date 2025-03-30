@@ -1,8 +1,9 @@
 # MNIST Digit Classifier
 # Copyright (c) 2025 YuriODev (YuriiOks)
-# File: ui/components/controls/bb8_toggle.py
+# File: web/ui/components/controls/bb8_toggle.py
 # Description: Improved BB8-themed toggle component for theme switching
 # Created: 2025-03-17
+# Updated: 2025-03-30
 
 import streamlit as st
 from st_click_detector import click_detector

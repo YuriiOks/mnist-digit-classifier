@@ -1,8 +1,9 @@
 # MNIST Digit Classifier
 # Copyright (c) 2025 YuriODev (YuriiOks)
-# File: core/app_state/settings_state.py
+# File: web/core/app_state/settings_state.py
 # Description: State management for application settings
 # Created: 2024-05-01
+# Updated: 2025-03-30
 
 import logging
 from typing import Dict, Any, Optional

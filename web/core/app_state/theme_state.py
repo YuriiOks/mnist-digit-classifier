@@ -1,8 +1,9 @@
 # MNIST Digit Classifier
 # Copyright (c) 2025 YuriODev (YuriiOks)
-# File: core/app_state/theme_state.py
+# File: web/core/app_state/theme_state.py
 # Description: Theme-specific state management
 # Created: 2025-03-16
+# Updated: 2025-03-30
 
 import logging
 from typing import Dict, Any, Literal, Optional

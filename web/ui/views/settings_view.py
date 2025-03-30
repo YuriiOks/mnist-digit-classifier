@@ -1,8 +1,9 @@
 # MNIST Digit Classifier
 # Copyright (c) 2025 YuriODev (YuriiOks)
-# File: ui/views/settings_view.py
+# File: web/ui/views/settings_view.py
 # Description: Settings view implementation
 # Created: 2025-03-17
+# Updated: 2025-03-30
 
 import streamlit as st
 import logging

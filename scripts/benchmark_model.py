@@ -1,5 +1,11 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
+# MNIST Digit Classifier
+# Copyright (c) 2025 YuriODev (YuriiOks)
+# File: scripts/benchmark_model.py
+# Description: [Brief description of the file's purpose]
+# Created: 2025-03-30
+# Updated: 2025-03-30
+
 """
 Benchmark script for MNIST model to establish baseline performance metrics.
 

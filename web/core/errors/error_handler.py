@@ -1,8 +1,9 @@
 # MNIST Digit Classifier
 # Copyright (c) 2025 YuriODev (YuriiOks)
-# File: core/errors/error_handler.py
+# File: web/core/errors/error_handler.py
 # Description: Base error handling classes and utilities
 # Created: 2025-03-16
+# Updated: 2025-03-30
 
 import logging
 import traceback

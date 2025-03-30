@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 # MNIST Digit Classifier
-# Copyright (c) 2025
-# File: utils/db_checker.py
+# Copyright (c) 2025 YuriODev (YuriiOks)
+# File: web/utils/db_checker.py
 # Description: Utility to check database contents
 # Created: 2025-03-24
+# Updated: 2025-03-30
 
 import os
 import sys

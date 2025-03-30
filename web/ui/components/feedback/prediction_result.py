@@ -1,8 +1,9 @@
 # MNIST Digit Classifier
 # Copyright (c) 2025 YuriODev (YuriiOks)
-# File: ui/components/feedback/prediction_result.py
+# File: web/ui/components/feedback/prediction_result.py
 # Description: Prediction result display component
 # Created: 2024-05-01
+# Updated: 2025-03-30
 
 import streamlit as st
 import logging

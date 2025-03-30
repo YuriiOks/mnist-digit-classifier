@@ -2,9 +2,8 @@
 # Copyright (c) 2025 YuriODev (YuriiOks)
 # File: scripts/check_headers.py
 # Description: Checks Python files for standard project headers and
-#              optionally attempts to fix the copyright line (Line 2).
 # Created: 2025-03-28
-# Updated: 2025-03-28
+# Updated: 2025-03-30
 
 import os
 import re

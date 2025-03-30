@@ -1,8 +1,9 @@
 # MNIST Digit Classifier
 # Copyright (c) 2025 YuriODev (YuriiOks)
-# File: ui/theme/theme_manager.py
+# File: web/ui/theme/theme_manager.py
 # Description: Theme management
 # Created: 2025-03-16
+# Updated: 2025-03-30
 
 import streamlit as st
 import logging

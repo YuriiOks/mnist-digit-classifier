@@ -1,8 +1,9 @@
 # MNIST Digit Classifier
 # Copyright (c) 2025 YuriODev (YuriiOks)
-# File: ui/layout/sidebar.py
+# File: web/ui/layout/sidebar.py
 # Description: Sidebar component for the application
 # Created: 2025-03-17
+# Updated: 2025-03-30
 
 import streamlit as st
 import logging

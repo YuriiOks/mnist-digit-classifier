@@ -1,9 +1,9 @@
 # MNIST Digit Classifier
 # Copyright (c) 2025 YuriODev (YuriiOks)
-# File: core/database/db_manager.py
+# File: web/core/database/db_manager.py
 # Description: Thread-safe database manager for SQLite database operations
 # Created: 2025-03-24
-# Updated: 2025-03-24
+# Updated: 2025-03-30
 
 import os
 import sqlite3

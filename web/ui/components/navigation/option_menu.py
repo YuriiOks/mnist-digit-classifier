@@ -1,3 +1,10 @@
+# MNIST Digit Classifier
+# Copyright (c) 2025 YuriODev (YuriiOks)
+# File: web/ui/components/navigation/option_menu.py
+# Description: [Brief description of the file's purpose]
+# Created: 2025-03-30
+# Updated: 2025-03-30
+
 import streamlit as st
 from streamlit_option_menu import option_menu
 from typing import List, Dict, Any, Optional, Callable

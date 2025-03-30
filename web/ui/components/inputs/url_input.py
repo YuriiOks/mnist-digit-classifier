@@ -1,8 +1,9 @@
 # MNIST Digit Classifier
 # Copyright (c) 2025 YuriODev (YuriiOks)
-# File: ui/components/inputs/url_input.py
+# File: web/ui/components/inputs/url_input.py
 # Description: URL input component for image loading
 # Created: 2024-05-01
+# Updated: 2025-03-30
 
 import streamlit as st
 import logging

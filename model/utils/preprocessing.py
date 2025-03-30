@@ -1,9 +1,9 @@
 # MNIST Digit Classifier
 # Copyright (c) 2025 YuriODev (YuriiOks)
-# File: utils/preprocessing.py
+# File: model/utils/preprocessing.py
 # Description: Preprocessing utilities for MNIST images, like centering.
-# Created: Earlier Date
-# Updated: 2025-03-29 (Final Cleanup for Docker - Expects W-on-B)
+# Created: 2025-03-30
+# Updated: 2025-03-30
 
 import logging
 import numpy as np

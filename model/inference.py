@@ -1,3 +1,10 @@
+# MNIST Digit Classifier
+# Copyright (c) 2025 YuriODev (YuriiOks)
+# File: model/inference.py
+# Description: [Brief description of the file's purpose]
+# Created: 2025-03-30
+# Updated: 2025-03-30
+
 import torch
 import torch.nn.functional as F
 from PIL import Image

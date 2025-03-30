@@ -1,9 +1,9 @@
 # MNIST Digit Classifier
 # Copyright (c) 2025 YuriODev (YuriiOks)
-# File: app.py
+# File: web/app.py
 # Description: Main application entry point with view-based architecture
 # Created: 2025-03-17
-# Updated: 2025-03-24
+# Updated: 2025-03-30
 
 import streamlit as st
 import logging

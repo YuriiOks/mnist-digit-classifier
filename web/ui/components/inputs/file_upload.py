@@ -1,8 +1,9 @@
 # MNIST Digit Classifier
 # Copyright (c) 2025 YuriODev (YuriiOks)
-# File: ui/components/inputs/file_upload.py
+# File: web/ui/components/inputs/file_upload.py
 # Description: Image file upload component
 # Created: 2024-05-01
+# Updated: 2025-03-30
 
 import streamlit as st
 import logging

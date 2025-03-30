@@ -1,8 +1,9 @@
 # MNIST Digit Classifier
 # Copyright (c) 2025 YuriODev (YuriiOks)
-# File: core/errors/__init__.py
+# File: web/core/errors/__init__.py
 # Description: Error handling initialization
 # Created: 2025-03-16
+# Updated: 2025-03-30
 
 """Error handling for the MNIST Digit Classifier."""
 

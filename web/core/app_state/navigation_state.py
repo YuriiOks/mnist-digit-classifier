@@ -1,8 +1,9 @@
 # MNIST Digit Classifier
 # Copyright (c) 2025 YuriODev (YuriiOks)
-# File: core/app_state/navigation_state.py
+# File: web/core/app_state/navigation_state.py
 # Description: Navigation state management
 # Created: 2025-03-16
+# Updated: 2025-03-30
 
 import logging
 from typing import Dict, List, Optional, Any
