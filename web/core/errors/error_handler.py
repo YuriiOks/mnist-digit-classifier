@@ -57,15 +57,11 @@ class ErrorHandler:
         try:
             # Prepare messages
             log_message = message or str(error) or cls.DEFAULT_ERROR_MESSAGE
-            display_message = (
-                user_message or str(error) or cls.DEFAULT_USER_MESSAGE
-            )
+            display_message = user_message or str(error) or cls.DEFAULT_USER_MESSAGE
 
             # Add context to log message if provided
             if context:
-                context_str = ", ".join(
-                    f"{k}={v}" for k, v in context.items()
-                )
+                context_str = ", ".join(f"{k}={v}" for k, v in context.items())
                 log_message = f"{log_message} [Context: {context_str}]"
 
             # Log according to level
