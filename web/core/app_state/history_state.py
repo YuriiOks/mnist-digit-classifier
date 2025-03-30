@@ -92,15 +92,11 @@ class HistoryState:
 
         # Try to get from database first (limit=1, newest first)
         try:
-            predictions = db_manager.get_predictions(
-                limit=1, sort_by="newest"
-            )
+            predictions = db_manager.get_predictions(limit=1, sort_by="newest")
             if predictions:
                 return predictions[0]
         except Exception as e:
-            logger.error(
-                f"Error getting latest prediction from database: {e}"
-            )
+            logger.error(f"Error getting latest prediction from database: {e}")
 
         # Fallback to session state
         history = SessionState.get(cls.HISTORY_KEY, [])
@@ -175,9 +171,7 @@ class HistoryState:
             db_manager.clear_predictions()
             logger.info("Cleared prediction history from database")
         except Exception as e:
-            logger.error(
-                f"Error clearing prediction history from database: {e}"
-            )
+            logger.error(f"Error clearing prediction history from database: {e}")
 
         # Clear session state
         SessionState.set(cls.HISTORY_KEY, [])
@@ -258,10 +252,7 @@ class HistoryState:
             if digit_filter is not None or min_confidence > 0:
                 filtered_history = []
                 for entry in history:
-                    if (
-                        digit_filter is not None
-                        and entry.get("digit") != digit_filter
-                    ):
+                    if digit_filter is not None and entry.get("digit") != digit_filter:
                         continue
                     if entry.get("confidence", 0) < min_confidence:
                         continue
@@ -298,9 +289,7 @@ class HistoryState:
 
         # Update in database
         try:
-            db_manager.update_prediction(
-                entry_id, {"user_correction": correct_digit}
-            )
+            db_manager.update_prediction(entry_id, {"user_correction": correct_digit})
             logger.info(
                 f"Updated prediction {entry_id} with correction {correct_digit}"
             )
@@ -348,9 +337,7 @@ class HistoryState:
 
         # Delete from session state too
         history = SessionState.get(cls.HISTORY_KEY, [])
-        updated_history = [
-            entry for entry in history if entry.get("id") != entry_id
-        ]
+        updated_history = [entry for entry in history if entry.get("id") != entry_id]
 
         # Only update if something was removed
         if len(updated_history) < len(history):
