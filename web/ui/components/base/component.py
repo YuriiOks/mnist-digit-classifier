@@ -67,12 +67,8 @@ class Component(ABC, Generic[T]):
         self.__attributes = attributes or {}
 
         # Set up logger
-        self._logger = logging.getLogger(
-            f"{__name__}.{self.__class__.__name__}"
-        )
-        self._logger.debug(
-            f"Initializing {self.__class__.__name__} component"
-        )
+        self._logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
+        self._logger.debug(f"Initializing {self.__class__.__name__} component")
 
         # Automatically load CSS for this component if available
         self._load_component_css()
@@ -80,18 +76,14 @@ class Component(ABC, Generic[T]):
     @AspectUtils.catch_errors
     def _load_component_css(self) -> None:
         """Load CSS specific to this component."""
-        css_path = (
-            f"{self.__component_type}/{self.__component_name.lower()}.css"
-        )
+        css_path = f"{self.__component_type}/{self.__component_name.lower()}.css"
         css = resource_manager.load_css(css_path)
         if css:
             resource_manager.inject_css(css)
             self._logger.debug(f"Loaded CSS for {self.__component_name}")
         else:
             # Fallback to component type CSS
-            type_css = resource_manager.load_css(
-                f"{self.__component_type}.css"
-            )
+            type_css = resource_manager.load_css(f"{self.__component_type}.css")
             if type_css:
                 resource_manager.inject_css(type_css)
                 self._logger.debug(f"Loaded CSS for {self.__component_type}")
@@ -134,8 +126,7 @@ class Component(ABC, Generic[T]):
     def component_id(self) -> str:
         """Compute and return the component's unique HTML ID."""
         return (
-            self.__id
-            or f"{self.__component_type}-" f"{self.__component_name}"
+            self.__id or f"{self.__component_type}-" f"{self.__component_name}"
         ).lower()
 
     @property
@@ -201,9 +192,7 @@ class Component(ABC, Generic[T]):
 
                 # Try all alternative paths
                 for alt_path in alt_paths:
-                    template_content = resource_manager.load_template(
-                        alt_path
-                    )
+                    template_content = resource_manager.load_template(alt_path)
                     if template_content:
                         self._logger.debug(
                             f"Found template at alternative path: {alt_path}"
@@ -225,9 +214,7 @@ class Component(ABC, Generic[T]):
                 # if class name is "Sidebar"
                 # if self.__component_name == "sidebar":
                 # print(f"key: {key}, value: {value}")
-                rendered = rendered.replace(
-                    key, str(value)
-                )  # double curly braces
+                rendered = rendered.replace(key, str(value))  # double curly braces
                 rendered = rendered.replace(f"${{{key.upper()}}}", str(value))
 
             return rendered
