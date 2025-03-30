@@ -29,9 +29,7 @@ class HomeView(View):
     def render(self) -> None:
         """Render the home view content."""
         # Load welcome card data from JSON
-        welcome_data = resource_manager.load_json_resource(
-            "home/welcome_card.json"
-        )
+        welcome_data = resource_manager.load_json_resource("home/welcome_card.json")
 
         # Create and display welcome card
         welcome_card = WelcomeCard(
@@ -46,14 +44,10 @@ class HomeView(View):
         st.markdown("<hr style='margin: 2rem 0;'>", unsafe_allow_html=True)
 
         # Display "How It Works" section
-        st.markdown(
-            "<h2 id='how-it-works'>How It Works</h2>", unsafe_allow_html=True
-        )
+        st.markdown("<h2 id='how-it-works'>How It Works</h2>", unsafe_allow_html=True)
 
         # Load feature cards data from JSON
-        feature_cards = resource_manager.load_json_resource(
-            "home/feature_cards.json"
-        )
+        feature_cards = resource_manager.load_json_resource("home/feature_cards.json")
 
         # Create columns for feature cards
         cols = st.columns(len(feature_cards))
