@@ -90,14 +90,10 @@ class DigitClassifier:
 
             # Encode to base64
             base64_encoded = base64.b64encode(img_bytes).decode("utf-8")
-            logger.debug(
-                f"Image encoded to base64 ({len(base64_encoded)} characters)"
-            )
+            logger.debug(f"Image encoded to base64 ({len(base64_encoded)} characters)")
             return base64_encoded
         except Exception as e:
-            logger.error(
-                f"Error in preprocess_image: {str(e)}", exc_info=True
-            )
+            logger.error(f"Error in preprocess_image: {str(e)}", exc_info=True)
             raise ValueError(f"Failed to preprocess image: {str(e)}")
 
     def predict(
@@ -170,7 +166,9 @@ class DigitClassifier:
                 raise ValueError(error_msg)
 
         except requests.exceptions.Timeout:
-            error_msg = "Request to model API timed out. The server might be overloaded."
+            error_msg = (
+                "Request to model API timed out. The server might be overloaded."
+            )
             self.logger.error(error_msg)
             raise ConnectionError(error_msg)
         except requests.RequestException as e:
@@ -194,15 +192,11 @@ class DigitClassifier:
         results = []
         for i, image in enumerate(images):
             try:
-                self.logger.info(
-                    f"Processing batch image {i+1}/{len(images)}"
-                )
+                self.logger.info(f"Processing batch image {i+1}/{len(images)}")
                 digit, confidence = self.predict(image)
                 results.append((digit, confidence))
             except Exception as e:
-                self.logger.error(
-                    f"Error predicting image {i+1} in batch: {str(e)}"
-                )
+                self.logger.error(f"Error predicting image {i+1} in batch: {str(e)}")
                 results.append((None, 0.0))
 
         return results
