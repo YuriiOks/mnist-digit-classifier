@@ -27,6 +27,16 @@ class Tab:
         content: Optional[str] = None,
         disabled: bool = False,
     ):
+        """
+        Initialize a tab.
+        Args:
+          id: Unique identifier for the tab.
+          label: Display label for the tab.
+          icon: Optional icon for the tab.
+          content: Optional content to display in the tab.
+          disabled: Whether the tab is disabled.
+        """
+
         self.__id = id
         self.__label = label
         self.__icon = icon
