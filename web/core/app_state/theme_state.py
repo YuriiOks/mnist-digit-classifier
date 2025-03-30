@@ -1,5 +1,5 @@
 # MNIST Digit Classifier
-# Copyright (c) 2025
+# Copyright (c) 2025 YuriODev (YuriiOks)
 # File: core/app_state/theme_state.py
 # Description: Theme-specific state management
 # Created: 2025-03-16
@@ -37,56 +37,56 @@ class ThemeState:
     DEFAULT_THEME = THEME_LIGHT
     DEFAULT_COLORS = {
         THEME_LIGHT: {
-                "primary": "#4361ee",
-                "primary-rgb": "67, 97, 238",
-                "secondary": "#4cc9f0",
-                "secondary-rgb": "76, 201, 240",
-                "accent": "#4895ef",
-                "accent-rgb": "72, 149, 239",
-                "background": "#f8f9fa",
-                "background-alt": "#f1f3f5",
-                "card": "#ffffff",
-                "card-alt": "#f1f3f5",
-                "text": "#212529",
-                "text-light": "#6c757d",
-                "text-muted": "#adb5bd",
-                "border": "#dee2e6",
-                "success": "#4cc9f0",
-                "warning": "#fbbf24",
-                "error": "#f87171",
-                "info": "#60a5fa"
+            "primary": "#4361ee",
+            "primary-rgb": "67, 97, 238",
+            "secondary": "#4cc9f0",
+            "secondary-rgb": "76, 201, 240",
+            "accent": "#4895ef",
+            "accent-rgb": "72, 149, 239",
+            "background": "#f8f9fa",
+            "background-alt": "#f1f3f5",
+            "card": "#ffffff",
+            "card-alt": "#f1f3f5",
+            "text": "#212529",
+            "text-light": "#6c757d",
+            "text-muted": "#adb5bd",
+            "border": "#dee2e6",
+            "success": "#4cc9f0",
+            "warning": "#fbbf24",
+            "error": "#f87171",
+            "info": "#60a5fa",
         },
         THEME_DARK: {
-                "primary": "#ee4347",
-                "primary-rgb": "238, 67, 71",
-                "secondary": "#f0c84c",
-                "secondary-rgb": "240, 200, 76",
-                "accent": "#5e81f4",
-                "accent-rgb": "94, 129, 244",
-                "background": "#121212",
-                "background-alt": "#1a1a1a",
-                "color-card": "#1e1e1e",
-                "card": "#1e1e1e",
-                "card-alt": "#252525",
-                "text": "#f8f9fa",
-                "text-light": "#d1d5db",
-                "text-muted": "#9ca3af",
-                "border": "#383838",
-                "success": "#34d399",
-                "warning": "#fbbf24",
-                "error": "#f87171",
-                "info": "#60a5fa"
-        }
+            "primary": "#ee4347",
+            "primary-rgb": "238, 67, 71",
+            "secondary": "#f0c84c",
+            "secondary-rgb": "240, 200, 76",
+            "accent": "#5e81f4",
+            "accent-rgb": "94, 129, 244",
+            "background": "#121212",
+            "background-alt": "#1a1a1a",
+            "color-card": "#1e1e1e",
+            "card": "#1e1e1e",
+            "card-alt": "#252525",
+            "text": "#f8f9fa",
+            "text-light": "#d1d5db",
+            "text-muted": "#9ca3af",
+            "border": "#383838",
+            "success": "#34d399",
+            "warning": "#fbbf24",
+            "error": "#f87171",
+            "info": "#60a5fa",
+        },
     }
     DEFAULT_FONTS = {
-                "primary": "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-                "heading": "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-                "code": "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace"
+        "primary": "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+        "heading": "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+        "code": "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
     }
     DEFAULT_SETTINGS = {
-                "border-radius": "0.5rem",
-                "shadow-strength": "1.4",
-                "animations-enabled": True
+        "border-radius": "0.5rem",
+        "shadow-strength": "1.4",
+        "animations-enabled": True,
     }
 
     _logger = logging.getLogger(f"{__name__}.ThemeState")
@@ -104,7 +104,7 @@ class ThemeState:
         theme_config = {
             "colors": {},
             "fonts": cls.DEFAULT_FONTS.copy(),
-            "settings": cls.DEFAULT_SETTINGS.copy()
+            "settings": cls.DEFAULT_SETTINGS.copy(),
         }
 
         try:
@@ -112,34 +112,43 @@ class ThemeState:
             default_config = resource_manager.load_theme_json("default.json")
             light_config = resource_manager.load_theme_json("light.json")
             dark_config = resource_manager.load_theme_json("dark.json")
-            
-            cls._logger.debug("Attempted to load theme files from assets/config/themes/")
-            
+
+            cls._logger.debug(
+                "Attempted to load theme files from assets/config/themes/"
+            )
+
             if default_config:
                 cls._logger.debug("Successfully loaded default.json theme")
                 if "fonts" in default_config:
                     theme_config["fonts"].update(default_config["fonts"])
                 if "settings" in default_config:
-                    theme_config["settings"].update(default_config["settings"])
+                    theme_config["settings"].update(
+                        default_config["settings"]
+                    )
 
             if light_config and "colors" in light_config:
                 cls._logger.debug("Successfully loaded light.json theme")
-                theme_config["colors"][cls.THEME_LIGHT] = light_config["colors"]
+                theme_config["colors"][cls.THEME_LIGHT] = light_config[
+                    "colors"
+                ]
 
             if dark_config and "colors" in dark_config:
                 cls._logger.debug("Successfully loaded dark.json theme")
                 theme_config["colors"][cls.THEME_DARK] = dark_config["colors"]
         except Exception as e:
             cls._logger.error(f"Error loading theme config: {e}")
-            
+
         # Ensure we have fallback values for colors
         if cls.THEME_LIGHT not in theme_config["colors"]:
-            theme_config["colors"][cls.THEME_LIGHT] = cls.DEFAULT_COLORS[cls.THEME_LIGHT]
+            theme_config["colors"][cls.THEME_LIGHT] = cls.DEFAULT_COLORS[
+                cls.THEME_LIGHT
+            ]
         if cls.THEME_DARK not in theme_config["colors"]:
-            theme_config["colors"][cls.THEME_DARK] = cls.DEFAULT_COLORS[cls.THEME_DARK]
+            theme_config["colors"][cls.THEME_DARK] = cls.DEFAULT_COLORS[
+                cls.THEME_DARK
+            ]
 
         return theme_config
-
 
     @classmethod
     @AspectUtils.catch_errors
@@ -223,7 +232,9 @@ class ThemeState:
             str: The new theme after toggling.
         """
         current = cls.get_current_theme()
-        new_theme = cls.THEME_DARK if current == cls.THEME_LIGHT else cls.THEME_LIGHT
+        new_theme = (
+            cls.THEME_DARK if current == cls.THEME_LIGHT else cls.THEME_LIGHT
+        )
         cls.set_theme(new_theme)
         return new_theme
 
@@ -284,7 +295,9 @@ class ThemeState:
         """
         colors = cls.get_all_colors()
         fonts = SessionState.get(cls.THEME_FONTS_KEY, cls.DEFAULT_FONTS)
-        settings = SessionState.get(cls.THEME_SETTINGS_KEY, cls.DEFAULT_SETTINGS)
+        settings = SessionState.get(
+            cls.THEME_SETTINGS_KEY, cls.DEFAULT_SETTINGS
+        )
 
         css_vars = [":root {"]
 
