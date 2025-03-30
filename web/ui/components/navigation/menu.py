@@ -92,16 +92,10 @@ class Menu(Component):
         # Store the session state key for this menu instance
         self.state_key = f"menu_state_{component_id}"
         self.collapse_state_key = f"menu_collapse_{component_id}"
-        self.logger = logging.getLogger(
-            f"{__name__}.{self.__class__.__name__}"
-        )
-        self.logger.debug(
-            f"Menu initialized with active item: {self.active_item}"
-        )
+        self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
+        self.logger.debug(f"Menu initialized with active item: {self.active_item}")
 
-    def _generate_menu_items_html(
-        self, items: List[MenuItem], level: int = 0
-    ) -> str:
+    def _generate_menu_items_html(self, items: List[MenuItem], level: int = 0) -> str:
         """Generate HTML for menu items.
 
         Args:
@@ -126,9 +120,7 @@ class Menu(Component):
 
             # Add icon if provided
             icon_html = (
-                f'<span class="menu-item-icon">{item.icon}</span>'
-                if item.icon
-                else ""
+                f'<span class="menu-item-icon">{item.icon}</span>' if item.icon else ""
             )
 
             # Determine if submenu should be expanded
@@ -151,9 +143,7 @@ class Menu(Component):
 
             # Add submenu if item has children
             if has_children:
-                submenu_style = (
-                    "display: block;" if is_expanded else "display: none;"
-                )
+                submenu_style = "display: block;" if is_expanded else "display: none;"
                 items_html += f"""
                 <ul class="submenu level-{level + 1}" style="{submenu_style}">
                     {self._generate_menu_items_html(item.children, level + 1)}
@@ -333,9 +323,7 @@ class Menu(Component):
             st.markdown(html, unsafe_allow_html=True)
 
             # Update state based on interaction
-            new_active_item = st.session_state.get(
-                self.state_key, self.active_item
-            )
+            new_active_item = st.session_state.get(self.state_key, self.active_item)
             new_collapsed_state = st.session_state.get(
                 self.collapse_state_key, self.collapsed
             )
