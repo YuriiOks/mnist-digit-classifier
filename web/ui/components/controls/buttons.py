@@ -1,5 +1,5 @@
 # MNIST Digit Classifier
-# Copyright (c) 2025
+# Copyright (c) 2025 YuriODev (YuriiOks)
 # File: ui/components/controls/buttons.py
 # Description: Button components
 # Created: 2025-03-16
@@ -31,7 +31,7 @@ class Button(Component[bool]):
         id: Optional[str] = None,
         classes: Optional[list] = None,
         attributes: Optional[Dict[str, str]] = None,
-        **extra_kwargs
+        **extra_kwargs,
     ):
         """
         Initialize a button.
@@ -57,9 +57,9 @@ class Button(Component[bool]):
             classes=classes or [],
             attributes=attributes or {},
             key=key,
-            **extra_kwargs
+            **extra_kwargs,
         )
-        
+
         self.__label = label
         self.__key = key or f"button_{id}"
         self.__on_click = on_click
@@ -73,27 +73,27 @@ class Button(Component[bool]):
     def label(self) -> str:
         """Get the button label."""
         return self.__label
-    
+
     @property
     def type(self) -> str:
         """Get the button type."""
         return self.__type
-    
+
     @property
     def disabled(self) -> bool:
         """Get the button disabled state."""
         return self.__disabled
-    
+
     @disabled.setter
     def disabled(self, value: bool) -> None:
         """Set the button disabled state."""
         self.__disabled = value
-    
+
     @AspectUtils.catch_errors
     def render(self) -> str:
         """
         Render the button as HTML.
-        
+
         Returns:
             HTML representation of the button.
         """
@@ -104,7 +104,7 @@ class Button(Component[bool]):
     def display(self) -> bool:
         """
         Render the button using Streamlit.
-        
+
         Returns:
             True if the button was clicked, False otherwise.
         """
@@ -116,7 +116,7 @@ class Button(Component[bool]):
             kwargs=self.__kwargs,
             disabled=self.__disabled,
             help=self.__help,
-            type=self.__type
+            type=self.__type,
         )
 
 
@@ -126,7 +126,7 @@ class PrimaryButton(Button):
     def __init__(self, label: str, **kwargs):
         """
         Initialize a primary button.
-        
+
         Args:
             label: Button text
             **kwargs: Additional button parameters
@@ -140,7 +140,7 @@ class SecondaryButton(Button):
     def __init__(self, label: str, **kwargs):
         """
         Initialize a secondary button.
-        
+
         Args:
             label: Button text
             **kwargs: Additional button parameters
@@ -162,7 +162,7 @@ class IconButton(Button):
         disabled: bool = False,
         help: Optional[str] = None,
         label: Optional[str] = None,
-        **extra_kwargs
+        **extra_kwargs,
     ):
         """
         Initialize an icon button.
@@ -179,7 +179,7 @@ class IconButton(Button):
             **extra_kwargs: Additional keyword arguments.
         """
         display_label = f"{icon} {label}" if label else icon
-        
+
         super().__init__(
             label=display_label,
             key=key,
@@ -188,5 +188,5 @@ class IconButton(Button):
             kwargs=kwargs or {},
             disabled=disabled,
             help=help,
-            **extra_kwargs
+            **extra_kwargs,
         )
