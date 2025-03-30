@@ -4,9 +4,9 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_PASSWORD=secure_password
-      - POSTGRES_USER=mnist_app
-      - POSTGRES_DB=digit_predictions
+      POSTGRES_PASSWORD: secure_password
+      POSTGRES_USER: mnist_app
+      POSTGRES_DB: digit_predictions
     restart: always
 
   model:
@@ -16,9 +16,9 @@ services:
     volumes:
       - ./model:/app
     environment:
-      - PORT=5000
-      - PYTHONUNBUFFERED=1
-      - FLASK_DEBUG=1
+      PORT: 5000
+      PYTHONUNBUFFERED: 1
+      FLASK_DEBUG: 1
     restart: always
 
   web:
@@ -26,21 +26,22 @@ services:
       context: ./web
       dockerfile: Dockerfile
     ports:
-      - "8501:8501"
-    volumes:
-      - ./web:/app
+      - "8501:8501" # Expose Streamlit to host
+    volumes: # REMOVED - Use code baked into the image
+     - ./web:/app # Keep commented out for reference during dev
     depends_on:
       - model
       - db
     environment:
-      - MODEL_URL=http://model:5000
-      - DB_HOST=db
-      - DB_USER=mnist_app
-      - DB_PASSWORD=secure_password
-      - DB_NAME=digit_predictions
-      - PYTHONUNBUFFERED=1
-      - STREAMLIT_SERVER_ENABLE_CORS=false
+      MODEL_URL: http://model:5000 # Correct internal URL
+      DB_HOST: db
+      DB_USER: mnist_app
+      DB_PASSWORD: secure_password # Use secrets in production
+      DB_NAME: digit_predictions
+      PYTHONUNBUFFERED: 1
+      STREAMLIT_SERVER_ENABLE_CORS: "false" # Should be string "false"
+      # Ensure Streamlit runs on correct port/address if needed, though default is usually fine
     restart: always
 
 volumes:
-  postgres_data:
+  postgres_data: # Defines the named volume for db persistence
