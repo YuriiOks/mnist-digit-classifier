@@ -37,9 +37,7 @@ class Database:
             "port": os.environ.get("DB_PORT", "5432"),
         }
 
-        self.enabled = (
-            os.environ.get("USE_DATABASE", "true").lower() == "true"
-        )
+        self.enabled = os.environ.get("USE_DATABASE", "true").lower() == "true"
 
         # Initialize connection pool if enabled
         if self.enabled:
@@ -49,9 +47,7 @@ class Database:
                 )
                 self.logger.info("Database connection pool initialized")
             except Exception as e:
-                self.logger.error(
-                    f"Failed to initialize database pool: {str(e)}"
-                )
+                self.logger.error(f"Failed to initialize database pool: {str(e)}")
                 self.enabled = False
 
         self._initialized = True
@@ -205,9 +201,7 @@ class Database:
             Tuple of (list of prediction records, total count)
         """
         if not self.enabled:
-            self.logger.warning(
-                "Database is disabled. Returning empty results."
-            )
+            self.logger.warning("Database is disabled. Returning empty results.")
             return [], 0
 
         # Base query conditions
@@ -238,18 +232,14 @@ class Database:
         """
 
         # Get total count
-        count_result = self.execute_query(
-            count_query, tuple(params), fetch=True
-        )
+        count_result = self.execute_query(count_query, tuple(params), fetch=True)
         total_count = count_result[0][0] if count_result else 0
 
         # Add limit and offset to params
         params.extend([limit, offset])
 
         # Get records
-        records_result = self.execute_query(
-            data_query, tuple(params), fetch=True
-        )
+        records_result = self.execute_query(data_query, tuple(params), fetch=True)
 
         # Convert to list of dictionaries
         records = []
