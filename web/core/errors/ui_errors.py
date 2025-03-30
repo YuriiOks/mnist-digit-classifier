@@ -51,9 +51,7 @@ class UIError(Exception):
 
         location_str = ", ".join(location_info)
         full_message = (
-            f"{message}"
-            if not location_str
-            else f"{message} [{location_str}]"
+            f"{message}" if not location_str else f"{message} [{location_str}]"
         )
 
         super().__init__(full_message)
@@ -124,9 +122,7 @@ class TemplateError(UIError):
         }
 
         # Filter out None values
-        template_details = {
-            k: v for k, v in template_details.items() if v is not None
-        }
+        template_details = {k: v for k, v in template_details.items() if v is not None}
 
         # Combine with provided details
         combined_details = details or {}
