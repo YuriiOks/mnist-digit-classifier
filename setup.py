@@ -1,7 +1,7 @@
 # MNIST Digit Classifier
 # Copyright (c) 2025 YuriODev (YuriiOks)
 # File: setup.py
-# Description: [Brief description of the file's purpose]
+# Description: Setup script for the MNIST Digit Classifier project
 # Created: 2025-03-28
 # Updated: 2025-03-30
 
@@ -12,6 +12,5 @@ setup(
     version="0.1.0",
     packages=find_packages(
         include=["utils*", "scripts*", "model*", "web*"]
-    ),  # Include your main packages
-    # You might add author, description etc. later
+    )
 )
