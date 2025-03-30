@@ -29,12 +29,23 @@ class PredictionService:
     _instance = None
 
     def __new__(cls):
+        """
+        Ensure only one instance of PredictionService exists.
+        This is a Singleton pattern.
+        """
         if cls._instance is None:
             cls._instance = super(PredictionService, cls).__new__(cls)
             cls._instance._initialized = False
         return cls._instance
 
     def __init__(self):
+        """
+        Initialize the PredictionService instance.
+        This method sets up the database connection parameters,
+        checks the database connection, and ensures the
+        prediction_logs table exists.
+        """
+
         if getattr(self, "_initialized", False):
             return
 
