@@ -97,6 +97,11 @@ def check_health(api_url):
 
 # Main function
 def main():
+    """
+    Main function to run the Streamlit app.
+    This function sets up the sidebar, tabs, and handles user interactions.
+    It includes features for live testing, performance metrics, and request history.
+    """
     # Sidebar
     st.sidebar.title("📊 MNIST Classifier Dashboard")
 
