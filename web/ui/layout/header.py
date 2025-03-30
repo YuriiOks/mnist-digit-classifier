@@ -1,5 +1,5 @@
 # MNIST Digit Classifier
-# Copyright (c) 2025
+# Copyright (c) 2025 YuriODev (YuriiOks)
 # File: ui/layout/header.py
 # Description: Header component for the application
 # Created: 2025-03-16
@@ -16,7 +16,7 @@ from utils.aspects import AspectUtils
 
 class Header(Component[None]):
     """Header component for the application."""
-    
+
     def __init__(
         self,
         title: str = "MNIST Digit Classifier",
@@ -27,11 +27,11 @@ class Header(Component[None]):
         classes: Optional[List[str]] = None,
         attributes: Optional[Dict[str, str]] = None,
         key: Optional[str] = None,
-        **kwargs
+        **kwargs,
     ):
         """
         Initialize the header component.
-        
+
         Args:
             title: Application title to display.
             actions_html: HTML for additional actions in the header.
@@ -45,8 +45,10 @@ class Header(Component[None]):
         # Set basic properties before parent initialization
         self.__title = title
         self.__actions_html = actions_html
-        self.__toggle_theme_callback = toggle_theme_callback or theme_manager.toggle_theme
-        
+        self.__toggle_theme_callback = (
+            toggle_theme_callback or theme_manager.toggle_theme
+        )
+
         # Initialize parent with explicitly named parameters
         super().__init__(
             component_type="layout",
@@ -55,52 +57,49 @@ class Header(Component[None]):
             classes=classes or [],
             attributes=attributes or {},
             key=key or "app_header",
-            **kwargs
+            **kwargs,
         )
-        
+
         self._logger.debug("Header component initialized successfully")
-    
+
     @property
     def title(self) -> str:
         """Get the header title."""
         return self.__title
-    
+
     @title.setter
     def title(self, value: str) -> None:
         """Set the header title."""
         self.__title = value
-    
+
     @property
     def actions_html(self) -> str:
         """Get the header actions HTML."""
         return self.__actions_html
-    
+
     @actions_html.setter
     def actions_html(self, value: str) -> None:
         """Set the header actions HTML."""
         self.__actions_html = value
-    
+
     @AspectUtils.catch_errors
     @AspectUtils.log_method
     def render(self) -> str:
         """
         Render the header component.
-        
+
         Returns:
             HTML representation of the header.
         """
         # Try to render using template
         template_content = self.render_template(
             "components/layout/header.html",
-            {
-                "TITLE": self.__title,
-                "ACTIONS_HTML": self.__actions_html
-            }
+            {"TITLE": self.__title, "ACTIONS_HTML": self.__actions_html},
         )
-        
+
         if template_content:
             return template_content
-        
+
         # Fallback to direct HTML generation
         return f"""
         <div class="app-header">
@@ -108,20 +107,20 @@ class Header(Component[None]):
             {self.__actions_html}
         </div>
         """
-    
+
     @AspectUtils.catch_errors
     @AspectUtils.log_method
     def display(self) -> None:
         """Display the header component in Streamlit."""
         # Load CSS for header
         self._load_component_css()
-        
+
         # Render the HTML
         header_html = self.render()
-        
+
         # Display in Streamlit
         st.markdown(header_html, unsafe_allow_html=True)
-    
+
     def _load_component_css(self) -> None:
         """Load CSS specific to this component."""
         css_path = "components/layout/header.css"
