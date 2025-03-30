@@ -208,6 +208,7 @@ class _ECELoss(nn.Module):
     """Helper nn.Module to calculate Expected Calibration Error."""
 
     def __init__(self, n_bins=15):
+        """Initialize the _ECELoss instance."""
         super(_ECELoss, self).__init__()
         bin_boundaries = torch.linspace(0, 1, n_bins + 1)
         self.bin_lowers = bin_boundaries[:-1]
