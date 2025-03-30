@@ -40,9 +40,7 @@ class AspectUtils:
             else:
                 # For static methods or functions
                 module_logger = logging.getLogger(method.__module__)
-                module_logger.debug(
-                    f"🔹 Entering function: {method.__name__}"
-                )
+                module_logger.debug(f"🔹 Entering function: {method.__name__}")
                 result = method(*args, **kwargs)
                 module_logger.debug(f"✅ Exiting function: {method.__name__}")
                 return result
