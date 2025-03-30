@@ -37,9 +37,7 @@ class ThemeManager:
 
     def __init__(self):
         """Initialize the theme manager."""
-        self._logger = logging.getLogger(
-            f"{__name__}.{self.__class__.__name__}"
-        )
+        self._logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         self._themes: Dict[str, Dict[str, Any]] = {}
         self._load_themes()
 
@@ -53,9 +51,7 @@ class ThemeManager:
         else:
             # Create default light theme
             self._themes[self.LIGHT_THEME] = self._get_default_light_theme()
-            self._logger.warning(
-                "Using default light theme (config file not found)"
-            )
+            self._logger.warning("Using default light theme (config file not found)")
 
         # Try to load dark theme
         dark_theme = resource_manager.load_json_resource("themes/dark.json")
@@ -65,9 +61,7 @@ class ThemeManager:
         else:
             # Create default dark theme
             self._themes[self.DARK_THEME] = self._get_default_dark_theme()
-            self._logger.warning(
-                "Using default dark theme (config file not found)"
-            )
+            self._logger.warning("Using default dark theme (config file not found)")
 
     def _get_default_light_theme(self) -> Dict[str, Any]:
         """
@@ -192,9 +186,7 @@ class ThemeManager:
 
     @AspectUtils.catch_errors
     @AspectUtils.log_method
-    def get_theme_data(
-        self, theme_mode: Optional[str] = None
-    ) -> Dict[str, Any]:
+    def get_theme_data(self, theme_mode: Optional[str] = None) -> Dict[str, Any]:
         """
         Get theme data for the specified mode.
 
@@ -223,18 +215,14 @@ class ThemeManager:
         """
         current_theme = self.get_current_theme()
         new_theme = (
-            self.DARK_THEME
-            if current_theme == self.LIGHT_THEME
-            else self.LIGHT_THEME
+            self.DARK_THEME if current_theme == self.LIGHT_THEME else self.LIGHT_THEME
         )
 
         # Apply the new theme
         self.apply_theme(new_theme)
 
         # Log the change
-        self._logger.info(
-            f"Theme toggled from {current_theme} to {new_theme}"
-        )
+        self._logger.info(f"Theme toggled from {current_theme} to {new_theme}")
 
         return new_theme
 
@@ -303,9 +291,7 @@ class ThemeManager:
 
     @AspectUtils.catch_errors
     @AspectUtils.log_method
-    def get_theme_color(
-        self, color_name: str, for_inline: bool = False
-    ) -> str:
+    def get_theme_color(self, color_name: str, for_inline: bool = False) -> str:
         """
         Get a color from the current theme.
 
