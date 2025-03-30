@@ -16,9 +16,7 @@ from ui.theme.theme_manager import theme_manager
 class View(ABC):
     """Base class for all application views."""
 
-    def __init__(
-        self, name: str, title: str, description: Optional[str] = None
-    ):
+    def __init__(self, name: str, title: str, description: Optional[str] = None):
         """
         Initialize a view.
 
@@ -30,9 +28,7 @@ class View(ABC):
         self.name = name
         self.title = title
         self.description = description
-        self.logger = logging.getLogger(
-            f"{__name__}.{self.__class__.__name__}"
-        )
+        self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
 
     def load_view_css(self) -> None:
         """Load CSS specific to this view."""
@@ -56,9 +52,7 @@ class View(ABC):
             if self.title:
                 st.markdown(f"<h2>{self.title}</h2>", unsafe_allow_html=True)
             if self.description:
-                st.markdown(
-                    f"<p>{self.description}</p>", unsafe_allow_html=True
-                )
+                st.markdown(f"<p>{self.description}</p>", unsafe_allow_html=True)
 
     def post_render(self) -> None:
         """Perform cleanup after rendering the view."""
@@ -74,8 +68,6 @@ class View(ABC):
             self.logger.error(
                 f"Error rendering view '{self.name}': {str(e)}", exc_info=True
             )
-            st.error(
-                f"An error occurred while rendering the {self.title} view."
-            )
+            st.error(f"An error occurred while rendering the {self.title} view.")
             if st.session_state.get("debug_mode", False):
                 st.exception(e)
