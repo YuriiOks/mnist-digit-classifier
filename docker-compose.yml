@@ -1,8 +1,9 @@
 services:
   db:
-    image: postgres:14
+    image: postgres:17 # Updated PG version
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
     environment:
       POSTGRES_PASSWORD: secure_password
       POSTGRES_USER: mnist_app
@@ -26,22 +27,21 @@ services:
       context: ./web
       dockerfile: Dockerfile
     ports:
-      - "8501:8501" # Expose Streamlit to host
-    volumes: # REMOVED - Use code baked into the image
-     - ./web:/app # Keep commented out for reference during dev
+      - "8501:8501"
+    # volumes:
+      # - ./web:/app # <<< Temporarily commented out to ensure container uses built code
     depends_on:
       - model
       - db
     environment:
-      MODEL_URL: http://model:5000 # Correct internal URL
+      MODEL_URL: http://model:5000
       DB_HOST: db
       DB_USER: mnist_app
-      DB_PASSWORD: secure_password # Use secrets in production
+      DB_PASSWORD: secure_password
       DB_NAME: digit_predictions
       PYTHONUNBUFFERED: 1
-      STREAMLIT_SERVER_ENABLE_CORS: "false" # Should be string "false"
-      # Ensure Streamlit runs on correct port/address if needed, though default is usually fine
+      STREAMLIT_SERVER_ENABLE_CORS: "false"
     restart: always
 
 volumes:
-  postgres_data: # Defines the named volume for db persistence
+  postgres_data:
