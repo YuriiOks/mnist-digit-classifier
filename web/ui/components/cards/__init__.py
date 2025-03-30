@@ -1,5 +1,5 @@
 # MNIST Digit Classifier
-# Copyright (c) 2025
+# Copyright (c) 2025 YuriODev (YuriiOks)
 # File: ui/components/cards/__init__.py
 # Description: Card components package initialization
 # Created: 2025-03-16
@@ -8,8 +8,4 @@
 
 from ui.components.cards.card import Card, FeatureCard, WelcomeCard
 
-__all__ = [
-    "Card",
-    "FeatureCard",
-    "WelcomeCard"
-]
+__all__ = ["Card", "FeatureCard", "WelcomeCard"]
