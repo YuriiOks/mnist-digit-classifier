@@ -57,8 +57,7 @@ def get_probabilities_labels(
                 all_true_labels.append(labels.cpu().numpy())
             except Exception as e:
                 logger.error(
-                    f"Error processing batch in "
-                    f"get_probabilities_labels: {e}"
+                    f"Error processing batch in " f"get_probabilities_labels: {e}"
                 )
                 return None  # Abort on error
 
@@ -95,9 +94,7 @@ def plot_reliability_diagram(
         Expected Calibration Error (ECE) score, or float('nan') on failure.
     """
     if not (len(confidences) == len(predictions) == len(true_labels)):
-        logger.error(
-            "Input arrays must have the same length for reliability."
-        )
+        logger.error("Input arrays must have the same length for reliability.")
         return float("nan")
     if len(confidences) == 0:
         logger.warning("Cannot plot reliability diagram: No data.")
@@ -112,22 +109,15 @@ def plot_reliability_diagram(
     bin_counts = np.zeros(num_bins, dtype=int)
 
     for i in range(num_bins):
-        in_bin = (confidences > bin_lowers[i]) & (
-            confidences <= bin_uppers[i]
-        )
+        in_bin = (confidences > bin_lowers[i]) & (confidences <= bin_uppers[i])
         bin_counts[i] = np.sum(in_bin)
         if bin_counts[i] > 0:
-            bin_accuracies[i] = np.mean(
-                predictions[in_bin] == true_labels[in_bin]
-            )
+            bin_accuracies[i] = np.mean(predictions[in_bin] == true_labels[in_bin])
             bin_confidences[i] = np.mean(confidences[in_bin])
 
     # --- Calculate ECE ---
     total_samples = len(confidences)
-    ece = (
-        np.sum(bin_counts * np.abs(bin_accuracies - bin_confidences))
-        / total_samples
-    )
+    ece = np.sum(bin_counts * np.abs(bin_accuracies - bin_confidences)) / total_samples
     logger.info(f"📉 Calculated ECE: {ece:.4f}")
 
     # --- Plotting ---
@@ -240,10 +230,7 @@ class _ECELoss(nn.Module):
             if prop_in_bin.item() > 0:
                 accuracy_in_bin = accuracies[in_bin].float().mean()
                 avg_confidence_in_bin = confidences[in_bin].mean()
-                ece += (
-                    torch.abs(avg_confidence_in_bin - accuracy_in_bin)
-                    * prop_in_bin
-                )
+                ece += torch.abs(avg_confidence_in_bin - accuracy_in_bin) * prop_in_bin
         return ece
 
 
@@ -270,9 +257,7 @@ class ModelWithTemperature(nn.Module):
         temperature = self.temperature.clamp(min=1e-6)
         return logits / temperature
 
-    def set_temperature(
-        self, val_loader: DataLoader, device: torch.device
-    ) -> float:
+    def set_temperature(self, val_loader: DataLoader, device: torch.device) -> float:
         """Finds optimal temperature by minimizing NLL on validation set.
 
         Args:
@@ -283,9 +268,7 @@ class ModelWithTemperature(nn.Module):
             The optimized temperature value.
         """
         if not val_loader or len(val_loader.dataset) == 0:
-            logger.error(
-                "Validation loader is empty, cannot set temperature."
-            )
+            logger.error("Validation loader is empty, cannot set temperature.")
             return self.temperature.item()  # Return current T
 
         self.to(device)
@@ -337,8 +320,7 @@ class ModelWithTemperature(nn.Module):
             loss = nll_criterion(scaled_logits, all_labels)
             loss.backward()
             logger.debug(
-                f"  Temp: {self.temperature.item():.4f}, "
-                f"NLL: {loss.item():.4f}"
+                f"  Temp: {self.temperature.item():.4f}, " f"NLL: {loss.item():.4f}"
             )
             return loss
 
@@ -351,16 +333,12 @@ class ModelWithTemperature(nn.Module):
         try:
             with torch.no_grad():
                 scaled_logits_final = self.temperature_scale(all_logits)
-                ece_after = ece_criterion(
-                    scaled_logits_final, all_labels
-                ).item()
+                ece_after = ece_criterion(scaled_logits_final, all_labels).item()
             logger.info(
                 f"📊 ECE After Temp Scaling : {ece_after:.4f} "
                 f"(Optimal T={optimal_temp:.4f})"
             )
-            if (
-                ece_after >= ece_before - 1e-4
-            ):  # Check if ECE meaningfully improved
+            if ece_after >= ece_before - 1e-4:  # Check if ECE meaningfully improved
                 logger.warning(
                     "⚠️ Temperature scaling did not significantly "
                     "improve ECE. Final T may not be optimal."
