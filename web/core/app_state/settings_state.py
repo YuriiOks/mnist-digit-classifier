@@ -1,5 +1,5 @@
 # MNIST Digit Classifier
-# Copyright (c) 2025
+# Copyright (c) 2025 YuriODev (YuriiOks)
 # File: core/app_state/settings_state.py
 # Description: State management for application settings
 # Created: 2024-05-01
@@ -29,32 +29,32 @@ class SettingsState:
             default_settings = {
                 # Theme settings
                 "theme": {
-                    "mode": "light",              # light or dark
+                    "mode": "light",  # light or dark
                     "accent_color": "#6366F1",  # primary accent color
-                    "font_family": "Poppins",     # primary font family
-                    "enable_animations": True,    # enable UI animations
+                    "font_family": "Poppins",  # primary font family
+                    "enable_animations": True,  # enable UI animations
                 },
                 # Canvas settings
                 "canvas": {
-                    "canvas_size": 280,               # canvas size in pixels
-                    "stroke_width": 15,               # line width
-                    "stroke_color": "#000000",      # line color
+                    "canvas_size": 280,  # canvas size in pixels
+                    "stroke_width": 15,  # line width
+                    "stroke_color": "#000000",  # line color
                     "background_color": "#ffffff",  # canvas background
-                    "enable_grid": False,             # show grid on canvas
+                    "enable_grid": False,  # show grid on canvas
                 },
                 # Prediction settings
                 "prediction": {
-                    "auto_predict": True,       # auto-predict on drawings
-                    "show_confidence": True,    # show confidence percentages
-                    "min_confidence": 0.5,      # minimum confidence threshold
+                    "auto_predict": True,  # auto-predict on drawings
+                    "show_confidence": True,  # show confidence percentages
+                    "min_confidence": 0.5,  # minimum confidence threshold
                     "show_alternatives": True,  # show alternative predictions
                 },
                 # Application settings
                 "app": {
-                    "save_history": True,     # save prediction history
-                    "max_history": 50,        # max number of history items
-                    "show_tooltips": True,    # show tooltips on UI elements
-                    "debug_mode": False,      # enable debug features
+                    "save_history": True,  # save prediction history
+                    "max_history": 50,  # max number of history items
+                    "show_tooltips": True,  # show tooltips on UI elements
+                    "debug_mode": False,  # enable debug features
                 },
             }
             SessionState.set(cls.SETTINGS_KEY, default_settings)
@@ -90,12 +90,7 @@ class SettingsState:
     @classmethod
     @AspectUtils.catch_errors
     @AspectUtils.log_method
-    def get_setting(
-        cls,
-        category: str,
-        key: str,
-        default: Any = None
-    ) -> Any:
+    def get_setting(cls, category: str, key: str, default: Any = None) -> Any:
         """Get a specific setting value.
 
         Args:
