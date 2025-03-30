@@ -68,11 +68,7 @@ class Sidebar(Component):
                     f"{route['icon']} {route['label']}",
                     key=f"nav_{route['id']}",
                     # Highlight active view
-                    type=(
-                        "primary"
-                        if active_view == route["id"]
-                        else "secondary"
-                    ),
+                    type=("primary" if active_view == route["id"] else "secondary"),
                     use_container_width=True,
                 ):
                     try:
@@ -109,9 +105,7 @@ class Sidebar(Component):
 
             self.logger.debug("Sidebar navigation displayed successfully")
         except Exception as e:
-            self.logger.error(
-                f"Error displaying sidebar: {str(e)}", exc_info=True
-            )
+            self.logger.error(f"Error displaying sidebar: {str(e)}", exc_info=True)
             st.sidebar.error("Error loading navigation")
 
             # Fallback navigation in case of error
@@ -121,6 +115,4 @@ class Sidebar(Component):
                     st.session_state["active_view"] = "home"
                     st.rerun()
                 except Exception as e:
-                    self.logger.error(
-                        f"Error in emergency navigation: {str(e)}"
-                    )
+                    self.logger.error(f"Error in emergency navigation: {str(e)}")
