@@ -1,5 +1,5 @@
 # MNIST Digit Classifier
-# Copyright (c) 2025 YuriiODev (YuriiOks)
+# Copyright (c) 2025 YuriODev (YuriiOks)
 # File: model/app.py
 # Description: Flask API for serving the MNIST classifier model.
 # Created: Earlier Date
