@@ -31,9 +31,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from model.model import MNISTClassifier
 
 # Configure argument parser
-parser = argparse.ArgumentParser(
-    description="Benchmark MNIST model performance"
-)
+parser = argparse.ArgumentParser(description="Benchmark MNIST model performance")
 parser.add_argument(
     "--model_path",
     type=str,
@@ -161,9 +159,7 @@ def measure_inference_time(model, loader, num_runs=100):
     batch_time = (time.time() - start_time) / 10
     samples_per_second = batch_size / batch_time
 
-    print(
-        f"Batch inference time ({batch_size} samples): {batch_time * 1000:.2f} ms"
-    )
+    print(f"Batch inference time ({batch_size} samples): {batch_time * 1000:.2f} ms")
     print(f"Throughput: {samples_per_second:.2f} samples/second")
 
     return {
@@ -398,16 +394,12 @@ def main():
 
     # Run all benchmarks
     inference_stats = measure_inference_time(model, test_loader)
-    training_stats = measure_training_speed(
-        model, test_loader, args.micro_batches
-    )
+    training_stats = measure_training_speed(model, test_loader, args.micro_batches)
     accuracy_stats = evaluate_accuracy(model, test_loader)
     gpu_stats = measure_gpu_stats()
 
     # Plot confusion matrix
-    plot_confusion_matrix(
-        np.array(accuracy_stats["confusion_matrix"]), args.output_dir
-    )
+    plot_confusion_matrix(np.array(accuracy_stats["confusion_matrix"]), args.output_dir)
 
     # Analyze error examples
     error_examples = analyze_errors(model, test_loader)
@@ -427,7 +419,5 @@ def main():
     # Save results to file
     import json
 
-    with open(
-        os.path.join(args.output_dir, "benchmark_results.json"), "w"
-    ) as f:
+    with open(os.path.join(args.output_dir, "benchmark_results.json"), "w") as f:
         json.dump(benchmark_results, f, indent=4)
