@@ -1,5 +1,5 @@
 # MNIST Digit Classifier
-# Copyright (c) 2025
+# Copyright (c) 2025 YuriODev (YuriiOks)
 # File: ui/components/base_component.py
 # Description: Base component class for all UI components
 # Created: 2024-05-01
@@ -28,7 +28,9 @@ class BaseComponent(ABC):
         """
         self.key = key
         self.kwargs = kwargs
-        self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
+        self.logger = logging.getLogger(
+            f"{__name__}.{self.__class__.__name__}"
+        )
         self.logger.debug(f"Initializing {self.__class__.__name__} component")
 
     @abstractmethod
@@ -42,7 +44,9 @@ class BaseComponent(ABC):
         Args:
             error: The exception that was raised
         """
-        error_message = f"Error in {self.__class__.__name__} component: {str(error)}"
+        error_message = (
+            f"Error in {self.__class__.__name__} component: {str(error)}"
+        )
         self.logger.error(error_message, exc_info=True)
 
         # Log the error but don't display anything to the user
@@ -57,5 +61,5 @@ class BaseComponent(ABC):
         return {
             "type": self.__class__.__name__,
             "name": self.key,
-            "class": self.__class__.__name__
+            "class": self.__class__.__name__,
         }
