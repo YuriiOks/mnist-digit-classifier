@@ -42,9 +42,7 @@ class ResourceManager:
         if self._initialized:
             return
 
-        self._logger = logging.getLogger(
-            f"{__name__}.{self.__class__.__name__}"
-        )
+        self._logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         self._project_root = project_root or self._detect_project_root()
 
         # Print debugging info if DEBUG_RESOURCES is set
@@ -72,13 +70,9 @@ class ResourceManager:
                                     self._logger.info(f"    - {comp_dir}/ ✓")
                                     # List CSS files in each directory
                                     for css_file in comp_path.glob("*.css"):
-                                        self._logger.info(
-                                            f"      * {css_file.name}"
-                                        )
+                                        self._logger.info(f"      * {css_file.name}")
                                 else:
-                                    self._logger.warning(
-                                        f"    - {comp_dir}/ ✗ MISSING"
-                                    )
+                                    self._logger.warning(f"    - {comp_dir}/ ✗ MISSING")
                     else:
                         self._logger.warning(f"  - {subdir}/ ✗ MISSING")
             else:
@@ -97,9 +91,7 @@ class ResourceManager:
         # Log the actual paths we'll be checking
         for res_type, dirs in self._BASE_DIRS.items():
             paths = [str(self._project_root / d) for d in dirs]
-            self._logger.debug(
-                f"Resource paths for {res_type.value}: {paths}"
-            )
+            self._logger.debug(f"Resource paths for {res_type.value}: {paths}")
 
         # Cache for loaded resources
         self._cache = {res_type: {} for res_type in ResourceType}
@@ -130,15 +122,11 @@ class ResourceManager:
     ) -> Optional[Path]:
         """Get the full path to a resource with improved path resolution."""
         # Log requested path for debugging
-        self._logger.debug(
-            f"Resolving path for {resource_type.value}: {resource_path}"
-        )
+        self._logger.debug(f"Resolving path for {resource_type.value}: {resource_path}")
 
         # Handle absolute paths
         if Path(resource_path).is_absolute():
-            return (
-                Path(resource_path) if Path(resource_path).exists() else None
-            )
+            return Path(resource_path) if Path(resource_path).exists() else None
 
         # Strip leading slash if present
         resource_path = resource_path.lstrip("/")
@@ -165,9 +153,7 @@ class ResourceManager:
             return direct_path
 
         # Log the failure
-        self._logger.debug(
-            f"Resource not found: {resource_type.value}/{resource_path}"
-        )
+        self._logger.debug(f"Resource not found: {resource_type.value}/{resource_path}")
         return None
 
     def load_text_resource(
@@ -183,9 +169,7 @@ class ResourceManager:
             # Read the file
             with open(full_path, "r", encoding="utf-8") as f:
                 content = f.read()
-                self._logger.debug(
-                    f"Loaded {resource_type.value}: {resource_path}"
-                )
+                self._logger.debug(f"Loaded {resource_type.value}: {resource_path}")
                 return content
         except Exception as e:
             self._logger.error(
@@ -196,15 +180,11 @@ class ResourceManager:
     def load_json_resource(self, resource_path: str) -> Optional[Any]:
         """Load a JSON resource with improved path resolution."""
         # Check if it's in config first
-        config_content = self.load_text_resource(
-            ResourceType.CONFIG, resource_path
-        )
+        config_content = self.load_text_resource(ResourceType.CONFIG, resource_path)
 
         # If not found in config, try data directory
         if config_content is None:
-            data_content = self.load_text_resource(
-                ResourceType.DATA, resource_path
-            )
+            data_content = self.load_text_resource(ResourceType.DATA, resource_path)
             if data_content:
                 try:
                     return json.loads(data_content)
@@ -217,9 +197,7 @@ class ResourceManager:
             try:
                 return json.loads(config_content)
             except json.JSONDecodeError as e:
-                self._logger.error(
-                    f"Invalid JSON in config/{resource_path}: {str(e)}"
-                )
+                self._logger.error(f"Invalid JSON in config/{resource_path}: {str(e)}")
                 return None
 
         # If still not found, try with home/ prefix
@@ -240,16 +218,12 @@ class ResourceManager:
             # Try direct path under assets/css
             direct_path = self._project_root / "assets" / "css" / css_path
             if direct_path.exists():
-                self._logger.info(
-                    f"Found BB8 CSS at direct path: {direct_path}"
-                )
+                self._logger.info(f"Found BB8 CSS at direct path: {direct_path}")
                 try:
                     with open(direct_path, "r", encoding="utf-8") as f:
                         return f.read()
                 except Exception as e:
-                    self._logger.error(
-                        f"Error reading BB8 CSS file: {str(e)}"
-                    )
+                    self._logger.error(f"Error reading BB8 CSS file: {str(e)}")
 
         # Continue with regular CSS loading logic
         content = self.load_text_resource(ResourceType.CSS, css_path)
@@ -259,18 +233,14 @@ class ResourceManager:
     def load_template(self, template_path: str) -> Optional[str]:
         """Load a template file."""
         # First try direct path
-        content = self.load_text_resource(
-            ResourceType.TEMPLATE, template_path
-        )
+        content = self.load_text_resource(ResourceType.TEMPLATE, template_path)
         if content:
             return content
 
         # Try with components prefix if not already there
         if not template_path.startswith("components/"):
             components_path = f"components/{template_path}"
-            content = self.load_text_resource(
-                ResourceType.TEMPLATE, components_path
-            )
+            content = self.load_text_resource(ResourceType.TEMPLATE, components_path)
             if content:
                 return content
 
@@ -279,9 +249,7 @@ class ResourceManager:
             # Try specific card templates
             for card_type in ["feature_card.html", "welcome_card.html"]:
                 alt_path = template_path.replace("card.html", card_type)
-                content = self.load_text_resource(
-                    ResourceType.TEMPLATE, alt_path
-                )
+                content = self.load_text_resource(ResourceType.TEMPLATE, alt_path)
                 if content:
                     return content
 
@@ -309,9 +277,7 @@ class ResourceManager:
 
             return rendered
         except Exception as e:
-            self._logger.error(
-                f"Error rendering template {template_path}: {str(e)}"
-            )
+            self._logger.error(f"Error rendering template {template_path}: {str(e)}")
             return None
 
     _static_css_loaded = set()  # Track static CSS files by path
@@ -334,9 +300,7 @@ class ResourceManager:
         if source_path:
             # For static CSS files (loaded only once)
             if not is_dynamic and source_path in self._static_css_loaded:
-                self._logger.debug(
-                    f"Skipping already loaded static CSS: {source_path}"
-                )
+                self._logger.debug(f"Skipping already loaded static CSS: {source_path}")
                 return
 
             if not is_dynamic:
@@ -349,9 +313,7 @@ class ResourceManager:
                 source_path in self._dynamic_css_current
                 and self._dynamic_css_current[source_path] == css_content
             ):
-                self._logger.debug(
-                    f"Skipping unchanged dynamic CSS: {source_path}"
-                )
+                self._logger.debug(f"Skipping unchanged dynamic CSS: {source_path}")
                 return
 
             self._dynamic_css_current[source_path] = css_content
@@ -384,11 +346,7 @@ class ResourceManager:
         """
         # Define the exact path where theme files should be found
         exact_path = (
-            self._project_root
-            / "assets"
-            / "config"
-            / "themes"
-            / theme_filename
+            self._project_root / "assets" / "config" / "themes" / theme_filename
         )
 
         # Log the exact path we're checking
@@ -405,14 +363,10 @@ class ResourceManager:
 
             # Parse the JSON content
             data = json.loads(content)
-            self._logger.debug(
-                f"Successfully loaded theme file: {exact_path}"
-            )
+            self._logger.debug(f"Successfully loaded theme file: {exact_path}")
             return data
         except Exception as e:
-            self._logger.error(
-                f"Error loading theme file {exact_path}: {str(e)}"
-            )
+            self._logger.error(f"Error loading theme file {exact_path}: {str(e)}")
             return None
 
     def load_data_json(self, json_path: str) -> Optional[Dict[str, Any]]:
@@ -420,9 +374,7 @@ class ResourceManager:
         # First try as config file
         data = self.load_json_resource(json_path)
         if data:
-            self._logger.info(
-                f"✅ Successfully loaded JSON from config: {json_path}"
-            )
+            self._logger.info(f"✅ Successfully loaded JSON from config: {json_path}")
             return data
 
         # Try data directory with "data/" prefix
@@ -430,9 +382,7 @@ class ResourceManager:
             data_path = f"data/{json_path}"
             data = self.load_json_resource(data_path)
             if data:
-                self._logger.info(
-                    f"✅ Successfully loaded JSON from data: {data_path}"
-                )
+                self._logger.info(f"✅ Successfully loaded JSON from data: {data_path}")
                 return data
 
         # List available JSON files to help troubleshooting
@@ -448,9 +398,7 @@ class ResourceManager:
                         self._logger.info(f"  - {rel_path}")
 
         # If all attempts fail, create an empty fallback
-        self._logger.warning(
-            f"Unable to load JSON: {json_path} - using fallback"
-        )
+        self._logger.warning(f"Unable to load JSON: {json_path} - using fallback")
         if "welcome_card" in json_path:
             return {
                 "title": "MNIST Digit Classifier",
