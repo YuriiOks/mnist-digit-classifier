@@ -1,5 +1,5 @@
 # MNIST Digit Classifier
-# Copyright (c) 2025
+# Copyright (c) 2025 YuriODev (YuriiOks)
 # File: ui/layout/sidebar.py
 # Description: Sidebar component for the application
 # Created: 2025-03-17
@@ -19,7 +19,7 @@ from core.app_state.navigation_state import NavigationState
 
 class Sidebar(Component[None]):
     """Sidebar navigation component."""
-    
+
     def __init__(
         self,
         *,
@@ -27,7 +27,7 @@ class Sidebar(Component[None]):
         classes: Optional[List[str]] = None,
         attributes: Optional[Dict[str, str]] = None,
         key: Optional[str] = None,
-        **kwargs
+        **kwargs,
     ):
         """Initialize the sidebar component."""
         super().__init__(
@@ -37,15 +37,17 @@ class Sidebar(Component[None]):
             classes=classes or [],
             attributes=attributes or {},
             key=key or "app_sidebar",
-            **kwargs
+            **kwargs,
         )
-        self._logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
-    
+        self._logger = logging.getLogger(
+            f"{__name__}.{self.__class__.__name__}"
+        )
+
     @AspectUtils.catch_errors
     def render(self) -> str:
         """
         Render the sidebar component to HTML.
-        
+
         Returns:
             HTML representation of the sidebar.
         """
@@ -53,7 +55,7 @@ class Sidebar(Component[None]):
         # We're primarily using Streamlit's built-in sidebar rather than custom HTML
         current_year = datetime.now().year
         version = "1.0.0"
-        
+
         return f"""
         <div class="sidebar-container">
             <div class="sidebar-header">
@@ -79,14 +81,18 @@ class Sidebar(Component[None]):
             </div>
         </div>
         """
-    
+
     @AspectUtils.catch_errors
     def display(self) -> None:
         """Display the sidebar component in Streamlit."""
         # Load sidebar CSS
-        sidebar_css = resource_manager.load_css("components/layout/sidebar.css")
-        buttons_css = resource_manager.load_css("components/controls/buttons.css")
-        
+        sidebar_css = resource_manager.load_css(
+            "components/layout/sidebar.css"
+        )
+        buttons_css = resource_manager.load_css(
+            "components/controls/buttons.css"
+        )
+
         # Combine and inject CSS
         if sidebar_css or buttons_css:
             combined_css = ""
@@ -95,13 +101,13 @@ class Sidebar(Component[None]):
             if buttons_css:
                 combined_css += buttons_css
             resource_manager.inject_css(combined_css)
-        
+
         # Use Streamlit's sidebar container
         with st.sidebar:
             # Apply theme CSS variables
             theme_data = theme_manager.get_theme_data()
             theme_manager._apply_css_variables(theme_data)
-            
+
             # Header
             st.markdown(
                 """
@@ -110,35 +116,41 @@ class Sidebar(Component[None]):
                     <div class="sidebar-subheader">Digit Classification AI</div>
                 </div>
                 """,
-                unsafe_allow_html=True
+                unsafe_allow_html=True,
             )
-            
+
             # Navigation items
             nav_items = NavigationState.get_routes()
             active_view = NavigationState.get_active_view()
-            
+
             # Define mapping of navigation IDs to CSS-expected keys
             nav_key_mapping = {
                 "home": "nav_home_btn",
-                "draw": "nav_draw_btn", 
+                "draw": "nav_draw_btn",
                 "history": "nav_history_btn",
-                "settings": "nav_settings_btn"
+                "settings": "nav_settings_btn",
             }
 
             # Create navigation buttons
             for item in nav_items:
                 # Use the exact key format expected by CSS
-                button_key = nav_key_mapping.get(item['id'], f"nav_{item['id']}_btn")
-                
+                button_key = nav_key_mapping.get(
+                    item["id"], f"nav_{item['id']}_btn"
+                )
+
                 if st.button(
                     f"{item['icon']} {item['label']}",
                     key=button_key,
-                    type="primary" if active_view == item['id'] else "secondary",
-                    use_container_width=True
+                    type=(
+                        "primary"
+                        if active_view == item["id"]
+                        else "secondary"
+                    ),
+                    use_container_width=True,
                 ):
-                    NavigationState.set_active_view(item['id'])
+                    NavigationState.set_active_view(item["id"])
                     st.rerun()
-            
+
             # Add JavaScript to style active button
             script = f"""
             <script>
@@ -154,26 +166,26 @@ class Sidebar(Component[None]):
             </script>
             """
             st.markdown(script, unsafe_allow_html=True)
-            
+
             # Divider
             st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
-            
+
             # BB8 Toggle
             with st.container():
                 bb8_toggle = BB8Toggle(
                     theme_manager_instance=theme_manager,
                     on_change=lambda new_theme: st.rerun(),
-                    key="sidebar_bb8_toggle"
+                    key="sidebar_bb8_toggle",
                 )
                 bb8_toggle.display()
-            
+
             # Divider
             st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
-            
+
             # Footer
             current_year = datetime.now().year
             version = "1.0.0"
-            
+
             st.markdown(
                 f"""
                 <div class="sidebar-footer">
@@ -181,23 +193,23 @@ class Sidebar(Component[None]):
                     <p>© {current_year} MNIST Classifier</p>
                 </div>
                 """,
-                unsafe_allow_html=True
+                unsafe_allow_html=True,
             )
-            
+
             # Handle theme toggle callback
             if "theme" in st.session_state:
                 requested_theme = st.session_state["theme"]
                 current_theme = theme_manager.get_current_theme()
-                
+
                 if requested_theme != current_theme:
                     theme_manager.apply_theme(requested_theme)
                     st.rerun()
-            
+
             # Handle navigation callback
             if "view" in st.session_state:
                 requested_view = st.session_state["view"]
                 current_view = NavigationState.get_active_view()
-                
+
                 if requested_view != current_view:
                     NavigationState.set_active_view(requested_view)
                     st.rerun()
