@@ -1,5 +1,5 @@
 # MNIST Digit Classifier
-# Copyright (c) 2025
+# Copyright (c) 2025 YuriODev (YuriiOks)
 # File: core/errors/ui_errors.py
 # Description: UI-specific error classes
 # Created: 2025-03-16
@@ -11,9 +11,10 @@ from core.errors.error_handler import ErrorHandler
 
 logger = logging.getLogger(__name__)
 
+
 class UIError(Exception):
     """Base exception for UI-related errors."""
-    
+
     def __init__(
         self,
         message: str,
@@ -22,11 +23,11 @@ class UIError(Exception):
         view: Optional[str] = None,
         details: Optional[Dict[str, Any]] = None,
         original_exception: Optional[Exception] = None,
-        error_code: Optional[str] = None
+        error_code: Optional[str] = None,
     ):
         """
         Initialize UI error.
-        
+
         Args:
             message: Error message
             component: Name of the UI component that raised the error
@@ -40,23 +41,27 @@ class UIError(Exception):
         self.details = details or {}
         self.original_exception = original_exception
         self.error_code = error_code or "UI_ERROR"
-        
+
         # Format message with component and view information
         location_info = []
         if view:
             location_info.append(f"view='{view}'")
         if component:
             location_info.append(f"component='{component}'")
-        
+
         location_str = ", ".join(location_info)
-        full_message = f"{message}" if not location_str else f"{message} [{location_str}]"
-        
+        full_message = (
+            f"{message}"
+            if not location_str
+            else f"{message} [{location_str}]"
+        )
+
         super().__init__(full_message)
-    
+
     def log_error(self, level: str = ErrorHandler.LEVEL_ERROR) -> None:
         """
         Log the error with appropriate context.
-        
+
         Args:
             level: Error level to log at
         """
@@ -65,18 +70,18 @@ class UIError(Exception):
             context = {
                 "component": self.component,
                 "view": self.view,
-                "error_code": self.error_code
+                "error_code": self.error_code,
             }
             if self.details:
                 context.update(self.details)
-                
+
             # Use error handler to log consistently
             ErrorHandler.handle_error(
                 self.original_exception or self,
                 level=level,
                 message=str(self),
                 context=context,
-                show_user_message=False
+                show_user_message=False,
             )
         except Exception as e:
             # Fallback if error handler fails
@@ -86,7 +91,7 @@ class UIError(Exception):
 
 class TemplateError(UIError):
     """Exception for template-related UI errors."""
-    
+
     def __init__(
         self,
         message: str,
@@ -97,11 +102,11 @@ class TemplateError(UIError):
         view: Optional[str] = None,
         details: Optional[Dict[str, Any]] = None,
         original_exception: Optional[Exception] = None,
-        error_code: Optional[str] = None
+        error_code: Optional[str] = None,
     ):
         """
         Initialize template error.
-        
+
         Args:
             message: Error message
             template_name: Name of the template
@@ -115,16 +120,18 @@ class TemplateError(UIError):
         # Add template-specific details
         template_details = {
             "template_name": template_name,
-            "template_path": template_path
+            "template_path": template_path,
         }
-        
+
         # Filter out None values
-        template_details = {k: v for k, v in template_details.items() if v is not None}
-        
+        template_details = {
+            k: v for k, v in template_details.items() if v is not None
+        }
+
         # Combine with provided details
         combined_details = details or {}
         combined_details.update(template_details)
-        
+
         error_code = error_code or "TEMPLATE_ERROR"
         super().__init__(
             message,
@@ -132,13 +139,13 @@ class TemplateError(UIError):
             view=view,
             details=combined_details,
             original_exception=original_exception,
-            error_code=error_code
+            error_code=error_code,
         )
-    
+
     def get_user_message(self) -> str:
         """
         Get a user-friendly error message.
-        
+
         Returns:
             str: User-friendly error message
         """
@@ -148,7 +155,7 @@ class TemplateError(UIError):
 
 class ComponentError(UIError):
     """Exception for component-related UI errors."""
-    
+
     def __init__(
         self,
         message: str,
@@ -158,11 +165,11 @@ class ComponentError(UIError):
         view: Optional[str] = None,
         details: Optional[Dict[str, Any]] = None,
         original_exception: Optional[Exception] = None,
-        error_code: Optional[str] = None
+        error_code: Optional[str] = None,
     ):
         """
         Initialize component error.
-        
+
         Args:
             message: Error message
             component_type: Type of component
@@ -181,20 +188,22 @@ class ComponentError(UIError):
             if component_name:
                 parts.append(component_name)
             full_component = "/".join(parts)
-        
+
         # Add component-specific details
         component_details = {
             "component_type": component_type,
-            "component_name": component_name
+            "component_name": component_name,
         }
-        
+
         # Filter out None values
-        component_details = {k: v for k, v in component_details.items() if v is not None}
-        
+        component_details = {
+            k: v for k, v in component_details.items() if v is not None
+        }
+
         # Combine with provided details
         combined_details = details or {}
         combined_details.update(component_details)
-        
+
         error_code = error_code or "COMPONENT_ERROR"
         super().__init__(
             message,
@@ -202,13 +211,13 @@ class ComponentError(UIError):
             view=view,
             details=combined_details,
             original_exception=original_exception,
-            error_code=error_code
+            error_code=error_code,
         )
-    
+
     def get_user_message(self) -> str:
         """
         Get a user-friendly error message.
-        
+
         Returns:
             str: User-friendly error message
         """
