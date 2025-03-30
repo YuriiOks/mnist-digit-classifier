@@ -20,6 +20,7 @@ MNIST_MEAN = (0.1307,)
 MNIST_STD = (0.3081,)
 # ---------------------
 
+
 def center_digit(image: Image.Image) -> Image.Image:
     """
     Centers a white digit on a black background within a new square canvas.
@@ -35,17 +36,18 @@ def center_digit(image: Image.Image) -> Image.Image:
                    Returns the original image if centering fails.
     """
     try:
-        img_gray = image.convert('L') # Ensure grayscale
+        img_gray = image.convert("L")  # Ensure grayscale
 
         # Find bounding box of the WHITE digit pixels (non-black pixels).
         try:
-            bbox = img_gray.getbbox() # Finds box containing non-zero pixels
-        except ValueError: # Handle potential errors on edge cases
-             bbox = None
+            bbox = img_gray.getbbox()  # Finds box containing non-zero pixels
+        except ValueError:  # Handle potential errors on edge cases
+            bbox = None
 
         if bbox is None:
-            logger.warning("center_digit: No bounding box found. "
-                           "Returning original.")
+            logger.warning(
+                "center_digit: No bounding box found. " "Returning original."
+            )
             return image
 
         # Crop the original image using the bounding box
@@ -53,11 +55,11 @@ def center_digit(image: Image.Image) -> Image.Image:
         digit_width, digit_height = cropped_digit.size
 
         # Create a new square canvas with BLACK background
-        bg_color = 0 # Black background for centered output
+        bg_color = 0  # Black background for centered output
         # Add generous padding around the largest dimension
         padding = 30
         new_size = max(digit_width, digit_height) + 2 * padding
-        centered_canvas = Image.new('L', (new_size, new_size), bg_color)
+        centered_canvas = Image.new("L", (new_size, new_size), bg_color)
 
         # Calculate top-left corner for pasting onto the center
         paste_x = (new_size - digit_width) // 2
@@ -66,13 +68,16 @@ def center_digit(image: Image.Image) -> Image.Image:
         # Paste the cropped (white) digit onto the center of the black canvas
         centered_canvas.paste(cropped_digit, (paste_x, paste_y))
 
-        logger.debug(f"center_digit: Centered W-on-B digit in new {new_size}x"
-                     f"{new_size} black canvas.")
+        logger.debug(
+            f"center_digit: Centered W-on-B digit in new {new_size}x"
+            f"{new_size} black canvas."
+        )
         return centered_canvas
 
     except Exception as e:
-        logger.error(f"💥 Error in center_digit: {e}. Returning original.",
-                     exc_info=True)
+        logger.error(
+            f"💥 Error in center_digit: {e}. Returning original.", exc_info=True
+        )
         return image
 
 
@@ -90,15 +95,16 @@ def resize_and_normalize(image: Image.Image) -> Optional[torch.Tensor]:
     """
     try:
         # Note: Input to this should be White-on-Black for MNIST convention
-        transform_pipeline = transforms.Compose([
-            transforms.Resize((28, 28)),
-            transforms.ToTensor(), # White(255)->1.0; Black(0)->0.0
-            transforms.Normalize(MNIST_MEAN, MNIST_STD)
-        ])
+        transform_pipeline = transforms.Compose(
+            [
+                transforms.Resize((28, 28)),
+                transforms.ToTensor(),  # White(255)->1.0; Black(0)->0.0
+                transforms.Normalize(MNIST_MEAN, MNIST_STD),
+            ]
+        )
         # Apply transforms and add batch dimension
         tensor = transform_pipeline(image).unsqueeze(0)
         return tensor
     except Exception as e:
-        logger.error(f"💥 Error in resize_and_normalize: {e}",
-                     exc_info=True)
+        logger.error(f"💥 Error in resize_and_normalize: {e}", exc_info=True)
         return None
