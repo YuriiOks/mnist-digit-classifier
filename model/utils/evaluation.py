@@ -110,9 +110,7 @@ def get_predictions_and_labels(model, data_loader, device):
     all_labels = []
     print("\n🔍 Getting predictions for evaluation...")  # Add user feedback
     with torch.no_grad():
-        for images, labels in tqdm(
-            data_loader, desc="Evaluating Batches"
-        ):  # Keep tqdm
+        for images, labels in tqdm(data_loader, desc="Evaluating Batches"):  # Keep tqdm
             images, labels = images.to(device), labels.to(device)
             outputs = model(images)
             _, predicted = torch.max(outputs.data, 1)
@@ -148,9 +146,7 @@ def generate_evaluation_report(
         class_names = [str(i) for i in range(10)]  # Default MNIST classes
 
     # 1. Get predictions and labels
-    all_preds, all_labels = get_predictions_and_labels(
-        model, data_loader, device
-    )
+    all_preds, all_labels = get_predictions_and_labels(model, data_loader, device)
 
     # 2. Compute Confusion Matrix
     print("📊 Computing Confusion Matrix...")
