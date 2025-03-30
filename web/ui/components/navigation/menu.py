@@ -1,5 +1,5 @@
 # MNIST Digit Classifier
-# Copyright (c) 2025
+# Copyright (c) 2025 YuriODev (YuriiOks)
 # File: ui/components/navigation/menu.py
 # Description: Menu navigation component
 # Created: 2024-05-01
@@ -13,22 +13,24 @@ from ui.components.base.component import Component
 
 logger = logging.getLogger(__name__)
 
+
 class MenuItem(NamedTuple):
     """Menu item data for menu navigation."""
+
     id: str
     label: str
     icon: Optional[str] = None
     url: Optional[str] = None
     disabled: bool = False
-    children: Optional[List['MenuItem']] = None
+    children: Optional[List["MenuItem"]] = None
 
 
 class Menu(Component):
     """Menu navigation component.
-    
+
     This component provides a menu interface for navigating between different sections.
     """
-    
+
     def __init__(
         self,
         items: List[MenuItem],
@@ -41,10 +43,10 @@ class Menu(Component):
         collapsed: bool = False,
         id: Optional[str] = None,
         classes: Optional[List[str]] = None,
-        attributes: Optional[Dict[str, str]] = None
+        attributes: Optional[Dict[str, str]] = None,
     ):
         """Initialize a menu component.
-        
+
         Args:
             items: List of MenuItem objects defining the menu.
             active_item: ID of the initially active item.
@@ -60,7 +62,7 @@ class Menu(Component):
         logger.debug(f"Initializing Menu component with {len(items)} items")
         # Generate a component ID if not provided
         component_id = id or f"menu_{uuid.uuid4().hex[:8]}"
-        
+
         # Prepare classes
         menu_classes = ["menu", f"menu-{orientation}"]
         if compact:
@@ -71,43 +73,49 @@ class Menu(Component):
             menu_classes.append("menu-collapsed")
         if classes:
             menu_classes.extend(classes)
-        
+
         super().__init__(
             "navigation",
             "menu",
             id=component_id,
             classes=menu_classes,
-            attributes=attributes
+            attributes=attributes,
         )
-        
+
         self.items = items
         self.active_item = active_item
         self.orientation = orientation
         self.on_change = on_change
         self.collapsible = collapsible
         self.collapsed = collapsed and collapsible
-        
+
         # Store the session state key for this menu instance
         self.state_key = f"menu_state_{component_id}"
         self.collapse_state_key = f"menu_collapse_{component_id}"
-        self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
-        self.logger.debug(f"Menu initialized with active item: {self.active_item}")
-    
-    def _generate_menu_items_html(self, items: List[MenuItem], level: int = 0) -> str:
+        self.logger = logging.getLogger(
+            f"{__name__}.{self.__class__.__name__}"
+        )
+        self.logger.debug(
+            f"Menu initialized with active item: {self.active_item}"
+        )
+
+    def _generate_menu_items_html(
+        self, items: List[MenuItem], level: int = 0
+    ) -> str:
         """Generate HTML for menu items.
-        
+
         Args:
             items: List of MenuItem objects.
             level: Current nesting level.
-            
+
         Returns:
             str: HTML for the menu items.
         """
         if not items:
             return ""
-            
+
         items_html = ""
-        
+
         for item in items:
             # Determine if this item is active
             is_active = item.id == self.active_item
@@ -115,14 +123,18 @@ class Menu(Component):
             disabled_class = "disabled" if item.disabled else ""
             has_children = item.children and len(item.children) > 0
             has_children_class = "has-children" if has_children else ""
-            
+
             # Add icon if provided
-            icon_html = f'<span class="menu-item-icon">{item.icon}</span>' if item.icon else ""
-            
+            icon_html = (
+                f'<span class="menu-item-icon">{item.icon}</span>'
+                if item.icon
+                else ""
+            )
+
             # Determine if submenu should be expanded
             is_expanded = is_active or self._has_active_child(item)
             expanded_class = "expanded" if is_expanded else ""
-            
+
             # Create menu item
             items_html += f"""
             <li class="menu-item level-{level} {active_class} {disabled_class} {has_children_class} {expanded_class}" 
@@ -136,52 +148,54 @@ class Menu(Component):
                     {has_children and '<button class="menu-toggle-btn">▾</button>' or ''}
                 </div>
             """
-            
+
             # Add submenu if item has children
             if has_children:
-                submenu_style = "display: block;" if is_expanded else "display: none;"
+                submenu_style = (
+                    "display: block;" if is_expanded else "display: none;"
+                )
                 items_html += f"""
                 <ul class="submenu level-{level + 1}" style="{submenu_style}">
                     {self._generate_menu_items_html(item.children, level + 1)}
                 </ul>
                 """
-            
+
             items_html += "</li>"
-        
+
         return items_html
-    
+
     def _has_active_child(self, item: MenuItem) -> bool:
         """Check if a menu item has an active child.
-        
+
         Args:
             item: MenuItem to check.
-            
+
         Returns:
             bool: True if the item has an active child, False otherwise.
         """
         if not item.children:
             return False
-            
+
         for child in item.children:
             if child.id == self.active_item:
                 return True
             if self._has_active_child(child):
                 return True
-                
+
         return False
-    
+
     def get_template_variables(self) -> Dict[str, Any]:
         """Get template variables for rendering.
-        
+
         Returns:
             Dict[str, Any]: Dictionary of variables for template rendering.
         """
         self.logger.debug("Getting template variables for menu")
         variables = super().get_template_variables()
-        
+
         # Generate HTML for menu items
         items_html = self._generate_menu_items_html(self.items)
-        
+
         # Generate toggle button for collapsible menu
         toggle_html = ""
         if self.collapsible:
@@ -191,22 +205,24 @@ class Menu(Component):
                 <span class="toggle-icon">{toggle_icon}</span>
             </button>
             """
-        
-        variables.update({
-            "MENU_ITEMS": items_html,
-            "MENU_TOGGLE": toggle_html,
-            "ACTIVE_ITEM": self.active_item or "",
-            "STATE_KEY": self.state_key,
-            "COLLAPSE_STATE_KEY": self.collapse_state_key,
-            "IS_COLLAPSED": "true" if self.collapsed else "false"
-        })
-        
+
+        variables.update(
+            {
+                "MENU_ITEMS": items_html,
+                "MENU_TOGGLE": toggle_html,
+                "ACTIVE_ITEM": self.active_item or "",
+                "STATE_KEY": self.state_key,
+                "COLLAPSE_STATE_KEY": self.collapse_state_key,
+                "IS_COLLAPSED": "true" if self.collapsed else "false",
+            }
+        )
+
         self.logger.debug("Template variables prepared successfully")
         return variables
-    
+
     def _create_click_handler_js(self) -> str:
         """Create JavaScript for handling menu interactions.
-        
+
         Returns:
             str: JavaScript code for the interaction handlers.
         """
@@ -297,10 +313,10 @@ class Menu(Component):
         }})();
         </script>
         """
-    
+
     def display(self) -> str:
         """Display the menu component and handle navigation.
-        
+
         Returns:
             str: The ID of the active menu item.
         """
@@ -308,33 +324,39 @@ class Menu(Component):
         try:
             # Render the HTML
             html = self.safe_render()
-            
+
             # Add JavaScript for handling menu interactions
             js = self._create_click_handler_js()
             html += js
-            
+
             # Display the component
             st.markdown(html, unsafe_allow_html=True)
-            
+
             # Update state based on interaction
-            new_active_item = st.session_state.get(self.state_key, self.active_item)
-            new_collapsed_state = st.session_state.get(self.collapse_state_key, self.collapsed)
-            
+            new_active_item = st.session_state.get(
+                self.state_key, self.active_item
+            )
+            new_collapsed_state = st.session_state.get(
+                self.collapse_state_key, self.collapsed
+            )
+
             # Check if item changed
             if new_active_item != self.active_item:
                 self.active_item = new_active_item
-                
+
                 # Call on_change callback if provided
                 if self.on_change and callable(self.on_change):
                     self.on_change(new_active_item)
-            
+
             # Check if collapse state changed
             if new_collapsed_state != self.collapsed:
                 self.collapsed = new_collapsed_state
-            
+
             self.logger.debug("Menu component displayed successfully")
             return self.active_item
         except Exception as e:
-            self.logger.error(f"Error displaying menu component: {str(e)}", exc_info=True)
+            self.logger.error(
+                f"Error displaying menu component: {str(e)}", exc_info=True
+            )
             st.error("Error displaying navigation menu")
             return self.active_item
