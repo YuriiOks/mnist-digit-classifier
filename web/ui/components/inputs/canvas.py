@@ -38,9 +38,7 @@ class DrawingCanvas(Component):
             attributes: Additional HTML attributes
         """
         super().__init__(classes=classes, attributes=attributes)
-        self.logger = logging.getLogger(
-            f"{__name__}.{self.__class__.__name__}"
-        )
+        self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         self.key = key
         self.on_change = on_change
 
@@ -50,12 +48,8 @@ class DrawingCanvas(Component):
 
         try:
             # Get canvas settings
-            canvas_size = SettingsState.get_setting(
-                "canvas", "canvas_size", 280
-            )
-            stroke_width = SettingsState.get_setting(
-                "canvas", "stroke_width", 15
-            )
+            canvas_size = SettingsState.get_setting("canvas", "canvas_size", 280)
+            stroke_width = SettingsState.get_setting("canvas", "stroke_width", 15)
             stroke_color = SettingsState.get_setting(
                 "canvas", "stroke_color", "#000000"
             )
@@ -137,9 +131,7 @@ class DrawingCanvas(Component):
                                 CanvasState.set_image_data(img_bytes)
 
                                 # Set input type to canvas
-                                CanvasState.set_input_type(
-                                    CanvasState.CANVAS_INPUT
-                                )
+                                CanvasState.set_input_type(CanvasState.CANVAS_INPUT)
 
                                 # Call on_change callback if provided
                                 if self.on_change:
@@ -154,9 +146,7 @@ class DrawingCanvas(Component):
             self.logger.error(
                 f"Error rendering drawing canvas: {str(e)}", exc_info=True
             )
-            st.error(
-                f"An error occurred while rendering the drawing canvas: {str(e)}"
-            )
+            st.error(f"An error occurred while rendering the drawing canvas: {str(e)}")
 
 
 def render_canvas(key="drawing_canvas", width=280, height=280):
