@@ -159,9 +159,17 @@ class Card(Component[None]):
             self._logger.warning("Could not load any card CSS")
 
     def __str__(self):
+        """
+        This method provides a string representation of the Card object.
+        It includes the class name, title, and content.
+        """
         return super().__str__() + f"({self.title})" + f"({self.content})"
 
     def __repr__(self):
+        """
+        This method provides a detailed string representation of the Card object.
+        It includes the class name, title, content, and other attributes.
+        """
         return super().__repr__() + f"({self.title})"
 
 
