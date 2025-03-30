@@ -40,9 +40,7 @@ class DrawView(View):
         self.show_header = False
 
         # Logger initialization
-        self.__logger = logging.getLogger(
-            f"{__name__}.{self.__class__.__name__}"
-        )
+        self.__logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
 
     @AspectUtils.catch_errors
     @AspectUtils.log_method
@@ -114,9 +112,7 @@ class DrawView(View):
         """
         welcome_card = WelcomeCard(
             title=welcome_data.get("title", "Draw & Recognize Digits"),
-            content=welcome_data.get(
-                "content", "Welcome to the drawing tool!"
-            ),
+            content=welcome_data.get("content", "Welcome to the drawing tool!"),
             icon=welcome_data.get("icon", "✏️"),
         )
         welcome_card.display()
@@ -147,9 +143,7 @@ class DrawView(View):
                 "Draw Digit",
                 key="tab_draw",
                 type=(
-                    "primary"
-                    if st.session_state.active_tab == "draw"
-                    else "secondary"
+                    "primary" if st.session_state.active_tab == "draw" else "secondary"
                 ),
                 use_container_width=True,
             ):
@@ -175,9 +169,7 @@ class DrawView(View):
                 "Enter URL",
                 key="tab_url",
                 type=(
-                    "primary"
-                    if st.session_state.active_tab == "url"
-                    else "secondary"
+                    "primary" if st.session_state.active_tab == "url" else "secondary"
                 ),
                 use_container_width=True,
             ):
@@ -305,13 +297,9 @@ class DrawView(View):
                             # Check if the request was successful
                             if response.status_code == 200:
                                 # Check if the content type is an image
-                                content_type = response.headers.get(
-                                    "Content-Type", ""
-                                )
+                                content_type = response.headers.get("Content-Type", "")
                                 if not content_type.startswith("image/"):
-                                    st.error(
-                                        "The URL doesn't point to an image."
-                                    )
+                                    st.error("The URL doesn't point to an image.")
                                 else:
                                     # Process and display the image
                                     img_bytes = response.content
@@ -324,14 +312,10 @@ class DrawView(View):
 
                                     # Store in CanvasState
                                     CanvasState.set_image_data(img_bytes)
-                                    CanvasState.set_input_type(
-                                        CanvasState.URL_INPUT
-                                    )
+                                    CanvasState.set_input_type(CanvasState.URL_INPUT)
 
                                     # Debug output (optional)
-                                    st.session_state["url_image_loaded"] = (
-                                        True
-                                    )
+                                    st.session_state["url_image_loaded"] = True
                             else:
                                 st.error(
                                     f"Failed to load image. Status code: {response.status_code}"
@@ -405,9 +389,7 @@ class DrawView(View):
                 # Generate new keys for all input widgets to effectively reset them
                 timestamp = int(time.time() * 1000)
                 st.session_state.canvas_key = f"canvas_{timestamp}"
-                st.session_state.file_upload_key = (
-                    f"file_uploader_{timestamp}"
-                )
+                st.session_state.file_upload_key = f"file_uploader_{timestamp}"
                 st.session_state.url_input_key = f"url_input_{timestamp}"
                 st.session_state.reset_counter += 1
 
@@ -452,9 +434,7 @@ class DrawView(View):
                         classifier = DigitClassifier()
 
                         # Make prediction
-                        predicted_digit, confidence = classifier.predict(
-                            image_data
-                        )
+                        predicted_digit, confidence = classifier.predict(image_data)
 
                         # Store prediction results in session state
                         st.session_state.predicted_digit = predicted_digit
@@ -493,14 +473,10 @@ class DrawView(View):
 
                 except ConnectionError as e:
                     st.error(f"Connection error: {str(e)}")
-                    self.__logger.error(
-                        f"Connection error in prediction: {str(e)}"
-                    )
+                    self.__logger.error(f"Connection error in prediction: {str(e)}")
                 except ValueError as e:
                     st.error(f"Error processing image: {str(e)}")
-                    self.__logger.error(
-                        f"Value error in prediction: {str(e)}"
-                    )
+                    self.__logger.error(f"Value error in prediction: {str(e)}")
                 except Exception as e:
                     st.error(f"An unexpected error occurred: {str(e)}")
                     self.__logger.error(
@@ -561,9 +537,7 @@ class DrawView(View):
                 )
 
                 # Feedback options
-                st.markdown(
-                    "<h4>Is this correct?</h4>", unsafe_allow_html=True
-                )
+                st.markdown("<h4>Is this correct?</h4>", unsafe_allow_html=True)
 
                 # Thumbs up/down buttons
                 feedback_col1, feedback_col2 = st.columns(2)
@@ -621,14 +595,10 @@ class DrawView(View):
                             key=f"digit_{i}_{st.session_state.reset_counter}",
                         ):
                             # Get the current prediction to update
-                            current_pred = (
-                                HistoryState.get_current_prediction()
-                            )
+                            current_pred = HistoryState.get_current_prediction()
                             if current_pred:
                                 # Update the history entry with correction
-                                HistoryState.set_user_correction(
-                                    current_pred["id"], i
-                                )
+                                HistoryState.set_user_correction(current_pred["id"], i)
 
                                 # Log correction to database if available
                                 try:
@@ -645,9 +615,7 @@ class DrawView(View):
                                     )
 
                             st.session_state.corrected_digit = i
-                            st.success(
-                                f"Thank you! Recorded the correct digit as {i}."
-                            )
+                            st.success(f"Thank you! Recorded the correct digit as {i}.")
                             st.session_state.show_correction = False
 
             # If we have probabilities, show distribution
@@ -674,9 +642,7 @@ class DrawView(View):
         """Render the tips card."""
         if tips_data:
             items = tips_data.get("items", [])
-            numbered_list = "\n".join(
-                f"\n{i+1}. {tip}" for i, tip in enumerate(items)
-            )
+            numbered_list = "\n".join(f"\n{i+1}. {tip}" for i, tip in enumerate(items))
 
             FeatureCard(
                 title=tips_data.get("title", "Tips"),
