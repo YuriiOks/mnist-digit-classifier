@@ -185,9 +185,7 @@ class SettingsView(View):
             # Canvas size
             st.markdown("<h2>Drawing Canvas</h2>", unsafe_allow_html=True)
 
-            canvas_size = SettingsState.get_setting(
-                "canvas", "canvas_size", 280
-            )
+            canvas_size = SettingsState.get_setting("canvas", "canvas_size", 280)
             new_canvas_size = st.slider(
                 "Canvas Size",
                 min_value=200,
@@ -198,21 +196,15 @@ class SettingsView(View):
             )
 
             if new_canvas_size != canvas_size:
-                SettingsState.set_setting(
-                    "canvas", "canvas_size", new_canvas_size
-                )
+                SettingsState.set_setting("canvas", "canvas_size", new_canvas_size)
                 # Reset canvas key to ensure it reloads with new size
                 if "canvas_key" in st.session_state:
                     import time
 
-                    st.session_state.canvas_key = (
-                        f"canvas_{hash(time.time())}"
-                    )
+                    st.session_state.canvas_key = f"canvas_{hash(time.time())}"
 
             # Stroke width
-            stroke_width = SettingsState.get_setting(
-                "canvas", "stroke_width", 15
-            )
+            stroke_width = SettingsState.get_setting("canvas", "stroke_width", 15)
             new_stroke_width = st.slider(
                 "Default Stroke Width",
                 min_value=5,
@@ -223,9 +215,7 @@ class SettingsView(View):
             )
 
             if new_stroke_width != stroke_width:
-                SettingsState.set_setting(
-                    "canvas", "stroke_width", new_stroke_width
-                )
+                SettingsState.set_setting("canvas", "stroke_width", new_stroke_width)
 
         with tab_cols[1]:
 
@@ -263,17 +253,13 @@ class SettingsView(View):
                     )
 
             # Grid settings
-            enable_grid = SettingsState.get_setting(
-                "canvas", "enable_grid", False
-            )
+            enable_grid = SettingsState.get_setting("canvas", "enable_grid", False)
             new_enable_grid = st.toggle(
                 "Show Grid on Canvas", value=enable_grid, key="grid_toggle"
             )
 
             if new_enable_grid != enable_grid:
-                SettingsState.set_setting(
-                    "canvas", "enable_grid", new_enable_grid
-                )
+                SettingsState.set_setting("canvas", "enable_grid", new_enable_grid)
                 # Apply grid CSS
                 if new_enable_grid:
                     grid_css = """
@@ -283,9 +269,7 @@ class SettingsView(View):
                         background-size: 20px 20px;
                     }
                     """
-                    st.markdown(
-                        f"<style>{grid_css}</style>", unsafe_allow_html=True
-                    )
+                    st.markdown(f"<style>{grid_css}</style>", unsafe_allow_html=True)
 
     def _render_prediction_settings(self) -> None:
         """Render prediction settings tab content."""
@@ -294,9 +278,7 @@ class SettingsView(View):
         with tab_cols[0]:
 
             # Auto-predict
-            st.markdown(
-                "<h2>Prediction Behavior</h2>", unsafe_allow_html=True
-            )
+            st.markdown("<h2>Prediction Behavior</h2>", unsafe_allow_html=True)
 
             auto_predict = SettingsState.get_setting(
                 "prediction", "auto_predict", False
@@ -357,9 +339,7 @@ class SettingsView(View):
             # History settings
             st.markdown("<h2>History</h2>", unsafe_allow_html=True)
 
-            save_history = SettingsState.get_setting(
-                "app", "save_history", True
-            )
+            save_history = SettingsState.get_setting("app", "save_history", True)
             new_save_history = st.toggle(
                 "Save prediction history",
                 value=save_history,
@@ -367,9 +347,7 @@ class SettingsView(View):
             )
 
             if new_save_history != save_history:
-                SettingsState.set_setting(
-                    "app", "save_history", new_save_history
-                )
+                SettingsState.set_setting("app", "save_history", new_save_history)
 
             max_history = SettingsState.get_setting("app", "max_history", 50)
             new_max_history = st.slider(
@@ -382,25 +360,19 @@ class SettingsView(View):
             )
 
             if new_max_history != max_history:
-                SettingsState.set_setting(
-                    "app", "max_history", new_max_history
-                )
+                SettingsState.set_setting("app", "max_history", new_max_history)
 
         with tab_cols[1]:
             # UI settings
             st.markdown("<h2>User Interface</h2>", unsafe_allow_html=True)
 
-            show_tooltips = SettingsState.get_setting(
-                "app", "show_tooltips", True
-            )
+            show_tooltips = SettingsState.get_setting("app", "show_tooltips", True)
             new_show_tooltips = st.toggle(
                 "Show tooltips", value=show_tooltips, key="tooltips_toggle"
             )
 
             if new_show_tooltips != show_tooltips:
-                SettingsState.set_setting(
-                    "app", "show_tooltips", new_show_tooltips
-                )
+                SettingsState.set_setting("app", "show_tooltips", new_show_tooltips)
                 # Apply tooltip CSS
                 if not new_show_tooltips:
                     st.markdown(
@@ -439,9 +411,7 @@ class SettingsView(View):
                 theme_manager.apply_theme(theme_manager.LIGHT_THEME)
 
                 # Force a rerun to update the UI with default values
-                st.session_state.active_settings_tab = (
-                    "theme"  # Reset to first tab
-                )
+                st.session_state.active_settings_tab = "theme"  # Reset to first tab
                 st.success("All settings have been reset to defaults.")
                 st.rerun()
 
@@ -449,9 +419,7 @@ class SettingsView(View):
         """
         Load necessary JSON data for the History/Settings view.
         """
-        data = resource_manager.load_json_resource(
-            "settings/settings_view.json"
-        )
+        data = resource_manager.load_json_resource("settings/settings_view.json")
         if not data:
             data = {}  # fallback
 
