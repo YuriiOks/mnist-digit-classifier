@@ -38,9 +38,7 @@ class ImageUrlInput(Component):
             attributes: Additional HTML attributes
         """
         super().__init__(classes=classes, attributes=attributes)
-        self.logger = logging.getLogger(
-            f"{__name__}.{self.__class__.__name__}"
-        )
+        self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         self.key = key
         self.on_load = on_load
 
@@ -128,9 +126,7 @@ class ImageUrlInput(Component):
             self.logger.error(
                 f"Error rendering image URL input: {str(e)}", exc_info=True
             )
-            st.error(
-                f"An error occurred while rendering the image URL input: {str(e)}"
-            )
+            st.error(f"An error occurred while rendering the image URL input: {str(e)}")
 
     def _load_image_from_url(self, url: str) -> None:
         """Load image from URL and store in application state.
@@ -169,14 +165,10 @@ class ImageUrlInput(Component):
                 st.success("Image loaded successfully!")
                 st.rerun()
             else:
-                st.error(
-                    f"Failed to load image. Status code: {response.status_code}"
-                )
+                st.error(f"Failed to load image. Status code: {response.status_code}")
         except requests.exceptions.RequestException as e:
             st.error(f"Error fetching image: {str(e)}")
-            self.logger.error(
-                f"Error fetching image from URL: {str(e)}", exc_info=True
-            )
+            self.logger.error(f"Error fetching image from URL: {str(e)}", exc_info=True)
 
     def _is_valid_url(self, url: str) -> bool:
         """Check if the URL is valid.
