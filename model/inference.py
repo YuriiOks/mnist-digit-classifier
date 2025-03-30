@@ -41,14 +41,10 @@ class MNISTPredictor:
 
         # Load trained parameters
         try:
-            self.model.load_state_dict(
-                torch.load(model_path, map_location=self.device)
-            )
+            self.model.load_state_dict(torch.load(model_path, map_location=self.device))
             print(f"Model loaded from {model_path}")
         except Exception as e:
-            raise RuntimeError(
-                f"Failed to load model from {model_path}: {str(e)}"
-            )
+            raise RuntimeError(f"Failed to load model from {model_path}: {str(e)}")
 
         # Set to evaluation mode
         self.model.eval()
@@ -100,8 +96,7 @@ class MNISTPredictor:
             probabilities = F.softmax(outputs, dim=1)
             predicted_classes = torch.argmax(probabilities, dim=1).tolist()
             confidences = [
-                probabilities[i, cls].item()
-                for i, cls in enumerate(predicted_classes)
+                probabilities[i, cls].item() for i, cls in enumerate(predicted_classes)
             ]
 
         return predicted_classes, confidences
