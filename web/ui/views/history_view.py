@@ -28,9 +28,7 @@ class HistoryView(View):
             title="Prediction History",
             description="View and manage your past digit predictions.",
         )
-        self._logger = logging.getLogger(
-            f"{__name__}.{self.__class__.__name__}"
-        )
+        self._logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
 
     def _initialize_session_state(self) -> None:
         """Initialize session state variables for history filtering and pagination."""
@@ -57,9 +55,7 @@ class HistoryView(View):
 
     def _load_view_data(self) -> Dict:
         """Load necessary JSON data for the History view."""
-        data = resource_manager.load_json_resource(
-            "history/history_view.json"
-        )
+        data = resource_manager.load_json_resource("history/history_view.json")
         return data or {}  # Return empty dict as fallback
 
     def _render_empty_state(self) -> None:
@@ -104,9 +100,7 @@ class HistoryView(View):
 
     def _render_filters(self) -> None:
         """Render filter controls for the history view."""
-        st.markdown(
-            "<div style='margin-bottom: 1rem;'>", unsafe_allow_html=True
-        )
+        st.markdown("<div style='margin-bottom: 1rem;'>", unsafe_allow_html=True)
 
         filter_col1, filter_col2, filter_col3 = st.columns(3)
 
@@ -122,9 +116,7 @@ class HistoryView(View):
                 index=(
                     0
                     if st.session_state.history_filter_digit is None
-                    else digit_options.index(
-                        st.session_state.history_filter_digit
-                    )
+                    else digit_options.index(st.session_state.history_filter_digit)
                 ),
             )
             st.session_state.history_filter_digit = digit_filter
@@ -155,9 +147,7 @@ class HistoryView(View):
                 options=list(sort_options.keys()),
                 format_func=lambda x: sort_options[x],
                 key="sort_by",
-                index=list(sort_options.keys()).index(
-                    st.session_state.history_sort_by
-                ),
+                index=list(sort_options.keys()).index(st.session_state.history_sort_by),
             )
             st.session_state.history_sort_by = sort_by
 
@@ -168,9 +158,7 @@ class HistoryView(View):
             st.session_state.history_page = 1
 
         # Update previous filter values for change detection
-        st.session_state.prev_digit_filter = (
-            st.session_state.history_filter_digit
-        )
+        st.session_state.prev_digit_filter = st.session_state.history_filter_digit
         st.session_state.prev_confidence_filter = (
             st.session_state.history_filter_min_confidence
         )
@@ -183,8 +171,7 @@ class HistoryView(View):
             != st.session_state.history_filter_digit
             or st.session_state.get("prev_confidence_filter")
             != st.session_state.history_filter_min_confidence
-            or st.session_state.get("prev_sort_by")
-            != st.session_state.history_sort_by
+            or st.session_state.get("prev_sort_by") != st.session_state.history_sort_by
         )
 
     def _get_confidence_color(self, confidence: float) -> str:
@@ -235,9 +222,7 @@ class HistoryView(View):
         if total_pages > 1:
             self._render_pagination_controls(total_pages, position)
 
-    def _render_pagination_controls(
-        self, total_pages: int, position: str
-    ) -> None:
+    def _render_pagination_controls(self, total_pages: int, position: str) -> None:
         """Render the pagination control buttons and slider."""
         col1, col2, col3 = st.columns([1, 3, 1])
 
@@ -331,9 +316,7 @@ class HistoryView(View):
 
         col1, col2 = st.columns(2)
         with col1:
-            if st.button(
-                "Cancel", key="cancel_clear", use_container_width=True
-            ):
+            if st.button("Cancel", key="cancel_clear", use_container_width=True):
                 st.session_state.clear_all_confirm = False
                 st.rerun()
         with col2:
@@ -361,10 +344,7 @@ class HistoryView(View):
     def _handle_delete(self) -> None:
         """Handle deletion of individual history entries."""
         # Check if we have a pending deletion
-        if (
-            st.session_state.delete_id
-            and st.session_state.show_delete_confirm
-        ):
+        if st.session_state.delete_id and st.session_state.show_delete_confirm:
             entry_id = st.session_state.delete_id
 
             # Show confirmation dialog
@@ -388,9 +368,7 @@ class HistoryView(View):
 
             col1, col2 = st.columns(2)
             with col1:
-                if st.button(
-                    "Cancel", key="cancel_delete", use_container_width=True
-                ):
+                if st.button("Cancel", key="cancel_delete", use_container_width=True):
                     st.session_state.delete_id = None
                     st.session_state.show_delete_confirm = False
                     st.rerun()
@@ -416,9 +394,7 @@ class HistoryView(View):
                     st.session_state.show_delete_confirm = False
                     st.rerun()
 
-    def _get_card_title_and_icon(
-        self, item: Dict[str, Any]
-    ) -> Tuple[str, str]:
+    def _get_card_title_and_icon(self, item: Dict[str, Any]) -> Tuple[str, str]:
         """Generate smart card title and icon based on prediction status."""
         # Extract necessary data
         digit_value = self._extract_digit_value(item)
@@ -484,14 +460,10 @@ class HistoryView(View):
             else datetime.datetime.now()
         )
 
-    def _render_history_entries(
-        self, page_items: List[Dict[str, Any]]
-    ) -> None:
+    def _render_history_entries(self, page_items: List[Dict[str, Any]]) -> None:
         """Render history entries in a grid layout."""
         if not page_items:
-            st.info(
-                "No entries match your filter criteria. Try adjusting the filters."
-            )
+            st.info("No entries match your filter criteria. Try adjusting the filters.")
             return
 
         # Create grid layout with 3 columns
@@ -533,9 +505,7 @@ class HistoryView(View):
         # Determine input type
         input_type = item.get("input_type", "canvas")
         input_icon = (
-            "✏️"
-            if input_type == "canvas"
-            else "📷" if input_type == "upload" else "🔗"
+            "✏️" if input_type == "canvas" else "📷" if input_type == "upload" else "🔗"
         )
 
         # Get dynamic card title and icon
@@ -646,9 +616,7 @@ class HistoryView(View):
 
         # Calculate pagination
         items_per_page = st.session_state.history_items_per_page
-        total_pages = max(
-            1, (total_items + items_per_page - 1) // items_per_page
-        )
+        total_pages = max(1, (total_items + items_per_page - 1) // items_per_page)
 
         # Ensure current page is valid
         st.session_state.history_page = min(
@@ -683,9 +651,7 @@ class HistoryView(View):
             FeatureCard(
                 title=tips_data.get("title", "Tips"),
                 content="<ul class='tips-list'>"
-                + "".join(
-                    f"<li>{tip}</li>" for tip in tips_data.get("items", [])
-                )
+                + "".join(f"<li>{tip}</li>" for tip in tips_data.get("items", []))
                 + "</ul>",
                 icon="💡",
             ).display()
