@@ -16,9 +16,7 @@ from utils.resource_manager import resource_manager
 from utils.aspects import AspectUtils
 
 # Load BB8 CSS once at module level for better performance
-BB8_INLINE_CSS = resource_manager.load_css(
-    "components/controls/bb8-toggle.css"
-)
+BB8_INLINE_CSS = resource_manager.load_css("components/controls/bb8-toggle.css")
 
 
 class BB8Toggle(Component[Dict[str, Any]]):
@@ -97,15 +95,11 @@ class BB8Toggle(Component[Dict[str, Any]]):
 
             if template:
                 # Inject the CSS and checked state
-                full_html = template.replace(
-                    "{BB8_INLINE_CSS}", BB8_INLINE_CSS
-                )
+                full_html = template.replace("{BB8_INLINE_CSS}", BB8_INLINE_CSS)
                 full_html = full_html.replace("{checked_attr}", checked_attr)
 
                 # Use click detector to handle toggle clicks
-                clicked = click_detector(
-                    full_html, key=f"{self.__key}_{current_theme}"
-                )
+                clicked = click_detector(full_html, key=f"{self.__key}_{current_theme}")
 
                 if clicked == "bb8-toggle":
                     # Toggle theme
