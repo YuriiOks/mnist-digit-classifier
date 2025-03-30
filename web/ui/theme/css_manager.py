@@ -37,9 +37,7 @@ class CSSManager:
         if getattr(self, "_initialized", False):
             return
 
-        self._logger = logging.getLogger(
-            f"{__name__}.{self.__class__.__name__}"
-        )
+        self._logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
 
         # Track loaded CSS files to prevent duplicates
         self._loaded_files: Set[str] = set()
@@ -116,9 +114,7 @@ class CSSManager:
         if view_id in self._view_css_files:
             self._load_css_files(self._view_css_files[view_id])
         else:
-            self._logger.warning(
-                f"No specific CSS defined for view: {view_id}"
-            )
+            self._logger.warning(f"No specific CSS defined for view: {view_id}")
 
     @AspectUtils.catch_errors
     def _load_css_files(self, css_files: List[str]) -> None:
@@ -134,9 +130,7 @@ class CSSManager:
         for css_file in css_files:
             # Skip already loaded files
             if css_file in self._loaded_files:
-                self._logger.debug(
-                    f"CSS already loaded, skipping: {css_file}"
-                )
+                self._logger.debug(f"CSS already loaded, skipping: {css_file}")
                 continue
 
             # Try to get CSS from cache
