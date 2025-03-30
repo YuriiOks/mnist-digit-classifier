@@ -1,5 +1,5 @@
 # MNIST Digit Classifier
-# Copyright (c) 2025
+# Copyright (c) 2025 YuriODev (YuriiOks)
 # File: ui/components/inputs/__init__.py
 # Description: Input components initialization
 # Created: 2024-05-01
