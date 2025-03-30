@@ -38,9 +38,7 @@ def check_database():
         print("ERROR: Database file doesn't exist!")
         return
 
-    print(
-        f"Database file exists (size: {os.path.getsize(db_path) / 1024:.2f} KB)"
-    )
+    print(f"Database file exists (size: {os.path.getsize(db_path) / 1024:.2f} KB)")
 
     try:
         conn = sqlite3.connect(db_path)
@@ -86,20 +84,14 @@ def check_database():
                 """
                 )
                 print("\nMost recent predictions:")
-                print(
-                    "ID | Digit | Confidence | Timestamp | Input Type | Correction"
-                )
+                print("ID | Digit | Confidence | Timestamp | Input Type | Correction")
                 print("-" * 80)
                 for row in cursor.fetchall():
                     # Format timestamp if it's a string
                     if isinstance(row["timestamp"], str):
                         try:
-                            timestamp = datetime.fromisoformat(
-                                row["timestamp"]
-                            )
-                            timestamp_str = timestamp.strftime(
-                                "%Y-%m-%d %H:%M:%S"
-                            )
+                            timestamp = datetime.fromisoformat(row["timestamp"])
+                            timestamp_str = timestamp.strftime("%Y-%m-%d %H:%M:%S")
                         except ValueError:
                             timestamp_str = row["timestamp"]
                     else:
@@ -107,9 +99,7 @@ def check_database():
 
                     # Truncate ID for display
                     id_short = (
-                        row["id"][:8] + "..."
-                        if len(row["id"]) > 8
-                        else row["id"]
+                        row["id"][:8] + "..." if len(row["id"]) > 8 else row["id"]
                     )
 
                     print(
@@ -132,9 +122,7 @@ def check_database():
                     value = row["value"]
                     if len(value) > 30:
                         value = value[:27] + "..."
-                    print(
-                        f"{row['category']:10s} | {row['key']:15s} | {value}"
-                    )
+                    print(f"{row['category']:10s} | {row['key']:15s} | {value}")
 
         conn.close()
 
