@@ -1,5 +1,5 @@
 # MNIST Digit Classifier
-# Copyright (c) 2025
+# Copyright (c) 2025 YuriODev (YuriiOks)
 # File: ui/components/navigation/tabs.py
 # Description: Tab navigation component
 # Created: 2024-05-01
@@ -18,10 +18,14 @@ logger = logging.getLogger(__name__)
 class Tab:
     """Tab data for tabs navigation."""
 
-    def __init__(self, id: str, label: str,
-                 icon: Optional[str] = None,
-                 content: Optional[str] = None,
-                 disabled: bool = False):
+    def __init__(
+        self,
+        id: str,
+        label: str,
+        icon: Optional[str] = None,
+        content: Optional[str] = None,
+        disabled: bool = False,
+    ):
         self.__id = id
         self.__label = label
         self.__icon = icon
@@ -61,15 +65,19 @@ class Tabs(Component):
     different contents.
     """
 
-    def __init__(self, tabs: List[Tab],
-                 active_tab: Optional[str] = None,
-                 on_change: Optional[callable] = None,
-                 *, id: Optional[str] = None,
-                 classes: Optional[List[str]] = None,
-                 attributes: Optional[Dict[str, str]] = None,
-                 vertical: bool = False,
-                 pill_style: bool = False,
-                 template_loader: Optional[Any] = None):
+    def __init__(
+        self,
+        tabs: List[Tab],
+        active_tab: Optional[str] = None,
+        on_change: Optional[callable] = None,
+        *,
+        id: Optional[str] = None,
+        classes: Optional[List[str]] = None,
+        attributes: Optional[Dict[str, str]] = None,
+        vertical: bool = False,
+        pill_style: bool = False,
+        template_loader: Optional[Any] = None,
+    ):
         """
         Initialize the tabs component.
 
@@ -97,7 +105,7 @@ class Tabs(Component):
             component_name="tabs",
             id=comp_id,
             classes=tabs_cls,
-            attributes=attributes
+            attributes=attributes,
         )
         self.__tabs = tabs
         self.__active_tab = active_tab or tabs[0].id
@@ -133,7 +141,7 @@ class Tabs(Component):
                 f'<li class="tab {active_cls}" data-tab-id="{tab.id}">'
                 f'<button class="tab-button" {disabled_attr}>'
                 f'{tab.icon or ""}<span>{tab.label}</span>'
-                f'</button></li>'
+                f"</button></li>"
             )
             contents_html += (
                 f'<div class="tab-content '
@@ -141,12 +149,14 @@ class Tabs(Component):
                 f'data-tab-id="{tab.id}">'
                 f'{tab.content or ""}</div>'
             )
-        base_vars.update({
-            "TABS_HTML": tabs_html,
-            "CONTENTS_HTML": contents_html,
-            "ACTIVE_TAB": self.__active_tab,
-            "STATE_KEY": self.__state_key
-        })
+        base_vars.update(
+            {
+                "TABS_HTML": tabs_html,
+                "CONTENTS_HTML": contents_html,
+                "ACTIVE_TAB": self.__active_tab,
+                "STATE_KEY": self.__state_key,
+            }
+        )
         return base_vars
 
     def _create_click_handler_js(self) -> str:
@@ -182,9 +192,9 @@ class Tabs(Component):
             f"        content.classList.remove('active');\n"
             f"      }}\n"
             f"    }});\n"
-            f"    const widgetValue = {{value: tabId, id: \"{self.__state_key}\"}};\n"
+            f'    const widgetValue = {{value: tabId, id: "{self.__state_key}"}};\n'
             f"    window.parent.postMessage({{type: "
-            f"\"streamlit:setComponentValue\", value: widgetValue}}, \"*\");\n"
+            f'"streamlit:setComponentValue", value: widgetValue}}, "*");\n'
             f"  }}\n"
             f"  const tabs = document.querySelectorAll('#{self.component_id} "
             f".tab:not(.disabled)');\n"
@@ -206,13 +216,10 @@ class Tabs(Component):
           str: The ID of the active tab.
         """
         html = self.template_loader.render_template(
-            "components/navigation/tabs.html",
-            self.template_variables
+            "components/navigation/tabs.html", self.template_variables
         )
         st.components.v1.html(html, height=300)
-        curr = st.session_state.get(
-            self.component_id, self.__active_tab
-        )
+        curr = st.session_state.get(self.component_id, self.__active_tab)
         if curr:
             if curr != self.__active_tab:
                 self.__active_tab = curr
@@ -224,10 +231,13 @@ class Tabs(Component):
 class InputTabs(Tabs):
     """Specialized tabs for input selection: Draw, Upload, URL."""
 
-    def __init__(self,
-                 default_tab: Optional[str] = None,
-                 on_change: Optional[callable] = None,
-                 *, key: str = "input_tabs"):
+    def __init__(
+        self,
+        default_tab: Optional[str] = None,
+        on_change: Optional[callable] = None,
+        *,
+        key: str = "input_tabs",
+    ):
         """
         Initialize input selection tabs.
 
@@ -239,13 +249,13 @@ class InputTabs(Tabs):
         input_tabs = [
             Tab("draw", "Draw"),
             Tab("upload", "Upload"),
-            Tab("url", "URL")
+            Tab("url", "URL"),
         ]
         super().__init__(
             tabs=input_tabs,
             active_tab=default_tab or input_tabs[0].id,
             on_change=on_change,
-            id=key
+            id=key,
         )
 
     @AspectUtils.catch_errors
@@ -262,15 +272,18 @@ class InputTabs(Tabs):
             options=[tab.label for tab in self.__tabs],
             key=self.component_id,
             index=next(
-                (i for i, tab in enumerate(self.__tabs)
-                 if tab.id == self.__active_tab), 0
+                (
+                    i
+                    for i, tab in enumerate(self.__tabs)
+                    if tab.id == self.__active_tab
+                ),
+                0,
             ),
-            horizontal=True
+            horizontal=True,
         )
         self.__active_tab = next(
-            (tab.id for tab in self.__tabs 
-             if tab.label == selected),
-            self.__tabs[0].id
+            (tab.id for tab in self.__tabs if tab.label == selected),
+            self.__tabs[0].id,
         )
         if self.__on_change:
             self.__on_change(self.__active_tab)
