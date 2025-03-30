@@ -1,5 +1,5 @@
 # MNIST Digit Classifier
-# Copyright (c) 2025
+# Copyright (c) 2025 YuriODev (YuriiOks)
 # File: ui/views/draw_view.py
 # Description: Draw view implementation
 # Created: 2025-03-17
@@ -25,49 +25,60 @@ from core.app_state.history_state import HistoryState
 from utils.resource_manager import resource_manager
 from utils.aspects import AspectUtils
 
+
 class DrawView(View):
     """Draw view for the MNIST Digit Classifier application."""
-    
+
     def __init__(self):
         """Initialize the draw view."""
         super().__init__(
             name="draw",
             title="Digit Recognition",
-            description="Choose a method to input a digit for recognition."
+            description="Choose a method to input a digit for recognition.",
         )
         # Hide the default header since we'll use welcome card
         self.show_header = False
-        
+
         # Logger initialization
-        self.__logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
-        
+        self.__logger = logging.getLogger(
+            f"{__name__}.{self.__class__.__name__}"
+        )
+
     @AspectUtils.catch_errors
     @AspectUtils.log_method
-    def __load_view_data(self) -> Tuple[Dict[str, Any], List[Dict[str, Any]], Dict[str, Any]]:
+    def __load_view_data(
+        self,
+    ) -> Tuple[Dict[str, Any], List[Dict[str, Any]], Dict[str, Any]]:
         """
         Load necessary JSON data for the view.
-        
+
         Returns:
             Tuple containing welcome card data, tabs data, and tips data
         """
         # Load welcome card data
-        welcome_data = resource_manager.load_json_resource("draw/welcome_card.json") or {
+        welcome_data = resource_manager.load_json_resource(
+            "draw/welcome_card.json"
+        ) or {
             "title": "Draw & Recognize Digits",
             "icon": "✏️",
-            "content": "Welcome to the drawing tool! Choose a method to input a digit."
+            "content": "Welcome to the drawing tool! Choose a method to input a digit.",
         }
-        
+
         # Load tabs data
         tabs_data = resource_manager.load_json_resource("draw/tabs.json")
 
         # Load tips data
         tips_data = resource_manager.load_json_resource("draw/tips.json") or {
             "title": "Tips for Best Results",
-            "items": ["Draw clearly", "Center your digit", "Use a thick stroke"]
+            "items": [
+                "Draw clearly",
+                "Center your digit",
+                "Use a thick stroke",
+            ],
         }
-        
+
         return welcome_data, tabs_data, tips_data
-        
+
     def __initialize_session_state(self) -> None:
         """Initialize session state variables for the draw view."""
         # Initialize session state variables if they don't exist
@@ -97,14 +108,16 @@ class DrawView(View):
     def __render_welcome_card(self, welcome_data: Dict[str, Any]) -> None:
         """
         Render the welcome card at the top of the view.
-        
+
         Args:
             welcome_data: Welcome card data from JSON
         """
         welcome_card = WelcomeCard(
             title=welcome_data.get("title", "Draw & Recognize Digits"),
-            content=welcome_data.get("content", "Welcome to the drawing tool!"),
-            icon=welcome_data.get("icon", "✏️")
+            content=welcome_data.get(
+                "content", "Welcome to the drawing tool!"
+            ),
+            icon=welcome_data.get("icon", "✏️"),
         )
         welcome_card.display()
 
@@ -113,16 +126,16 @@ class DrawView(View):
     def __render_feature_card(self, tab_data: List[Dict[str, Any]]) -> None:
         """
         Render the feature card for the current tab.
-        
+
         Args:
             tabs_data: List of tab data from JSON
         """
         # Find the current tab's data
-        
+
         feature_card = FeatureCard(
             title=tab_data.get("title", ""),
             content=tab_data.get("content", ""),
-            icon=tab_data.get("icon", "")
+            icon=tab_data.get("icon", ""),
         )
         feature_card.display()
 
@@ -130,29 +143,46 @@ class DrawView(View):
         """Render tab selection buttons."""
         tab_cols = st.columns(3)
         with tab_cols[0]:
-            if st.button("Draw Digit", 
-                        key="tab_draw", 
-                        type="primary" if st.session_state.active_tab == "draw" else "secondary",
-                        use_container_width=True):
+            if st.button(
+                "Draw Digit",
+                key="tab_draw",
+                type=(
+                    "primary"
+                    if st.session_state.active_tab == "draw"
+                    else "secondary"
+                ),
+                use_container_width=True,
+            ):
                 st.session_state.active_tab = "draw"
                 st.rerun()
-        
+
         with tab_cols[1]:
-            if st.button("Upload Image", 
-                        key="tab_upload", 
-                        type="primary" if st.session_state.active_tab == "upload" else "secondary",
-                        use_container_width=True):
+            if st.button(
+                "Upload Image",
+                key="tab_upload",
+                type=(
+                    "primary"
+                    if st.session_state.active_tab == "upload"
+                    else "secondary"
+                ),
+                use_container_width=True,
+            ):
                 st.session_state.active_tab = "upload"
                 st.rerun()
-        
+
         with tab_cols[2]:
-            if st.button("Enter URL", 
-                        key="tab_url", 
-                        type="primary" if st.session_state.active_tab == "url" else "secondary",
-                        use_container_width=True):
+            if st.button(
+                "Enter URL",
+                key="tab_url",
+                type=(
+                    "primary"
+                    if st.session_state.active_tab == "url"
+                    else "secondary"
+                ),
+                use_container_width=True,
+            ):
                 st.session_state.active_tab = "url"
                 st.rerun()
-
 
     def __render_draw_tab(self, draw_data) -> None:
         """Render the draw digit tab content."""
@@ -170,7 +200,7 @@ class DrawView(View):
             import io
             import base64
             from core.app_state.canvas_state import CanvasState
-            
+
             # Canvas configuration
             stroke_width = st.slider("Brush Width", 10, 25, 15)
             canvas_result = st_canvas(
@@ -184,22 +214,22 @@ class DrawView(View):
                 key=st.session_state.canvas_key,
                 display_toolbar=True,
             )
-            
+
             # Store canvas result in session state for prediction
             if canvas_result.image_data is not None:
                 # Immediately store in CanvasState when drawing happens
                 img_array = canvas_result.image_data
-                img = Image.fromarray(img_array).convert('L')
+                img = Image.fromarray(img_array).convert("L")
                 buffer = io.BytesIO()
                 img.save(buffer, format="PNG")
                 img_bytes = buffer.getvalue()
-                
+
                 # Store in CanvasState
                 CanvasState.set_image_data(img_bytes)
                 CanvasState.set_input_type(CanvasState.CANVAS_INPUT)
-                
+
                 # Debug output (optional)
-                st.session_state['canvas_drawing_detected'] = True
+                st.session_state["canvas_drawing_detected"] = True
 
     def __render_upload_tab(self, upload_data) -> None:
         """Render the upload image tab content."""
@@ -208,35 +238,37 @@ class DrawView(View):
         with tab_cols[0]:
             # Render feature card for the current tab
             self.__render_feature_card(upload_data)
-        
+
         with tab_cols[1]:
             # File uploader - use the key from session state
             from PIL import Image
             import io
             from core.app_state.canvas_state import CanvasState
-            
-            uploaded_file = st.file_uploader("Upload digit image", 
-                                            type=["png", "jpg", "jpeg"], 
-                                            key=st.session_state.file_upload_key)
-            
+
+            uploaded_file = st.file_uploader(
+                "Upload digit image",
+                type=["png", "jpg", "jpeg"],
+                key=st.session_state.file_upload_key,
+            )
+
             # Preview uploaded image and store data
             if uploaded_file is not None:
                 try:
                     # Read and display the image
                     image = Image.open(uploaded_file)
                     st.image(image, caption="Uploaded Image", width=280)
-                    
+
                     # Immediately store the uploaded file in CanvasState
                     uploaded_file.seek(0)  # Reset file pointer to beginning
                     img_bytes = uploaded_file.getvalue()
-                    
+
                     # Store in CanvasState
                     CanvasState.set_image_data(img_bytes)
                     CanvasState.set_input_type(CanvasState.UPLOAD_INPUT)
-                    
+
                     # Debug output (optional)
-                    st.session_state['upload_detected'] = True
-                    
+                    st.session_state["upload_detected"] = True
+
                 except Exception as e:
                     st.error(f"Error processing image: {str(e)}")
 
@@ -254,11 +286,13 @@ class DrawView(View):
             from PIL import Image
             import io
             from core.app_state.canvas_state import CanvasState
-            
-            url = st.text_input("Image URL", 
-                            key=st.session_state.url_input_key, 
-                            placeholder="https://example.com/digit.jpg")
-        
+
+            url = st.text_input(
+                "Image URL",
+                key=st.session_state.url_input_key,
+                placeholder="https://example.com/digit.jpg",
+            )
+
             # Load button
             if url:
                 if st.button("Load Image", key="load_url_image"):
@@ -267,32 +301,49 @@ class DrawView(View):
                         with st.spinner("Loading image from URL..."):
                             # Fetch image from URL
                             response = requests.get(url, timeout=5)
-                            
+
                             # Check if the request was successful
                             if response.status_code == 200:
                                 # Check if the content type is an image
-                                content_type = response.headers.get('Content-Type', '')
-                                if not content_type.startswith('image/'):
-                                    st.error("The URL doesn't point to an image.")
+                                content_type = response.headers.get(
+                                    "Content-Type", ""
+                                )
+                                if not content_type.startswith("image/"):
+                                    st.error(
+                                        "The URL doesn't point to an image."
+                                    )
                                 else:
                                     # Process and display the image
                                     img_bytes = response.content
                                     image = Image.open(io.BytesIO(img_bytes))
-                                    st.image(image, caption="Image from URL", width=280)
-                                    
+                                    st.image(
+                                        image,
+                                        caption="Image from URL",
+                                        width=280,
+                                    )
+
                                     # Store in CanvasState
                                     CanvasState.set_image_data(img_bytes)
-                                    CanvasState.set_input_type(CanvasState.URL_INPUT)
-                                    
+                                    CanvasState.set_input_type(
+                                        CanvasState.URL_INPUT
+                                    )
+
                                     # Debug output (optional)
-                                    st.session_state['url_image_loaded'] = True
+                                    st.session_state["url_image_loaded"] = (
+                                        True
+                                    )
                             else:
-                                st.error(f"Failed to load image. Status code: {response.status_code}")
+                                st.error(
+                                    f"Failed to load image. Status code: {response.status_code}"
+                                )
                     except Exception as e:
                         st.error(f"Error loading image: {str(e)}")
-        
+
         # Display preview if already loaded
-        if CanvasState.get_input_type() == CanvasState.URL_INPUT and CanvasState.get_image_data():
+        if (
+            CanvasState.get_input_type() == CanvasState.URL_INPUT
+            and CanvasState.get_image_data()
+        ):
             img_bytes = CanvasState.get_image_data()
             if img_bytes:
                 try:
@@ -310,231 +361,312 @@ class DrawView(View):
             import io
             import numpy as np
             from core.app_state.canvas_state import CanvasState
-            
+
             # Create a white 28x28 image
-            test_img = Image.new('L', (28, 28), 255)
-            
+            test_img = Image.new("L", (28, 28), 255)
+
             # Draw a vertical line (digit "1")
             for y in range(5, 23):
                 for x in range(12, 16):
                     test_img.putpixel((x, y), 0)  # Black pixel
-            
+
             # Display the test image
             st.image(test_img, caption="Test Digit: 1", width=100)
-            
+
             # Convert to bytes
             buffer = io.BytesIO()
             test_img.save(buffer, format="PNG")
             img_bytes = buffer.getvalue()
-            
+
             # Store in CanvasState
             CanvasState.set_image_data(img_bytes)
             CanvasState.set_input_type("test")
-            
+
             st.success("Test image loaded! Click Predict to test the model.")
-        
+
         # Add buttons in a row
         button_cols = st.columns(2)
-        
+
         # Clear button - resets everything by changing widget keys
         with button_cols[0]:
-            if st.button("Clear All", key="clear_all", type="secondary", use_container_width=True):
+            if st.button(
+                "Clear All",
+                key="clear_all",
+                type="secondary",
+                use_container_width=True,
+            ):
                 # Reset all prediction-related state
                 st.session_state.prediction_made = False
                 st.session_state.prediction_correct = None
                 st.session_state.show_correction = False
                 st.session_state.predicted_digit = None
                 st.session_state.confidence = None
-                
+
                 # Generate new keys for all input widgets to effectively reset them
                 timestamp = int(time.time() * 1000)
                 st.session_state.canvas_key = f"canvas_{timestamp}"
-                st.session_state.file_upload_key = f"file_uploader_{timestamp}"
+                st.session_state.file_upload_key = (
+                    f"file_uploader_{timestamp}"
+                )
                 st.session_state.url_input_key = f"url_input_{timestamp}"
                 st.session_state.reset_counter += 1
-                
+
                 # Clear canvas state
                 from core.app_state.canvas_state import CanvasState
+
                 CanvasState.clear_all()
-                
+
                 # Trigger a rerun to apply the changes
                 st.rerun()
-        
+
         # Predict button
         with button_cols[1]:
-            if st.button("Predict", key="predict", type="primary", use_container_width=True):
+            if st.button(
+                "Predict",
+                key="predict",
+                type="primary",
+                use_container_width=True,
+            ):
                 try:
                     # Get image data from CanvasState
                     from core.app_state.canvas_state import CanvasState
+
                     image_data = CanvasState.get_image_data()
-                    
+
                     # Check if we have image data
                     if image_data is None:
-                        st.error("No image data available. Please draw, upload or load an image first.")
+                        st.error(
+                            "No image data available. Please draw, upload or load an image first."
+                        )
                         return
-                    
+
                     # Show image data info for debugging
                     st.info(f"Processing image data: {len(image_data)} bytes")
-                    
+
                     # Show prediction in progress
                     with st.spinner("Predicting digit..."):
                         # Import the digit classifier
                         from model.digit_classifier import DigitClassifier
-                        
+
                         # Initialize the classifier
                         classifier = DigitClassifier()
-                        
+
                         # Make prediction
-                        predicted_digit, confidence = classifier.predict(image_data)
-                        
+                        predicted_digit, confidence = classifier.predict(
+                            image_data
+                        )
+
                         # Store prediction results in session state
                         st.session_state.predicted_digit = predicted_digit
                         st.session_state.confidence = confidence
                         st.session_state.prediction_made = True
                         st.session_state.show_correction = False
                         st.session_state.prediction_correct = None
-                        
+
                         # Add to history state
                         from core.app_state.history_state import HistoryState
-                        
+
                         # Get the input type from CanvasState
                         input_type = CanvasState.get_input_type()
-                        
+
                         # Encode image data for history
                         import base64
-                        encoded_image = base64.b64encode(image_data).decode('utf-8') if image_data else None
-                        
+
+                        encoded_image = (
+                            base64.b64encode(image_data).decode("utf-8")
+                            if image_data
+                            else None
+                        )
+
                         # Add prediction to history
                         HistoryState.add_prediction(
                             digit=predicted_digit,
                             confidence=confidence,
                             image_data=encoded_image,
-                            input_type=input_type
+                            input_type=input_type,
                         )
-                        
+
                     # Success message
-                    st.success(f"Predicted digit: {predicted_digit} with {confidence:.2%} confidence")
-                        
+                    st.success(
+                        f"Predicted digit: {predicted_digit} with {confidence:.2%} confidence"
+                    )
+
                 except ConnectionError as e:
                     st.error(f"Connection error: {str(e)}")
-                    self.__logger.error(f"Connection error in prediction: {str(e)}")
+                    self.__logger.error(
+                        f"Connection error in prediction: {str(e)}"
+                    )
                 except ValueError as e:
                     st.error(f"Error processing image: {str(e)}")
-                    self.__logger.error(f"Value error in prediction: {str(e)}")
+                    self.__logger.error(
+                        f"Value error in prediction: {str(e)}"
+                    )
                 except Exception as e:
                     st.error(f"An unexpected error occurred: {str(e)}")
-                    self.__logger.error(f"Unexpected error in prediction: {str(e)}", exc_info=True)
+                    self.__logger.error(
+                        f"Unexpected error in prediction: {str(e)}",
+                        exc_info=True,
+                    )
 
     def __render_prediction_result(self) -> None:
         """Render prediction result if available."""
         if st.session_state.prediction_made:
             st.markdown("<hr>", unsafe_allow_html=True)
             st.markdown("<h3>Prediction Result</h3>", unsafe_allow_html=True)
-            
+
             # Create two columns for the prediction display
             col1, col2 = st.columns([1, 2])
-            
+
             with col1:
                 # Display the predicted digit prominently
-                st.markdown(f"""
+                st.markdown(
+                    f"""
                 <div style="text-align: center; font-size: 8rem; font-weight: bold; color: var(--color-primary);">
                     {st.session_state.predicted_digit}
                 </div>
-                """, unsafe_allow_html=True)
-            
+                """,
+                    unsafe_allow_html=True,
+                )
+
             with col2:
                 # Display confidence information
                 st.markdown("<h4>Confidence</h4>", unsafe_allow_html=True)
-                
+
                 # Format confidence as percentage
                 confidence_pct = f"{st.session_state.confidence * 100:.1f}%"
-                
+
                 # Progress bar for confidence
                 confidence_color = "normal"
                 if st.session_state.confidence < 0.6:
                     confidence_color = "red"
                 elif st.session_state.confidence > 0.9:
                     confidence_color = "green"
-                    
+
                 safe_confidence = max(0.01, st.session_state.confidence)
                 st.progress(safe_confidence, text=confidence_pct)
-                
-                confidence_message = "Low confidence" if st.session_state.confidence < 0.6 else \
-                                "Medium confidence" if st.session_state.confidence < 0.9 else \
-                                "High confidence"
-                                
-                st.markdown(f"<p>The model is <b>{confidence_message}</b> in this prediction.</p>", unsafe_allow_html=True)
-                
+
+                confidence_message = (
+                    "Low confidence"
+                    if st.session_state.confidence < 0.6
+                    else (
+                        "Medium confidence"
+                        if st.session_state.confidence < 0.9
+                        else "High confidence"
+                    )
+                )
+
+                st.markdown(
+                    f"<p>The model is <b>{confidence_message}</b> in this prediction.</p>",
+                    unsafe_allow_html=True,
+                )
+
                 # Feedback options
-                st.markdown("<h4>Is this correct?</h4>", unsafe_allow_html=True)
-                
+                st.markdown(
+                    "<h4>Is this correct?</h4>", unsafe_allow_html=True
+                )
+
                 # Thumbs up/down buttons
                 feedback_col1, feedback_col2 = st.columns(2)
-                
+
                 with feedback_col1:
-                    if st.button("👍 Yes", key=f"thumbs_up_{st.session_state.reset_counter}", use_container_width=True):
+                    if st.button(
+                        "👍 Yes",
+                        key=f"thumbs_up_{st.session_state.reset_counter}",
+                        use_container_width=True,
+                    ):
                         st.session_state.prediction_correct = True
                         st.session_state.show_correction = False
-                        
+
                         # Get the current prediction to log feedback
                         current_pred = HistoryState.get_current_prediction()
                         if current_pred:
                             # Log confirmation to database if available
                             try:
-                                from services.prediction.prediction_service import prediction_service
+                                from services.prediction.prediction_service import (
+                                    prediction_service,
+                                )
+
                                 prediction_service.update_true_label(
-                                    current_pred["id"], 
-                                    current_pred["digit"]
+                                    current_pred["id"], current_pred["digit"]
                                 )
                             except Exception as e:
-                                self.__logger.error(f"Error logging confirmation: {str(e)}")
-                        
+                                self.__logger.error(
+                                    f"Error logging confirmation: {str(e)}"
+                                )
+
                         st.success("Thank you for your feedback!")
-                
+
                 with feedback_col2:
-                    if st.button("👎 No", key=f"thumbs_down_{st.session_state.reset_counter}", use_container_width=True):
+                    if st.button(
+                        "👎 No",
+                        key=f"thumbs_down_{st.session_state.reset_counter}",
+                        use_container_width=True,
+                    ):
                         st.session_state.prediction_correct = False
                         st.session_state.show_correction = True
-            
+
             # Show correction input if thumbs down was clicked
             if st.session_state.show_correction:
-                st.markdown("<h4>What's the correct digit?</h4>", unsafe_allow_html=True)
-                
+                st.markdown(
+                    "<h4>What's the correct digit?</h4>",
+                    unsafe_allow_html=True,
+                )
+
                 # Create a row of digit buttons
                 digit_cols = st.columns(10)
                 for i in range(10):
                     with digit_cols[i]:
-                        if st.button(str(i), key=f"digit_{i}_{st.session_state.reset_counter}"):
+                        if st.button(
+                            str(i),
+                            key=f"digit_{i}_{st.session_state.reset_counter}",
+                        ):
                             # Get the current prediction to update
-                            current_pred = HistoryState.get_current_prediction()
+                            current_pred = (
+                                HistoryState.get_current_prediction()
+                            )
                             if current_pred:
                                 # Update the history entry with correction
-                                HistoryState.set_user_correction(current_pred["id"], i)
-                                
+                                HistoryState.set_user_correction(
+                                    current_pred["id"], i
+                                )
+
                                 # Log correction to database if available
                                 try:
-                                    from services.prediction.prediction_service import prediction_service
+                                    from services.prediction.prediction_service import (
+                                        prediction_service,
+                                    )
+
                                     prediction_service.update_true_label(
-                                        current_pred["id"], 
-                                        i
+                                        current_pred["id"], i
                                     )
                                 except Exception as e:
-                                    self.__logger.error(f"Error logging correction: {str(e)}")
-                                    
+                                    self.__logger.error(
+                                        f"Error logging correction: {str(e)}"
+                                    )
+
                             st.session_state.corrected_digit = i
-                            st.success(f"Thank you! Recorded the correct digit as {i}.")
+                            st.success(
+                                f"Thank you! Recorded the correct digit as {i}."
+                            )
                             st.session_state.show_correction = False
-            
+
             # If we have probabilities, show distribution
-            if hasattr(st.session_state, "probabilities") and st.session_state.probabilities:
-                st.markdown("<h4>Probability Distribution</h4>", unsafe_allow_html=True)
-                
+            if (
+                hasattr(st.session_state, "probabilities")
+                and st.session_state.probabilities
+            ):
+                st.markdown(
+                    "<h4>Probability Distribution</h4>",
+                    unsafe_allow_html=True,
+                )
+
                 # Convert probabilities to a format for bar chart
                 probs = st.session_state.probabilities
                 chart_data = {"Digit": list(range(10)), "Probability": probs}
                 import pandas as pd
+
                 df = pd.DataFrame(chart_data)
-                
+
                 # Bar chart
                 st.bar_chart(df.set_index("Digit"))
 
@@ -542,19 +674,21 @@ class DrawView(View):
         """Render the tips card."""
         if tips_data:
             items = tips_data.get("items", [])
-            numbered_list = "\n".join(f"\n{i+1}. {tip}" for i, tip in enumerate(items))
-            
+            numbered_list = "\n".join(
+                f"\n{i+1}. {tip}" for i, tip in enumerate(items)
+            )
+
             FeatureCard(
                 title=tips_data.get("title", "Tips"),
                 content=numbered_list,
-                icon="💡"
+                icon="💡",
             ).display()
 
     def render(self) -> None:
         """Render the draw view content."""
         # Initialize session state variables
         self.__initialize_session_state()
-        
+
         # Load welcome card and tab data
         welcome_data, tabs_data, tips_data = self.__load_view_data()
 
@@ -563,9 +697,9 @@ class DrawView(View):
 
         # Tab navigation
         self.__render_tab_buttons()
-        
+
         st.markdown("<hr>", unsafe_allow_html=True)
-        
+
         # Input container based on active tab
         if st.session_state.active_tab == "draw":
             self.__render_draw_tab(tabs_data[0])
@@ -573,11 +707,11 @@ class DrawView(View):
             self.__render_upload_tab(tabs_data[1])
         elif st.session_state.active_tab == "url":
             self.__render_url_tab(tabs_data[2])
-        
+
         # Action buttons - always visible regardless of active tab
         st.markdown("<hr>", unsafe_allow_html=True)
         self.__render_action_buttons()
-        
+
         # Prediction result
         self.__render_prediction_result()
 
