@@ -36,9 +36,7 @@ class ImageUpload(Component):
             attributes: Additional HTML attributes
         """
         super().__init__(classes=classes, attributes=attributes)
-        self.logger = logging.getLogger(
-            f"{__name__}.{self.__class__.__name__}"
-        )
+        self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         self.key = key
         self.on_upload = on_upload
 
@@ -127,12 +125,8 @@ class ImageUpload(Component):
                     )
 
         except Exception as e:
-            self.logger.error(
-                f"Error rendering image upload: {str(e)}", exc_info=True
-            )
-            st.error(
-                f"An error occurred while rendering the image upload: {str(e)}"
-            )
+            self.logger.error(f"Error rendering image upload: {str(e)}", exc_info=True)
+            st.error(f"An error occurred while rendering the image upload: {str(e)}")
 
     def _resize_image(self, img: Image.Image, size: tuple) -> Image.Image:
         """Resize image while preserving aspect ratio.
