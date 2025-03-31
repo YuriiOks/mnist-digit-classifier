@@ -14,7 +14,7 @@ This project implements an end-to-end machine learning application that recogniz
 
 ![Application Screenshot](outputs/docs/web_app_main.png)
 
-**Live Demo:** [http://65.108.44.28](http://65.108.44.28)  
+**Live Demo:** [http://157.180.73.218](http://157.180.73.218)  
 *(Note: Replace with your actual deployment URL/IP.)*
 
 ---
