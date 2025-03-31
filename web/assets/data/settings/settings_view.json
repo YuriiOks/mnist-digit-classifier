@@ -1,0 +1,32 @@
+{
+    "title": "Settings",
+    "icon": "⚙️",
+    "description": "Configure your preferences for the MNIST Digit Classifier",
+    "welcome_card": {
+      "title": "Settings",
+      "icon": "⚙️",
+      "content": "<b>Adjust Your Preferences</b><p>Choose your theme, canvas size, etc. Future expansions allow deeper customization!</p>"
+    },
+    "sections": [
+      {
+        "id": "theme",
+        "title": "Theme Settings",
+        "content": "Customize colors and fonts"
+      },
+      {
+        "id": "canvas",
+        "title": "Canvas Settings",
+        "content": "Change canvas size, brush color, etc."
+      },
+      {
+        "id": "prediction",
+        "title": "Prediction Settings",
+        "content": "Toggle auto-predict, confidence threshold, etc."
+      },
+      {
+        "id": "app",
+        "title": "App Settings",
+        "content": "Control logging, debug mode, and history saving"
+      }
+    ]
+  }

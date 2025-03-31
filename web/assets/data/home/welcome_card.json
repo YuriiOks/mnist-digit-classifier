@@ -1,0 +1,5 @@
+{
+  "title": "MNIST Digit Classifier",
+  "icon": "👋",
+  "content": "<b>Welcome to the MNIST Digit Classifier!</b><p>This application allows you to draw digits and have them recognized by a machine learning model.</p><p>The model is trained on the MNIST dataset, which contains thousands of handwritten digit images.</p><p>Draw any digit from 0-9 and let our AI predict what you've written!</p>"
+} 

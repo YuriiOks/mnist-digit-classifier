@@ -1,0 +1,11 @@
+{
+    "title": "Tips for Best Results",
+    "items": [
+      "Draw digits that are centered in the canvas",
+      "Use a thick, clear stroke when drawing",
+      "Keep the digit simple and avoid unnecessary details",
+      "For uploaded images, ensure good contrast between the digit and background",
+      "If prediction seems incorrect, try redrawing with a different size or style",
+      "The model works best with digits similar to the MNIST dataset style"
+    ]
+  }

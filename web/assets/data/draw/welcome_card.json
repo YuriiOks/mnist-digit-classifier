@@ -1,0 +1,5 @@
+{
+    "title": "Draw & Recognize Digits",
+    "icon": "✏️",
+    "content": "<p>Welcome to the drawing tool! This is where you can test the digit recognition model using different input methods.</p><p>Choose from drawing a digit yourself, uploading an image, or entering a URL to an existing digit image. The AI model will analyze your input and predict which digit it represents.</p><p>Try all three methods and see how accurate our model can be!</p>"
+  }

@@ -1,0 +1,27 @@
+{
+    "app_title": "MNIST App",
+    "app_subtitle": "Digit Classification AI",
+    "navigation": [
+      {
+        "id": "home",
+        "label": "Home",
+        "icon": "🏠"
+      },
+      {
+        "id": "draw",
+        "label": "Draw",
+        "icon": "✏️"
+      },
+      {
+        "id": "history",
+        "label": "History",
+        "icon": "📊"
+      },
+      {
+        "id": "settings",
+        "label": "Settings",
+        "icon": "⚙️"
+      }
+    ],
+    "version": "1.0.0"
+  }

@@ -1,0 +1,23 @@
+[
+    {
+      "id": "draw",
+      "title": "Draw Digit",
+      "icon": "✏️",
+      "content": "<p>Use your mouse or touchscreen to draw a digit from 0-9 directly on the canvas.</p><p>Adjust the brush size to make thicker or thinner strokes. For best results, try to center your digit in the drawing area and make it reasonably large.</p>",
+      "active": true
+    },
+    {
+      "id": "upload",
+      "title": "Upload Image",
+      "icon": "📤",
+      "content": "<p>Upload an image file containing a handwritten digit.</p><p>Supported formats include PNG, JPG, and JPEG. The image will be processed and sent to our model for prediction. For best results, ensure the digit is clear and centered in the image.</p>",
+      "active": false
+    },
+    {
+      "id": "url",
+      "title": "Image URL",
+      "icon": "🔗",
+      "content": "<p>Enter a URL to an image of a handwritten digit available online.</p><p>The system will download and process the image. Make sure the URL points directly to an image file (ending with .jpg, .jpeg, .png) and that the digit is clearly visible.</p>",
+      "active": false
+    }
+  ]

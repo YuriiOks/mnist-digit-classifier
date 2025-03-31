@@ -1,0 +1,20 @@
+[
+  {
+    "title": "1. Draw a Digit",
+    "icon": "✏️",
+    "content": "<p>Navigate to the Drawing Canvas and use your mouse or touch to draw any digit from 0-9.</p><p>You can adjust the brush size and use the clear button to start over.</p>",
+    "size": "small"
+  },
+  {
+    "title": "2. Classify the Digit",
+    "icon": "🔍",
+    "content": "<p>Once you've drawn a digit, click the \"Classify\" button to have the model predict what number you've drawn.</p><p>The model will analyze your drawing and return its best guess.</p>",
+    "size": "small"
+  },
+  {
+    "title": "3. View History",
+    "icon": "📖",
+    "content": "<p>All your predictions are saved to your session history.</p><p>You can view past predictions, compare results, and see statistics about your drawing classifications.</p>",
+    "size": "small"
+  }
+]

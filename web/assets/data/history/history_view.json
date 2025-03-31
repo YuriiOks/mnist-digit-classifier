@@ -1,0 +1,18 @@
+{
+    "title": "Prediction History",
+    "icon": "📊",
+    "description": "View and manage your past digit predictions",
+    "welcome_card": {
+      "title": "Your Recent Predictions",
+      "icon": "📊",
+      "content": "<p>Browse, filter, and see details of your predictions here. Future updates will connect this to a database!</p>"
+    },
+    "tips": {
+      "title": "Tips for Reviewing History",
+      "items": [
+        "Filter by digit to find specific predictions",
+        "Sort by confidence to see how the model performed",
+        "Click Clear History to remove all local entries"
+      ]
+    }
+  }
