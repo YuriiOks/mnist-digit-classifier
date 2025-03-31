@@ -35,6 +35,9 @@ DEFAULT_IGNORE_DIRS: List[str] = [
 DEFAULT_INCLUDE_PATTERNS: Set[str] = {
     '.py',          # Python files
     '.sql',         # SQL files
+    '.js',         # JavaScript files
+    '.html',       # HTML files
+    '.css',        # CSS files
     'dockerfile',   # Dockerfiles (exact filename match, case-insensitive)
     '.dockerignore',# Docker ignore files
     'docker-compose.yml', # Docker compose files
